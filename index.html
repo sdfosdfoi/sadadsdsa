@@ -161,21 +161,21 @@ class LabubuCareGame {
         ]);
         this.activePetId = localStorage.getItem('shared_active_pet_id') || 'pet1';
         
-        // Эволюционные стадии
+        // Эволюционные стадии (временные placeholder изображения)
         this.evolutionStages = {
-            baby: { name: 'Малыш', minAge: 0, image: 'cIG1n66HZE3pJGlT_bgJp' },
-            child: { name: 'Ребенок', minAge: 7, image: 'cIG1n66HZE3pJGlT_bgJp' },
-            teen: { name: 'Подросток', minAge: 30, image: 'cIG1n66HZE3pJGlT_bgJp' },
-            adult: { name: 'Взрослый', minAge: 60, image: 'cIG1n66HZE3pJGlT_bgJp' },
-            elder: { name: 'Мудрец', minAge: 100, image: 'cIG1n66HZE3pJGlT_bgJp' }
+            baby: { name: 'Малыш', minAge: 0, image: 'https://via.placeholder.com/128x128/ff69b4/ffffff?text=🐰👶' },
+            child: { name: 'Ребенок', minAge: 7, image: 'https://via.placeholder.com/128x128/87ceeb/ffffff?text=🐰🧒' },
+            teen: { name: 'Подросток', minAge: 30, image: 'https://via.placeholder.com/128x128/98fb98/ffffff?text=🐰👦' },
+            adult: { name: 'Взрослый', minAge: 60, image: 'https://via.placeholder.com/128x128/ffd700/ffffff?text=🐰👨' },
+            elder: { name: 'Мудрец', minAge: 100, image: 'https://via.placeholder.com/128x128/dda0dd/ffffff?text=🐰👴' }
         };
         
         // Одежда с повышенными ценами
         this.outfits = {
             default: { name: 'Обычная одежда', price: 0, emoji: '👕', description: 'Классический стиль' },
-            cute: { name: 'Милая шапочка-зайчик', price: 300, emoji: '🐰', description: 'Очаровательная белая шапочка с розовыми ушками', image: 'M0KY2Qe3x0l8Hw4N_iMXG' },
-            cool: { name: 'Крутые очки', price: 250, emoji: '😎', description: 'Стильные солнцезащитные очки', image: 'Yme8QGDJDG8DnTIaYaeiY' },
-            formal: { name: 'Деловой костюм', price: 400, emoji: '🤵', description: 'Элегантный черный костюм с галстуком', image: 'pSumUP8pdm2i5wg-7WgWv' },
+            cute: { name: 'Милая шапочка-зайчик', price: 300, emoji: '🐰', description: 'Очаровательная белая шапочка с розовыми ушками', image: 'https://via.placeholder.com/100x80/ffb6c1/ffffff?text=👒' },
+            cool: { name: 'Крутые очки', price: 250, emoji: '😎', description: 'Стильные солнцезащитные очки', image: 'https://via.placeholder.com/80x40/000000/ffffff?text=🕶️' },
+            formal: { name: 'Деловой костюм', price: 400, emoji: '🤵', description: 'Элегантный черный костюм с галстуком', image: 'https://via.placeholder.com/80x96/2c3e50/ffffff?text=🤵' },
             winter: { name: 'Зимняя куртка', price: 350, emoji: '🧥', description: 'Теплая куртка для холодной погоды' },
             summer: { name: 'Летняя панама', price: 280, emoji: '👒', description: 'Защита от солнца в жаркие дни' },
             ninja: { name: 'Костюм ниндзя', price: 500, emoji: '🥷', description: 'Секретная маскировка для скрытности' },
