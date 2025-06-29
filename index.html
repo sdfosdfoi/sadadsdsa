@@ -1270,40 +1270,6 @@ class LabubuCareGame {
         return `
             <div class="space-y-3">
                 <div class="bg-white rounded-lg p-3 shadow">
-                    <h3 class="font-bold mb-3 text-purple-800 text-sm">💾 Управление данными</h3>
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <button onclick="game.exportGameData()" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-3 rounded text-xs transition-colors">
-                            📁 Экспорт
-                        </button>
-                        <button onclick="document.getElementById('importFile').click()" class="bg-green-500 hover:bg-green-600 text-white py-2 px-3 rounded text-xs transition-colors">
-                            📂 Импорт
-                        </button>
-                    </div>
-                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="game.handleFileImport(event)">
-                    
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <button onclick="game.saveData(); game.showMessage('💾 Данные сохранены!')" class="bg-purple-500 hover:bg-purple-600 text-white py-2 px-3 rounded text-xs transition-colors">
-                            💾 Сохранить
-                        </button>
-                        <button onclick="game.restoreFromBackupPrompt()" class="bg-orange-500 hover:bg-orange-600 text-white py-2 px-3 rounded text-xs transition-colors">
-                            🔄 Восстановить
-                        </button>
-                    </div>
-                    
-                    <button onclick="game.resetGamePrompt()" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 px-3 rounded text-xs transition-colors">
-                        🗑️ Сбросить игру
-                    </button>
-                    
-                    <div class="mt-3 p-2 bg-gray-50 rounded text-xs">
-                        <p class="text-gray-600">
-                            💾 Автосохранение: каждые 30 сек<br>
-                            📦 Резервные копии: последние 3<br>
-                            📊 Статус: ${localStorage.getItem('shared_labubu_stats') ? '✅ Данные найдены' : '❌ Нет данных'}
-                        </p>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-lg p-3 shadow">
                     <h3 class="font-bold mb-3 text-purple-800 text-sm">ℹ️ Информация об игре</h3>
                     <div class="space-y-3 text-xs">
                         <div class="bg-blue-50 p-2 rounded">
