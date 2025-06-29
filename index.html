@@ -226,18 +226,22 @@ class LabubuCareGame {
         console.log('🔄 Загрузка данных игры...');
         
         try {
-            // Сначала загружаем базовые данные из localStorage
+            // Загружаем только системные данные из localStorage
             this.gameUserId = this.loadData('game_user_id', this.generateUserId(), 'string');
             this.telegramConnected = this.loadData('telegram_connected', false, 'boolean');
             this.telegramChatId = this.loadData('telegram_chat_id', '', 'string');
             
-            // Попытка загрузки из базы данных
-            const loadedFromDB = await this.loadFromDatabase();
+            console.log('💾 Приоритетная загрузка из базы данных...');
             
-            if (!loadedFromDB) {
-                // Загрузка из localStorage если БД недоступна
-                console.log('📱 Загрузка из localStorage...');
+            // Сначала пытаемся загрузить из БД
+            const loadedFromDB = await this.loadFromDatabaseSync();
+            
+            if (loadedFromDB) {
+                console.log('✅ Данные успешно загружены из базы данных');
+            } else {
+                console.log('📱 БД недоступна, загружаем из localStorage как резерв...');
                 
+                // Если БД недоступна, загружаем из localStorage
                 this.stats = this.loadData('shared_labubu_stats', {
                     hunger: 100, happiness: 100, cleanliness: 100,
                     health: 100, energy: 100, sleep: 100
@@ -258,9 +262,11 @@ class LabubuCareGame {
                 this.chestCount = this.loadData('shared_chest_count', 0, 'number');
                 this.friendsInvited = this.loadData('shared_friends_invited', 0, 'number');
                 this.lastChestLevel = this.loadData('shared_last_chest_level', 0, 'number');
+                
+                console.log('⚠️ Используются локальные данные из-за недоступности БД');
             }
             
-            // Загрузка данных питомцев (всегда из localStorage)
+            // Загрузка данных питомцев (всегда из localStorage как дополнение)
             this.pets = this.loadData('shared_labubu_pets', [
                 { 
                     id: 'pet1', 
@@ -277,7 +283,7 @@ class LabubuCareGame {
             // Валидация загруженных данных
             this.validateGameData();
             
-            console.log('✅ Данные игры успешно загружены');
+            console.log('✅ Инициализация данных завершена');
             
         } catch (error) {
             console.error('❌ Ошибка при загрузке данных:', error);
@@ -415,46 +421,28 @@ class LabubuCareGame {
         try {
             console.log('💾 Сохранение данных игры...');
             
+            // Обновляем время последнего обновления
+            this.lastUpdate = Date.now();
+            
             // Обновление активного питомца
             this.updateActivePet();
             
-            // Основные статистики
-            this.saveValue('shared_labubu_stats', this.stats);
-            this.saveValue('shared_labubu_money', this.money);
-            this.saveValue('shared_labubu_outfit', this.outfit);
-            this.saveValue('shared_labubu_level', this.level);
-            this.saveValue('shared_labubu_experience', this.experience);
-            this.saveValue('shared_labubu_age', this.age);
-            this.saveValue('shared_labubu_evolution', this.evolutionStage);
-            this.saveValue('shared_labubu_last_update', Date.now());
-            this.saveValue('shared_pet_name', this.petName);
-            this.saveValue('shared_labubu_sleeping', this.isSleeping);
+            // ПРИОРИТЕТ: Сохранение в базу данных
+            this.saveToDatabaseAsync().then(success => {
+                if (success) {
+                    console.log('✅ Данные сохранены в БД (приоритет)');
+                } else {
+                    console.log('⚠️ БД недоступна, сохраняем только в localStorage');
+                }
+            });
             
-            // Данные питомцев
-            this.saveValue('shared_labubu_pets', this.pets);
-            this.saveValue('shared_active_pet_id', this.activePetId);
-            
-            // Настройки и система
-            this.saveValue('sound_enabled', this.soundEnabled);
-            this.saveValue('telegram_connected', this.telegramConnected);
-            this.saveValue('telegram_chat_id', this.telegramChatId);
-            this.saveValue('game_user_id', this.gameUserId);
-            
-            // Скины и сундуки
-            this.saveValue('shared_current_skin', this.currentSkin);
-            this.saveValue('shared_unlocked_skins', this.unlockedSkins);
-            this.saveValue('shared_chest_count', this.chestCount);
-            this.saveValue('shared_friends_invited', this.friendsInvited);
-            this.saveValue('shared_last_chest_level', this.lastChestLevel);
-            this.saveValue('shared_labubu_last_notification', this.lastNotification);
+            // Дублирование в localStorage как кэш
+            this.saveToLocalStorage();
             
             // Создание резервной копии
             this.createBackup();
             
-            console.log('✅ Данные сохранены в localStorage');
-            
-            // Сохранение в базу данных
-            this.saveToDatabaseAsync();
+            console.log('✅ Сохранение инициировано');
             
         } catch (error) {
             console.error('❌ Ошибка при сохранении данных:', error);
@@ -676,9 +664,15 @@ class LabubuCareGame {
     }
     
     startAutoSave() {
+        // Автосохранение каждые 30 секунд
         setInterval(() => {
             this.saveData();
-        }, 30000); // Автосохранение каждые 30 секунд
+        }, 30000);
+        
+        // Синхронизация с БД каждые 2 минуты
+        setInterval(() => {
+            this.loadFromDatabaseAsync();
+        }, 120000);
         
         // Сохранение при закрытии страницы
         window.addEventListener('beforeunload', () => {
@@ -688,6 +682,11 @@ class LabubuCareGame {
         // Сохранение при потере фокуса
         window.addEventListener('blur', () => {
             this.saveData();
+        });
+        
+        // Проверка обновлений при фокусе
+        window.addEventListener('focus', () => {
+            this.loadFromDatabaseAsync();
         });
     }
     
@@ -1317,6 +1316,8 @@ class LabubuCareGame {
     getInfoTabContent() {
         return `
             <div class="space-y-3">
+
+                
                 <div class="bg-white rounded-lg p-3 shadow">
                     <h3 class="font-bold mb-3 text-purple-800 text-sm">ℹ️ Информация об игре</h3>
                     <div class="space-y-3 text-xs">
@@ -1390,6 +1391,12 @@ class LabubuCareGame {
             this.stats.health = Math.min(100, this.stats.health + (food.health || 0));
             this.stats.energy = Math.min(100, this.stats.energy + (food.energy || 0));
             this.stats.cleanliness = Math.min(100, this.stats.cleanliness + (food.cleanliness || 0));
+            
+            // Больший бонус энергии от еды
+            if (!food.energy) {
+                this.stats.energy = Math.min(100, this.stats.energy + 10); // Увеличен бонус энергии
+            }
+            
             this.experience += 10;
             
             this.playSound(800, 150);
@@ -2031,24 +2038,12 @@ class LabubuCareGame {
         }
     }
     
-    connectTelegram() {
-        const chatId = prompt(`🤖 Подключение к Telegram боту:
 
-1. Найдите бота @LabubuCareBot в Telegram
-2. Отправьте команду /start
-3. Введите ваш Chat ID (он будет показан в сообщении бота):
-
-Введите Chat ID:`);
-        
-        if (chatId && chatId.trim()) {
-            this.registerTelegramUser(chatId.trim());
-        }
-    }
     
     async registerTelegramUser(chatId) {
         try {
-            // Здесь должен быть URL вашего сервера
-            const response = await fetch('https://your-bot-server.com/api/register', {
+            // URL вашего сервера
+            const response = await fetch('https://labubu-server.onrender.com/api/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -2083,7 +2078,7 @@ class LabubuCareGame {
         if (!this.telegramConnected) return;
         
         try {
-            await fetch('https://your-bot-server.com/api/notify', {
+            await fetch('https://labubu-server.onrender.com/api/notify', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -2101,12 +2096,14 @@ class LabubuCareGame {
     }
     
     async saveToDatabaseAsync() {
-        // Сохранение в базу данных (асинхронно, не блокирует игру)
+        // Сохранение в базу данных (приоритетное сохранение)
         try {
             if (!this.gameUserId) {
                 console.log('⚠️ gameUserId не найден, пропускаем сохранение в БД');
-                return;
+                return false;
             }
+
+            console.log('🌐 Сохранение в базу данных...');
 
             const gameData = {
                 gameUserId: this.gameUserId,
@@ -2124,41 +2121,109 @@ class LabubuCareGame {
                 friendsInvited: this.friendsInvited,
                 lastChestLevel: this.lastChestLevel,
                 isSleeping: this.isSleeping,
-                lastUpdate: Date.now()
+                lastUpdate: this.lastUpdate
             };
 
-            const response = await fetch('https://your-bot-server.com/api/save-game', {
+            const response = await fetch('https://labubu-server.onrender.com/api/save-game', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(gameData),
-                signal: AbortSignal.timeout(5000) // 5 секунд таймаут
+                signal: AbortSignal.timeout(8000) // 8 секунд таймаут для надежности
             });
 
             if (response.ok) {
-                console.log('✅ Данные сохранены в базу данных');
+                console.log('✅ Данные успешно сохранены в базу данных');
+                return true;
             } else {
                 console.warn('⚠️ Ошибка сохранения в БД:', response.status);
-            }
-
-        } catch (error) {
-            // Не показываем ошибку пользователю, т.к. localStorage работает
-            console.warn('⚠️ Сохранение в БД недоступно:', error.message);
-        }
-    }
-
-    async loadFromDatabase() {
-        // Загрузка из базы данных при запуске игры
-        try {
-            if (!this.gameUserId) {
-                console.log('⚠️ gameUserId не найден, используем localStorage');
                 return false;
             }
 
-            const response = await fetch(`https://your-bot-server.com/api/load-game/${this.gameUserId}`, {
+        } catch (error) {
+            console.warn('⚠️ Сохранение в БД недоступно:', error.message);
+            return false;
+        }
+    }
+
+    async loadFromDatabaseSync() {
+        // Синхронная загрузка из базы данных при запуске (блокирует до получения данных)
+        try {
+            if (!this.gameUserId) {
+                console.log('⚠️ gameUserId не найден, пропускаем загрузку из БД');
+                return false;
+            }
+
+            console.log('🌐 Синхронная загрузка данных из базы данных...');
+
+            const response = await fetch(`https://labubu-server.onrender.com/api/load-game/${this.gameUserId}`, {
                 method: 'GET',
-                signal: AbortSignal.timeout(3000) // 3 секунды таймаут
+                signal: AbortSignal.timeout(8000) // 8 секунд таймаут для первичной загрузки
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (data.success && data.gameData) {
+                    const gameData = data.gameData;
+                    
+                    console.log('✅ Данные получены из БД, применяем...');
+                    
+                    // Загружаем данные из БД
+                    this.stats = gameData.stats || {
+                        hunger: 100, happiness: 100, cleanliness: 100,
+                        health: 100, energy: 100, sleep: 100
+                    };
+                    this.money = gameData.money || 100;
+                    this.level = gameData.level || 1;
+                    this.experience = gameData.experience || 0;
+                    this.age = gameData.age || 0;
+                    this.outfit = gameData.outfit || 'default';
+                    this.currentSkin = gameData.currentSkin || 'default';
+                    this.unlockedSkins = gameData.unlockedSkins || ['default'];
+                    this.evolutionStage = gameData.evolutionStage || 'baby';
+                    this.chestCount = gameData.chestCount || 0;
+                    this.friendsInvited = gameData.friendsInvited || 0;
+                    this.lastChestLevel = gameData.lastChestLevel || 0;
+                    this.isSleeping = gameData.isSleeping || false;
+                    this.petName = gameData.petName || 'Labubu';
+                    this.lastUpdate = gameData.lastUpdate || Date.now();
+                    this.lastNotification = this.loadData('shared_labubu_last_notification', Date.now(), 'number');
+                    
+                    // Сразу сохраняем в localStorage как кэш
+                    this.saveToLocalStorage();
+                    
+                    console.log('✅ Данные из БД применены и сохранены в localStorage как кэш');
+                    return true;
+                } else {
+                    console.log('⚠️ Некорректный ответ от БД');
+                    return false;
+                }
+            } else {
+                console.log('⚠️ Данные не найдены в БД или ошибка сервера');
+                return false;
+            }
+
+        } catch (error) {
+            console.warn('⚠️ Загрузка из БД недоступна:', error.message);
+            return false;
+        }
+    }
+
+    async loadFromDatabaseAsync() {
+        // Асинхронная загрузка из базы данных (обновляет данные в фоне)
+        try {
+            if (!this.gameUserId) {
+                console.log('⚠️ gameUserId не найден, пропускаем загрузку из БД');
+                return;
+            }
+
+            console.log('🔄 Фоновая проверка обновлений в БД...');
+
+            const response = await fetch(`https://labubu-server.onrender.com/api/load-game/${this.gameUserId}`, {
+                method: 'GET',
+                signal: AbortSignal.timeout(5000) // 5 секунд таймаут
             });
 
             if (response.ok) {
@@ -2168,10 +2233,10 @@ class LabubuCareGame {
                     const gameData = data.gameData;
                     
                     // Проверяем, что данные из БД новее localStorage
-                    const localLastUpdate = this.loadData('shared_labubu_last_update', 0, 'number');
+                    const localLastUpdate = this.lastUpdate;
                     
                     if (gameData.lastUpdate > localLastUpdate) {
-                        console.log('🔄 Загружаем более свежие данные из БД');
+                        console.log('🔄 Найдены более свежие данные в БД, обновляем...');
                         
                         // Обновляем данные из БД
                         this.stats = gameData.stats || this.stats;
@@ -2190,23 +2255,22 @@ class LabubuCareGame {
                         this.petName = gameData.petName || this.petName;
                         this.lastUpdate = gameData.lastUpdate || this.lastUpdate;
                         
-                        // Сохраняем обновленные данные в localStorage
+                        // Сохраняем обновленные данные в localStorage как кэш
                         this.saveToLocalStorage();
                         
-                        return true;
+                        // Обновляем отображение с новыми данными
+                        this.updateDisplay();
+                        
+                        console.log('✅ Данные из БД успешно обновлены');
+                        this.showMessage('📱 Данные обновлены с сервера!');
                     } else {
-                        console.log('📱 Данные localStorage актуальнее БД');
-                        return false;
+                        console.log('📱 Локальные данные актуальны');
                     }
                 }
-            } else {
-                console.log('⚠️ Данные не найдены в БД, используем localStorage');
-                return false;
             }
 
         } catch (error) {
-            console.warn('⚠️ Загрузка из БД недоступна:', error.message);
-            return false;
+            console.warn('⚠️ Фоновая загрузка из БД недоступна:', error.message);
         }
     }
 
@@ -3451,18 +3515,19 @@ class LabubuCareGame {
                 this.lastUpdate = now;
             }
             
-            // Снижение статистик каждые 5 минут (300 секунд) - теперь падают постоянно
+            // Снижение статистик каждые 5 минут (300 секунд)
             if (timeDiff >= 300) {
                 if (!this.isSleeping) {
-                    this.stats.hunger = Math.max(0, this.stats.hunger - 3);
+                    this.stats.hunger = Math.max(0, this.stats.hunger - 3); // ВОЗВРАЩЕНО к исходному
                     this.stats.happiness = Math.max(0, this.stats.happiness - 2);
                     this.stats.cleanliness = Math.max(0, this.stats.cleanliness - 2);
                     this.stats.health = Math.max(0, this.stats.health - (this.stats.hunger < 20 ? 3 : 1));
-                    this.stats.energy = Math.max(0, this.stats.energy - 3);
+                    this.stats.energy = Math.max(0, this.stats.energy - 3); // ВОЗВРАЩЕНО к исходному
                     this.stats.sleep = Math.max(0, this.stats.sleep - 3);
                     
                     this.checkNotifications();
                 } else {
+                    // Восстановление во время сна
                     this.stats.energy = Math.min(100, this.stats.energy + 8);
                     this.stats.sleep = Math.min(100, this.stats.sleep + 12);
                 }
