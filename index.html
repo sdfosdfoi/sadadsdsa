@@ -122,6 +122,74 @@
 <script>
 class LabubuCareGame {
     constructor() {
+        // Инициализация свойств до загрузки данных
+        this.stats = {
+            hunger: 100, happiness: 100, cleanliness: 100,
+            health: 100, energy: 100, sleep: 100
+        };
+        this.evolutionStages = {
+            baby: { name: 'Малыш', minAge: 0 },
+            child: { name: 'Ребенок', minAge: 7 },
+            teen: { name: 'Подросток', minAge: 30 },
+            adult: { name: 'Взрослый', minAge: 60 },
+            elder: { name: 'Мудрец', minAge: 100 }
+        };
+        this.skins = {
+            default: { 
+                name: 'Базовый Лабубу', 
+                rarity: 'common', 
+                chance: 50, 
+                image: 'https://i.ebayimg.com/images/g/yVoAAOSwiqJnxCvP/s-l1600.jpg',
+                color: '#DEB887'
+            }
+        };
+        this.outfits = {
+            default: { name: 'Обычная одежда', price: 0, emoji: '👕', description: 'Классический стиль' }
+        };
+        this.currentSkin = 'default';
+        this.outfit = 'default';
+        this.evolutionStage = 'baby';
+        this.petName = 'Labubu';
+        
+        // Инициализация массивов до загрузки данных
+        this.food = [
+            { name: 'Печенье', hunger: 20, price: 20, emoji: '🍪', happiness: 5 },
+            { name: 'Фрукты', hunger: 30, price: 35, emoji: '🍎', health: 5 },
+            { name: 'Суши', hunger: 50, price: 65, emoji: '🍣', happiness: 10 },
+            { name: 'Торт', hunger: 40, happiness: 15, price: 75, emoji: '🍰' },
+            { name: 'Мороженое', hunger: 25, happiness: 20, price: 45, emoji: '🍦' },
+            { name: 'Пицца', hunger: 60, price: 80, emoji: '🍕', happiness: 10 },
+            { name: 'Витамины', health: 30, price: 95, emoji: '💊' },
+            { name: 'Энергетик', energy: 40, price: 55, emoji: '⚡' },
+            { name: 'Бургер', hunger: 45, price: 50, emoji: '🍔', happiness: 8 },
+            { name: 'Рыба', hunger: 35, health: 10, price: 45, emoji: '🐟' },
+            { name: 'Салат', health: 15, cleanliness: 10, price: 40, emoji: '🥗' },
+            { name: 'Молоко', hunger: 15, health: 8, price: 25, emoji: '🥛' }
+        ];
+        
+        this.miniGames = [
+            { id: 'memory', name: 'Мемори', emoji: '🧠', description: 'Запомни последовательность', reward: { happiness: 25, experience: 20, money: 15 } },
+            { id: 'reaction', name: 'Реакция', emoji: '⚡', description: 'Нажми когда появится сигнал', reward: { happiness: 20, experience: 15, money: 10 } },
+            { id: 'math', name: 'Математика', emoji: '🔢', description: 'Реши простой пример', reward: { happiness: 30, experience: 25, money: 20 } },
+            { id: 'puzzle', name: 'Пазл', emoji: '🧩', description: 'Собери числа по порядку', reward: { happiness: 35, experience: 30, money: 25 } },
+            { id: 'quiz', name: 'Викторина', emoji: '🤔', description: 'Ответь на вопрос', reward: { happiness: 28, experience: 22, money: 18 } },
+            { id: 'rhythm', name: 'Ритм', emoji: '🎵', description: 'Повтори ритм', reward: { happiness: 40, experience: 25, money: 20 } },
+            { id: 'treasure', name: 'Клад', emoji: '💎', description: 'Найди сокровище', reward: { happiness: 20, experience: 15, money: 35 } },
+            { id: 'balance', name: 'Баланс', emoji: '⚖️', description: 'Удержи равновесие', reward: { happiness: 25, experience: 20, money: 15 } },
+            { id: 'matching', name: 'Найди пару', emoji: '🃏', description: 'Найди одинаковые карточки', reward: { happiness: 30, experience: 25, money: 22 } },
+            { id: 'simon', name: 'Саймон говорит', emoji: '🎯', description: 'Повтори команды Саймона', reward: { happiness: 32, experience: 28, money: 25 } },
+            { id: 'word', name: 'Составь слово', emoji: '📝', description: 'Составь слово из букв', reward: { happiness: 35, experience: 30, money: 28 } },
+            { id: 'color', name: 'Цветная игра', emoji: '🌈', description: 'Угадай правильный цвет', reward: { happiness: 28, experience: 22, money: 18 } },
+            { id: 'sequence', name: 'Последовательность', emoji: '🔤', description: 'Найди следующий элемент', reward: { happiness: 33, experience: 27, money: 24 } },
+            { id: 'target', name: 'Попади в цель', emoji: '🎯', description: 'Попади в движущуюся мишень', reward: { happiness: 30, experience: 25, money: 20 } },
+            { id: 'catch', name: 'Поймай предмет', emoji: '🪣', description: 'Поймай падающие предметы', reward: { happiness: 35, experience: 28, money: 26 } },
+            { id: 'maze', name: 'Лабиринт', emoji: '🌀', description: 'Найди выход из лабиринта', reward: { happiness: 40, experience: 35, money: 30 } },
+            { id: 'code', name: 'Взломай код', emoji: '🔐', description: 'Угадай секретный код', reward: { happiness: 38, experience: 32, money: 28 } },
+            { id: 'stack', name: 'Собери башню', emoji: '🏗️', description: 'Построй высокую башню', reward: { happiness: 36, experience: 30, money: 25 } },
+            { id: 'speed', name: 'Скорость', emoji: '💨', description: 'Нажми как можно быстрее', reward: { happiness: 25, experience: 20, money: 15 } },
+            { id: 'pattern', name: 'Узор', emoji: '🎨', description: 'Повтори узор', reward: { happiness: 34, experience: 28, money: 23 } }
+        ];
+        
         // Инициализация данных
         this.initializeData();
         
@@ -154,41 +222,45 @@ class LabubuCareGame {
         }, 1000);
     }
     
-    initializeData() {
+    async initializeData() {
         console.log('🔄 Загрузка данных игры...');
         
         try {
-            // Загрузка основных статистик
-            this.stats = this.loadData('shared_labubu_stats', {
-                hunger: 100, happiness: 100, cleanliness: 100,
-                health: 100, energy: 100, sleep: 100
-            });
-            
-            // Загрузка базовых данных игрока
-            this.money = this.loadData('shared_labubu_money', 100, 'number');
-            this.outfit = this.loadData('shared_labubu_outfit', 'default', 'string');
-            this.level = this.loadData('shared_labubu_level', 1, 'number');
-            this.experience = this.loadData('shared_labubu_experience', 0, 'number');
-            this.age = this.loadData('shared_labubu_age', 0, 'number');
-            this.evolutionStage = this.loadData('shared_labubu_evolution', 'baby', 'string');
-            this.lastUpdate = this.loadData('shared_labubu_last_update', Date.now(), 'number');
-            this.lastNotification = this.loadData('shared_labubu_last_notification', Date.now(), 'number');
-            this.petName = this.loadData('shared_pet_name', 'Labubu', 'string');
-            this.isSleeping = this.loadData('shared_labubu_sleeping', false, 'boolean');
-            
-            // Загрузка Telegram данных
+            // Сначала загружаем базовые данные из localStorage
+            this.gameUserId = this.loadData('game_user_id', this.generateUserId(), 'string');
             this.telegramConnected = this.loadData('telegram_connected', false, 'boolean');
             this.telegramChatId = this.loadData('telegram_chat_id', '', 'string');
-            this.gameUserId = this.loadData('game_user_id', this.generateUserId(), 'string');
             
-            // Загрузка данных скинов и сундуков
-            this.currentSkin = this.loadData('shared_current_skin', 'default', 'string');
-            this.unlockedSkins = this.loadData('shared_unlocked_skins', ['default']);
-            this.chestCount = this.loadData('shared_chest_count', 0, 'number');
-            this.friendsInvited = this.loadData('shared_friends_invited', 0, 'number');
-            this.lastChestLevel = this.loadData('shared_last_chest_level', 0, 'number');
+            // Попытка загрузки из базы данных
+            const loadedFromDB = await this.loadFromDatabase();
             
-            // Загрузка данных питомцев
+            if (!loadedFromDB) {
+                // Загрузка из localStorage если БД недоступна
+                console.log('📱 Загрузка из localStorage...');
+                
+                this.stats = this.loadData('shared_labubu_stats', {
+                    hunger: 100, happiness: 100, cleanliness: 100,
+                    health: 100, energy: 100, sleep: 100
+                });
+                
+                this.money = this.loadData('shared_labubu_money', 100, 'number');
+                this.outfit = this.loadData('shared_labubu_outfit', 'default', 'string');
+                this.level = this.loadData('shared_labubu_level', 1, 'number');
+                this.experience = this.loadData('shared_labubu_experience', 0, 'number');
+                this.age = this.loadData('shared_labubu_age', 0, 'number');
+                this.evolutionStage = this.loadData('shared_labubu_evolution', 'baby', 'string');
+                this.lastUpdate = this.loadData('shared_labubu_last_update', Date.now(), 'number');
+                this.lastNotification = this.loadData('shared_labubu_last_notification', Date.now(), 'number');
+                this.petName = this.loadData('shared_pet_name', 'Labubu', 'string');
+                this.isSleeping = this.loadData('shared_labubu_sleeping', false, 'boolean');
+                this.currentSkin = this.loadData('shared_current_skin', 'default', 'string');
+                this.unlockedSkins = this.loadData('shared_unlocked_skins', ['default']);
+                this.chestCount = this.loadData('shared_chest_count', 0, 'number');
+                this.friendsInvited = this.loadData('shared_friends_invited', 0, 'number');
+                this.lastChestLevel = this.loadData('shared_last_chest_level', 0, 'number');
+            }
+            
+            // Загрузка данных питомцев (всегда из localStorage)
             this.pets = this.loadData('shared_labubu_pets', [
                 { 
                     id: 'pet1', 
@@ -301,45 +373,7 @@ class LabubuCareGame {
             robot: { name: 'Робот', price: 20000, emoji: '🤖', description: 'Металлический костюм будущего', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KRydl7aa74Zq_cG1QWNF0soJHjskQIeTDTjzGT-Bktd9uAxlZmiQy-xEn2DmyeC_YdApcJhIhvq6-z4Mx6P-7if4kAjiMIn6kvNao3Yt59wCR6jjeZy4tnFTT2_GpJhhdNlG6GwlS9g1pn0_mrCs42iLOXH3GXHiH0BjFnlrvki7QZ_QA=s1024' }
         };
         
-        // Еда с повышенными ценами
-        this.food = [
-            { name: 'Печенье', hunger: 20, price: 20, emoji: '🍪', happiness: 5 },
-            { name: 'Фрукты', hunger: 30, price: 35, emoji: '🍎', health: 5 },
-            { name: 'Суши', hunger: 50, price: 65, emoji: '🍣', happiness: 10 },
-            { name: 'Торт', hunger: 40, happiness: 15, price: 75, emoji: '🍰' },
-            { name: 'Мороженое', hunger: 25, happiness: 20, price: 45, emoji: '🍦' },
-            { name: 'Пицца', hunger: 60, price: 80, emoji: '🍕', happiness: 10 },
-            { name: 'Витамины', health: 30, price: 95, emoji: '💊' },
-            { name: 'Энергетик', energy: 40, price: 55, emoji: '⚡' },
-            { name: 'Бургер', hunger: 45, price: 50, emoji: '🍔', happiness: 8 },
-            { name: 'Рыба', hunger: 35, health: 10, price: 45, emoji: '🐟' },
-            { name: 'Салат', health: 15, cleanliness: 10, price: 40, emoji: '🥗' },
-            { name: 'Молоко', hunger: 15, health: 8, price: 25, emoji: '🥛' }
-        ];
-        
-        // 20 мини-игр
-        this.miniGames = [
-            { id: 'memory', name: 'Мемори', emoji: '🧠', description: 'Запомни последовательность', reward: { happiness: 25, experience: 20, money: 15 } },
-            { id: 'reaction', name: 'Реакция', emoji: '⚡', description: 'Нажми когда появится сигнал', reward: { happiness: 20, experience: 15, money: 10 } },
-            { id: 'math', name: 'Математика', emoji: '🔢', description: 'Реши простой пример', reward: { happiness: 30, experience: 25, money: 20 } },
-            { id: 'puzzle', name: 'Пазл', emoji: '🧩', description: 'Собери числа по порядку', reward: { happiness: 35, experience: 30, money: 25 } },
-            { id: 'quiz', name: 'Викторина', emoji: '🤔', description: 'Ответь на вопрос', reward: { happiness: 28, experience: 22, money: 18 } },
-            { id: 'rhythm', name: 'Ритм', emoji: '🎵', description: 'Повтори ритм', reward: { happiness: 40, experience: 25, money: 20 } },
-            { id: 'treasure', name: 'Клад', emoji: '💎', description: 'Найди сокровище', reward: { happiness: 20, experience: 15, money: 35 } },
-            { id: 'balance', name: 'Баланс', emoji: '⚖️', description: 'Удержи равновесие', reward: { happiness: 25, experience: 20, money: 15 } },
-            { id: 'matching', name: 'Найди пару', emoji: '🃏', description: 'Найди одинаковые карточки', reward: { happiness: 30, experience: 25, money: 22 } },
-            { id: 'simon', name: 'Саймон говорит', emoji: '🎯', description: 'Повтори команды Саймона', reward: { happiness: 32, experience: 28, money: 25 } },
-            { id: 'word', name: 'Составь слово', emoji: '📝', description: 'Составь слово из букв', reward: { happiness: 35, experience: 30, money: 28 } },
-            { id: 'color', name: 'Цветная игра', emoji: '🌈', description: 'Угадай правильный цвет', reward: { happiness: 28, experience: 22, money: 18 } },
-            { id: 'sequence', name: 'Последовательность', emoji: '🔤', description: 'Найди следующий элемент', reward: { happiness: 33, experience: 27, money: 24 } },
-            { id: 'target', name: 'Попади в цель', emoji: '🎯', description: 'Попади в движущуюся мишень', reward: { happiness: 30, experience: 25, money: 20 } },
-            { id: 'catch', name: 'Поймай предмет', emoji: '🪣', description: 'Поймай падающие предметы', reward: { happiness: 35, experience: 28, money: 26 } },
-            { id: 'maze', name: 'Лабиринт', emoji: '🌀', description: 'Найди выход из лабиринта', reward: { happiness: 40, experience: 35, money: 30 } },
-            { id: 'code', name: 'Взломай код', emoji: '🔐', description: 'Угадай секретный код', reward: { happiness: 38, experience: 32, money: 28 } },
-            { id: 'stack', name: 'Собери башню', emoji: '🏗️', description: 'Построй высокую башню', reward: { happiness: 36, experience: 30, money: 25 } },
-            { id: 'speed', name: 'Скорость', emoji: '💨', description: 'Нажми как можно быстрее', reward: { happiness: 25, experience: 20, money: 15 } },
-            { id: 'pattern', name: 'Узор', emoji: '🎨', description: 'Повтори узор', reward: { happiness: 34, experience: 28, money: 23 } }
-        ];
+
     }
     
     loadData(key, defaultValue, type = 'auto') {
@@ -417,10 +451,10 @@ class LabubuCareGame {
             // Создание резервной копии
             this.createBackup();
             
-            console.log('✅ Данные успешно сохранены');
+            console.log('✅ Данные сохранены в localStorage');
             
-            // Обновить статистики в Telegram
-            this.updateTelegramStats();
+            // Сохранение в базу данных
+            this.saveToDatabaseAsync();
             
         } catch (error) {
             console.error('❌ Ошибка при сохранении данных:', error);
@@ -847,16 +881,18 @@ class LabubuCareGame {
         // Звук
         if (soundToggle) soundToggle.textContent = this.soundEnabled ? '🔊' : '🔇';
         
-        // Telegram статус
+        // Telegram статус (optional elements)
         const telegramBtn = document.getElementById('telegramBtn');
         const telegramStatus = document.getElementById('telegramStatus');
         
-        if (this.telegramConnected) {
-            if (telegramBtn) telegramBtn.classList.add('hidden');
-            if (telegramStatus) telegramStatus.classList.remove('hidden');
-        } else {
-            if (telegramBtn) telegramBtn.classList.remove('hidden');
-            if (telegramStatus) telegramStatus.classList.add('hidden');
+        if (telegramBtn && telegramStatus) {
+            if (this.telegramConnected) {
+                telegramBtn.classList.add('hidden');
+                telegramStatus.classList.remove('hidden');
+            } else {
+                telegramBtn.classList.remove('hidden');
+                telegramStatus.classList.add('hidden');
+            }
         }
         
         // Настроение
@@ -866,12 +902,16 @@ class LabubuCareGame {
         const evolutionStage = document.getElementById('evolutionStage');
         const petImage = document.getElementById('petImage');
         
-        if (moodEmoji) moodEmoji.textContent = mood.emoji;
-        if (moodStatus) moodStatus.textContent = mood.status;
-        if (evolutionStage) evolutionStage.textContent = this.evolutionStages[this.evolutionStage].name;
+        if (moodEmoji && mood) moodEmoji.textContent = mood.emoji;
+        if (moodStatus && mood) moodStatus.textContent = mood.status;
+        if (evolutionStage && this.evolutionStages && this.evolutionStages[this.evolutionStage]) {
+            evolutionStage.textContent = this.evolutionStages[this.evolutionStage].name;
+        }
         
         // Изображение питомца
-        if (petImage) petImage.src = this.skins[this.currentSkin].image;
+        if (petImage && this.skins && this.skins[this.currentSkin] && this.skins[this.currentSkin].image) {
+            petImage.src = this.skins[this.currentSkin].image;
+        }
         
         // Сон и индикаторы
         const sleepIndicator = document.getElementById('sleepIndicator');
@@ -880,10 +920,13 @@ class LabubuCareGame {
         
         if (sleepIndicator) sleepIndicator.classList.toggle('hidden', !this.isSleeping);
         
-        const avgStats = Object.values(this.stats).reduce((a, b) => a + b, 0) / 6;
-        if (criticalIndicator) criticalIndicator.classList.toggle('hidden', avgStats > 10);
+        // Безопасная проверка stats для индикаторов
+        if (this.stats && typeof this.stats === 'object') {
+            const avgStats = Object.values(this.stats).reduce((a, b) => a + b, 0) / 6;
+            if (criticalIndicator) criticalIndicator.classList.toggle('hidden', avgStats > 10);
+        }
         
-        if (moodIndicator) {
+        if (moodIndicator && mood) {
             if (mood.emoji === '🥰') moodIndicator.textContent = '❤️';
             else moodIndicator.textContent = '';
         }
@@ -903,7 +946,7 @@ class LabubuCareGame {
         
         outfitContainer.innerHTML = '';
         
-        if (this.outfit !== 'default') {
+        if (this.outfit !== 'default' && this.outfits && this.outfits[this.outfit]) {
             const outfitData = this.outfits[this.outfit];
             currentOutfitEl.textContent = `${outfitData.emoji} ${outfitData.name}`;
             currentOutfitEl.classList.remove('hidden');
@@ -1010,6 +1053,11 @@ class LabubuCareGame {
     
     getMood() {
         if (this.isSleeping) return { emoji: '😴', status: 'Спит' };
+        
+        // Безопасная проверка stats
+        if (!this.stats || typeof this.stats !== 'object') {
+            return { emoji: '😐', status: 'Загрузка...' };
+        }
         
         const avg = Object.values(this.stats).reduce((a, b) => a + b, 0) / 6;
         if (avg > 90) return { emoji: '🥰', status: 'Восхитительно' };
@@ -2052,27 +2100,134 @@ class LabubuCareGame {
         }
     }
     
-    async updateTelegramStats() {
-        if (!this.telegramConnected) return;
-        
+    async saveToDatabaseAsync() {
+        // Сохранение в базу данных (асинхронно, не блокирует игру)
         try {
-            await fetch('https://your-bot-server.com/api/update-stats', {
+            if (!this.gameUserId) {
+                console.log('⚠️ gameUserId не найден, пропускаем сохранение в БД');
+                return;
+            }
+
+            const gameData = {
+                gameUserId: this.gameUserId,
+                petName: this.petName,
+                stats: this.stats,
+                level: this.level,
+                experience: this.experience,
+                money: this.money,
+                age: this.age,
+                outfit: this.outfit,
+                currentSkin: this.currentSkin,
+                unlockedSkins: this.unlockedSkins,
+                evolutionStage: this.evolutionStage,
+                chestCount: this.chestCount,
+                friendsInvited: this.friendsInvited,
+                lastChestLevel: this.lastChestLevel,
+                isSleeping: this.isSleeping,
+                lastUpdate: Date.now()
+            };
+
+            const response = await fetch('https://your-bot-server.com/api/save-game', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    gameUserId: this.gameUserId,
-                    stats: this.stats,
-                    petName: this.petName,
-                    level: this.level,
-                    money: this.money,
-                    age: this.age
-                })
+                body: JSON.stringify(gameData),
+                signal: AbortSignal.timeout(5000) // 5 секунд таймаут
             });
+
+            if (response.ok) {
+                console.log('✅ Данные сохранены в базу данных');
+            } else {
+                console.warn('⚠️ Ошибка сохранения в БД:', response.status);
+            }
+
         } catch (error) {
-            console.error('Failed to update Telegram stats:', error);
+            // Не показываем ошибку пользователю, т.к. localStorage работает
+            console.warn('⚠️ Сохранение в БД недоступно:', error.message);
         }
+    }
+
+    async loadFromDatabase() {
+        // Загрузка из базы данных при запуске игры
+        try {
+            if (!this.gameUserId) {
+                console.log('⚠️ gameUserId не найден, используем localStorage');
+                return false;
+            }
+
+            const response = await fetch(`https://your-bot-server.com/api/load-game/${this.gameUserId}`, {
+                method: 'GET',
+                signal: AbortSignal.timeout(3000) // 3 секунды таймаут
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                
+                if (data.success && data.gameData) {
+                    const gameData = data.gameData;
+                    
+                    // Проверяем, что данные из БД новее localStorage
+                    const localLastUpdate = this.loadData('shared_labubu_last_update', 0, 'number');
+                    
+                    if (gameData.lastUpdate > localLastUpdate) {
+                        console.log('🔄 Загружаем более свежие данные из БД');
+                        
+                        // Обновляем данные из БД
+                        this.stats = gameData.stats || this.stats;
+                        this.money = gameData.money || this.money;
+                        this.level = gameData.level || this.level;
+                        this.experience = gameData.experience || this.experience;
+                        this.age = gameData.age || this.age;
+                        this.outfit = gameData.outfit || this.outfit;
+                        this.currentSkin = gameData.currentSkin || this.currentSkin;
+                        this.unlockedSkins = gameData.unlockedSkins || this.unlockedSkins;
+                        this.evolutionStage = gameData.evolutionStage || this.evolutionStage;
+                        this.chestCount = gameData.chestCount || this.chestCount;
+                        this.friendsInvited = gameData.friendsInvited || this.friendsInvited;
+                        this.lastChestLevel = gameData.lastChestLevel || this.lastChestLevel;
+                        this.isSleeping = gameData.isSleeping || this.isSleeping;
+                        this.petName = gameData.petName || this.petName;
+                        this.lastUpdate = gameData.lastUpdate || this.lastUpdate;
+                        
+                        // Сохраняем обновленные данные в localStorage
+                        this.saveToLocalStorage();
+                        
+                        return true;
+                    } else {
+                        console.log('📱 Данные localStorage актуальнее БД');
+                        return false;
+                    }
+                }
+            } else {
+                console.log('⚠️ Данные не найдены в БД, используем localStorage');
+                return false;
+            }
+
+        } catch (error) {
+            console.warn('⚠️ Загрузка из БД недоступна:', error.message);
+            return false;
+        }
+    }
+
+    saveToLocalStorage() {
+        // Сохранение только в localStorage (без БД)
+        this.saveValue('shared_labubu_stats', this.stats);
+        this.saveValue('shared_labubu_money', this.money);
+        this.saveValue('shared_labubu_outfit', this.outfit);
+        this.saveValue('shared_labubu_level', this.level);
+        this.saveValue('shared_labubu_experience', this.experience);
+        this.saveValue('shared_labubu_age', this.age);
+        this.saveValue('shared_labubu_evolution', this.evolutionStage);
+        this.saveValue('shared_labubu_last_update', Date.now());
+        this.saveValue('shared_pet_name', this.petName);
+        this.saveValue('shared_labubu_sleeping', this.isSleeping);
+        this.saveValue('shared_current_skin', this.currentSkin);
+        this.saveValue('shared_unlocked_skins', this.unlockedSkins);
+        this.saveValue('shared_chest_count', this.chestCount);
+        this.saveValue('shared_friends_invited', this.friendsInvited);
+        this.saveValue('shared_last_chest_level', this.lastChestLevel);
+        this.saveValue('shared_labubu_last_notification', this.lastNotification);
     }
     
     // Игра "Реакция"
@@ -3246,6 +3401,11 @@ class LabubuCareGame {
     }
     
     checkNotifications() {
+        // Безопасная проверка stats
+        if (!this.stats || typeof this.stats !== 'object') {
+            return;
+        }
+        
         if (this.stats.happiness < 50) {
             this.showNotification(`😢 ${this.petName}: Мне скучно! Поиграй со мной!`, 'sad');
         }
