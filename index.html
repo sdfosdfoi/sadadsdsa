@@ -101,6 +101,7 @@
         <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors bg-purple-500 text-white" data-tab="care">🔧 Уход</button>
         <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50" data-tab="games">🎮 Игры</button>
         <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50" data-tab="shop">🛍️ Магазин</button>
+        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50" data-tab="chests">📦 Сундуки</button>
         <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50" data-tab="pets">🐰 Питомцы</button>
         <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50" data-tab="info">ℹ️ Инфо</button>
     </div>
@@ -159,61 +160,120 @@ class LabubuCareGame {
         this.telegramConnected = localStorage.getItem('telegram_connected') === 'true';
         this.telegramChatId = localStorage.getItem('telegram_chat_id') || '';
         this.gameUserId = localStorage.getItem('game_user_id') || this.generateUserId();
+        this.currentSkin = localStorage.getItem('shared_current_skin') || 'default';
+        this.unlockedSkins = this.loadData('shared_unlocked_skins', ['default']);
+        this.chestCount = parseInt(localStorage.getItem('shared_chest_count')) || 0;
+        this.friendsInvited = parseInt(localStorage.getItem('shared_friends_invited')) || 0;
+        this.lastChestLevel = parseInt(localStorage.getItem('shared_last_chest_level')) || 0;
         
         this.pets = this.loadData('shared_labubu_pets', [
             { id: 'pet1', name: 'Labubu', stats: this.stats, outfit: this.outfit, age: this.age, evolutionStage: this.evolutionStage }
         ]);
         this.activePetId = localStorage.getItem('shared_active_pet_id') || 'pet1';
         
-        // Эволюционные стадии (с вашим изображением)
+        // Скины персонажей с редкостями и шансами
+        this.skins = {
+            default: { 
+                name: 'Базовый Лабубу', 
+                rarity: 'common', 
+                chance: 50, 
+                image: 'https://i.ebayimg.com/images/g/yVoAAOSwiqJnxCvP/s-l1600.jpg',
+                color: '#DEB887'
+            },
+            pink: { 
+                name: 'Розовый Лабубу', 
+                rarity: 'rare', 
+                chance: 27, 
+                image: 'https://i.postimg.cc/8s8qs9Sv/photo-2025-06-29-05-15-51.jpg',
+                color: '#FFB6C1'
+            },
+            orange: { 
+                name: 'Оранжевый Лабубу', 
+                rarity: 'rare', 
+                chance: 26.5, 
+                image: 'https://i.postimg.cc/C5n3hYWY/photo-2025-06-29-05-16-06.jpg',
+                color: '#FFA500'
+            },
+            blue: { 
+                name: 'Голубой Лабубу', 
+                rarity: 'rare', 
+                chance: 25, 
+                image: 'https://i.postimg.cc/QNBC97DN/photo-2025-06-29-05-16-17.jpg',
+                color: '#87CEEB'
+            },
+            rainbow: { 
+                name: 'Радужный Лабубу', 
+                rarity: 'legendary', 
+                chance: 9, 
+                image: 'https://i.postimg.cc/SQwsW-KQ6/photo-2025-06-29-05-16-29.jpg',
+                color: '#FF69B4'
+            },
+            golden: { 
+                name: 'Золотой Лабубу', 
+                rarity: 'mythic', 
+                chance: 1, 
+                image: 'https://i.postimg.cc/wTLBFd3S/photo-2025-06-29-05-16-38.jpg',
+                color: '#FFD700'
+            }
+        };
+
+        // Редкости
+        this.rarities = {
+            common: { name: 'Обычная', color: '#888888', emoji: '⚪' },
+            rare: { name: 'Редкая', color: '#4A90E2', emoji: '🔵' },
+            legendary: { name: 'Легендарная', color: '#FF6B35', emoji: '🟠' },
+            mythic: { name: 'Мифическая', color: '#FFD700', emoji: '🟡' }
+        };
+
+        // Эволюционные стадии
         this.evolutionStages = {
-            baby: { name: 'Малыш', minAge: 0, image: 'https://i.pinimg.com/474x/49/b9/bc/49b9bc9d7961d675e91a963b192c16a9.jpg' },
-            child: { name: 'Ребенок', minAge: 7, image: 'https://i.pinimg.com/474x/49/b9/bc/49b9bc9d7961d675e91a963b192c16a9.jpg' },
-            teen: { name: 'Подросток', minAge: 30, image: 'https://i.pinimg.com/474x/49/b9/bc/49b9bc9d7961d675e91a963b192c16a9.jpg' },
-            adult: { name: 'Взрослый', minAge: 60, image: 'https://i.pinimg.com/474x/49/b9/bc/49b9bc9d7961d675e91a963b192c16a9.jpg' },
-            elder: { name: 'Мудрец', minAge: 100, image: 'https://i.pinimg.com/474x/49/b9/bc/49b9bc9d7961d675e91a963b192c16a9.jpg' }
+            baby: { name: 'Малыш', minAge: 0 },
+            child: { name: 'Ребенок', minAge: 7 },
+            teen: { name: 'Подросток', minAge: 30 },
+            adult: { name: 'Взрослый', minAge: 60 },
+            elder: { name: 'Мудрец', minAge: 100 }
         };
         
-        // Одежда с повышенными ценами
+        // Одежда с обновленными ценами и изображениями (отсортировано по возрастанию цен)
         this.outfits = {
             default: { name: 'Обычная одежда', price: 0, emoji: '👕', description: 'Классический стиль' },
-            cute: { name: 'Милая шапочка-зайчик', price: 300, emoji: '🐰', description: 'Очаровательная белая шапочка с розовыми ушками', image: 'https://via.placeholder.com/100x80/ffb6c1/ffffff?text=👒' },
             cool: { name: 'Крутые очки', price: 250, emoji: '😎', description: 'Стильные солнцезащитные очки', image: 'https://via.placeholder.com/80x40/000000/ffffff?text=🕶️' },
-            formal: { name: 'Деловой костюм', price: 400, emoji: '🤵', description: 'Элегантный черный костюм с галстуком', image: 'https://via.placeholder.com/80x96/2c3e50/ffffff?text=🤵' },
-            winter: { name: 'Зимняя куртка', price: 350, emoji: '🧥', description: 'Теплая куртка для холодной погоды' },
-            summer: { name: 'Летняя панама', price: 280, emoji: '👒', description: 'Защита от солнца в жаркие дни' },
-            ninja: { name: 'Костюм ниндзя', price: 500, emoji: '🥷', description: 'Секретная маскировка для скрытности' },
-            pirate: { name: 'Пиратский костюм', price: 480, emoji: '🏴‍☠️', description: 'Флаг и повязка настоящего морского разбойника' },
-            wizard: { name: 'Костюм волшебника', price: 550, emoji: '🧙', description: 'Магическая шляпа со звездами' },
-            school: { name: 'Школьная форма', price: 380, emoji: '🎒', description: 'Аккуратная школьная форма с рюкзачком' },
-            chef: { name: 'Костюм повара', price: 420, emoji: '👨‍🍳', description: 'Белый колпак и фартук шеф-повара' },
-            superhero: { name: 'Супергерой', price: 600, emoji: '🦸', description: 'Плащ и маска настоящего героя' },
-            princess: { name: 'Принцесса', price: 580, emoji: '👸', description: 'Роскошное платье с тиарой' },
-            astronaut: { name: 'Космонавт', price: 700, emoji: '👨‍🚀', description: 'Скафандр для космических путешествий' },
-            detective: { name: 'Детектив', price: 450, emoji: '🕵️', description: 'Плащ и шляпа сыщика' },
-            doctor: { name: 'Доктор', price: 520, emoji: '👨‍⚕️', description: 'Белый халат и стетоскоп' },
+            cute: { name: 'Милая шапочка-зайчик', price: 300, emoji: '🐰', description: 'Очаровательная белая шапочка с розовыми ушками', image: 'https://via.placeholder.com/100x80/ffb6c1/ffffff?text=👒' },
             artist: { name: 'Художник', price: 380, emoji: '🎨', description: 'Берет и палитра художника' },
-            dancer: { name: 'Танцор', price: 460, emoji: '💃', description: 'Яркий костюм для танцев' },
-            knight: { name: 'Рыцарь', price: 650, emoji: '⚔️', description: 'Доспехи и меч храброго рыцаря' },
-            vampire: { name: 'Вампир', price: 480, emoji: '🧛', description: 'Черный плащ с красной подкладкой' },
-            angel: { name: 'Ангел', price: 550, emoji: '👼', description: 'Белые крылья и нимб' },
-            robot: { name: 'Робот', price: 600, emoji: '🤖', description: 'Металлический костюм будущего' }
+            summer: { name: 'Летняя панама', price: 500, emoji: '👒', description: 'Защита от солнца в жаркие дни', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KQgNY3oPaKq-vJXjqtKJhwoKBgt5rHdjiTq7FSl987ybzI3bnqyqEZliWC6n1k_YWtItJfQNjLu5ZcOheY9IUSTB5eoHuGKqoBu3HtCCn0pcimU1FsxfZKjdZ6dW-gMU6qVKPPAfeTa9-dgIn97icgGJyx5N3s-FwgRq5B525IWj_oNWw=s1024' },
+            pirate: { name: 'Пиратский костюм', price: 500, emoji: '🏴‍☠️', description: 'Флаг и повязка настоящего морского разбойника', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KTqA1YhFzadswfIqFeTFATGNWcVmql50yfSGR14sxF3P_7fA51t61z9O_ElOyuBffWnyEP4uFz70PvgU0UFiXiYv83KqIeQr45k0r4FdFhb0yqWCa2ULVO0DPUanQNk8B4ROzTQGmHwO6-p5dkt8uD0yfrk6P7_DOd7jvVYx27V56CjLg=s1024' },
+            formal: { name: 'Деловой костюм', price: 1500, emoji: '🤵', description: 'Элегантный черный костюм с галстуком', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KSeqdykkIdnGZHfOH14tCALa06aMF9P6d9Sw0rm7WeTi1NR-nW-0C4x231qu8Zts6k-Jnxg16chpirg1zJFbt7wjgHf3Wo6DQYdth3uXsQeeM8B0bdfsfoxXMLCwUHjQ4JgzFxFqRApcbPf5MYgsGj5pORBo_pAj1K0LHVhXMX6xMSEQQ=s1024' },
+            winter: { name: 'Зимняя куртка', price: 2000, emoji: '🧥', description: 'Теплая куртка для холодной погоды', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KTxCEBZrsAcaOt8mt4LjcLthFQZ2lhlrIZTcwekzMR3ODS-7V-y_m7c-_yFdPd-hCb9i08p3fW0vCajAEdJkip67TQJw0rsP09l5c49ZyG_rBEsv2io9mW2msQJsli2hr7kv2kRopjHwdbN8hVyDVCoX7yBTzkkXxygobNfvPx1uqTp=s1024' },
+            school: { name: 'Школьная форма', price: 3000, emoji: '🎒', description: 'Аккуратная школьная форма с рюкзачком', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KSzueH3-hMtM7lA2WveRFgZV9iCXa0D5N9Z8Vw9AAR_mLgCyE6zTrqu6BABMCTH80UkFmp-vmBh0Cr7ZlDw7Lq-UttAyk21eli4s9rRagGFYjxeQESpOyAQXL9CSCPtGawNsaBfta6Wa_g7pku3LgMzEv6SzWSYs1UzxoJ9tJcQV2pr=s1024' },
+            knight: { name: 'Рыцарь', price: 3000, emoji: '⚔️', description: 'Доспехи и меч храброго рыцаря', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KQEyf89ZUfFdb4fEyslGacR2ovpuyvcMZ-2bBZNsjz6M3GboPgvXfVYSnJAarf5-kmyKBphmBLdZL63T4JlUTb1-IdxnLTjNTC-vMkNoj4heCd7LVeQWQ-47m5g-cOgDo75-3eLrKC9roxWbeHbtAgRJl3tRgA2jd0FBOXi-GqZqV3J3w=s1024' },
+            chef: { name: 'Костюм повара', price: 4000, emoji: '👨‍🍳', description: 'Белый колпак и фартук шеф-повара', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KRAnLRL68CsnxJmlEhhul-fAzzg0wyNCnUd_IYARXgWj1m9mDqKeOVJy4e59Fwpz86mPm43o5IjyKxS7wEXPHVh626clvIWqEVAtrmmm7dgL-XopAKZ1YRujxo4ZBJbMjiSJ_sD2FwU1_nthVxma-b1Uut01G8839lnChFiagdPIsqjkQ=s1024' },
+            superhero: { name: 'Супергерой', price: 4500, emoji: '🦸', description: 'Плащ и маска настоящего героя', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KT-a_UoSupy-qHI_hWHRFiSG1i_9VeWgkZDicgclAVN_VHcGZy0oMTtQYzI_LivmJS7w_MM0PIslsYPPhSgwIZhQwdIq3eYkAhKxtNxtx0NKEjmucGdKxLetlYZZC6sZwoJxMBOhGyL49rjiF4ZKnSGBqavOq6EaxZUhYYBekqKFgZu=s1024' },
+            doctor: { name: 'Доктор', price: 4800, emoji: '👨‍⚕️', description: 'Белый халат и стетоскоп', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KSVy9I1VlEurY9loVBGFCv5A7ydPo1u5iMtuyVSql4t4SATcmjUsn8deyd1wVd7B_Eb1RXkb0ig_Wok-qf6tE3RFjxrfzOSB8wYvL03UOJ4A6By6BQv0M6IEWZ0XOX9vL0VP_1kgkxg5iZhnR_GIxm38rrIJPTUHFnhrPrU-njScGl1dg=s1024' },
+            ninja: { name: 'Костюм ниндзя', price: 5000, emoji: '🥷', description: 'Секретная маскировка для скрытности', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KRshrrG8dFl75oR5qhzwIbpryxVJm5O8JyV17jwiybRyM2y5uotp52ANgD0AdevW_ZcWb1LrrMsdUeTHBUJ-tn8UZgA4BsRc7AI5CLstqTPYm9Ndb0eJRZhN1hfeUhRms8DP6LO2kKSPkZHSwEPYOFK2kBWm7-mmKALA7w8iWua8rTh=s1024' },
+            detective: { name: 'Детектив', price: 5000, emoji: '🕵️', description: 'Плащ и шляпа сыщика', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KTue-dtDhus0c5YaMD8XV9cM5RoZE_vv8hpx0XE6td8Rnf2S-XcR8I2O3gX_I-cknpK80NXU6vJ14RUY-j9w6-w4o4OfGXKaALMV-YEKugOVlyi5nNrPTQB-YKgkzS2Rxv2P-Hqui9vuXZmQVxP9Qf2tlEbKI8Va7-B_bsRbJ11XcBBhw=s1024' },
+            wizard: { name: 'Костюм волшебника', price: 5500, emoji: '🧙', description: 'Магическая шляпа со звездами', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KQPxv5r4tIYWRApKphxhkgxvnGKQM3xsq4M3aXc0geAPt-2vndpdQsdIj8NRVBWgKdMidAYute_I8JJm0ODHTBNQaJiocoUFom3YDGKQ8OVooO5DRr6FnrnXGQNeKxte5OkiBp0oSLIJJj5gLx4FSnqzIrX2gWgFz-4trg_FY9wwko_=s1024' },
+            astronaut: { name: 'Космонавт', price: 6000, emoji: '👨‍🚀', description: 'Скафандр для космических путешествий', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KT324-72aIqf_NQFi9Tnsm9RzZ1AMnpOiazs-OFBLsEscgjEI9veiZtGCKxmQk3colgJi1PMqB_eMay5IMKIz6PNNMi7EQ0TBZpBo7wL8txaVuxYXUhXtKUsrw7tmyT_aO5RFDQJWqxCihIvzMxa64kcSOD6zzyFXFbZLZGCIvnRkggxQ=s1024' },
+            dancer: { name: 'Танцор', price: 9000, emoji: '💃', description: 'Яркий костюм для танцев', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KQ1bWEIPopeYlRuCPeUOosampl8EutcqIbnPK8lFvkeqjxJW3_WJnqNouxj_V8rT8CpbIL1qquBwojfG7jXpGnpK6_gN881tPaFJVTaEeTbumY1RQI25STXm7xOo7aX_GplQe8czmFNvmmoyTIdUo8728z2C0fn09vYSiZnah0Z2zJb=s1024' },
+            vampire: { name: 'Вампир', price: 9999, emoji: '🧛', description: 'Черный плащ с красной подкладкой', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KSuo6SXblej9rDGQ8LILADG9BLIwAjJ4E2YLtjshoZUuodp0PuVPENbbyrkcpbzkZv3d7hvN1h8FBnqxoo1L-3X3ehM1TNmCv6REelZ5qgFQgwCczuogCjCvrO1RhZEY_QTA44gBkzOuU0DsRgsWALWmatt0SEkQSlW-gX1pCE28q7eTw=s1024' },
+            princess: { name: 'Принцесса', price: 10000, emoji: '👸', description: 'Роскошное платье с тиарой', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KT4Tt1J4Ad-O_QldsJl73yIYw2kiZytty5vsBTyRFyvDwq97eF62z6tZX4btNnDdy7vC1OiD-yz6hyGf_D4zzkFUZIx8ztfjmAALzJwveorga1bVO2z6awSb7B6bHBcjA3ElV1VqtYwbH8XGP39uVttD2NGXRxmCAKbxNyqhwmGBttx=s1024' },
+            angel: { name: 'Ангел', price: 14000, emoji: '👼', description: 'Белые крылья и нимб', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KSVmpstfVgB8mEks0YIUTCbhnziSNQu2lnWaN_czBj4obZG1n1OcLstyYdCGRYIRqkZ73KQb780aNr-E-Ntn-QC-AD0wGE-q1nl-Qn2r59f4YmPNf6L-GqacgaCRLB-Y9rXuFfJaFIVRsKPYV2UW4zfDfAGzhwp9Vc59TukY2RF7If-_A=s1024' },
+            robot: { name: 'Робот', price: 20000, emoji: '🤖', description: 'Металлический костюм будущего', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KRydl7aa74Zq_cG1QWNF0soJHjskQIeTDTjzGT-Bktd9uAxlZmiQy-xEn2DmyeC_YdApcJhIhvq6-z4Mx6P-7if4kAjiMIn6kvNao3Yt59wCR6jjeZy4tnFTT2_GpJhhdNlG6GwlS9g1pn0_mrCs42iLOXH3GXHiH0BjFnlrvki7QZ_QA=s1024' }
         };
         
-        // Еда
+        // Еда с повышенными ценами
         this.food = [
-            { name: 'Печенье', hunger: 20, price: 8, emoji: '🍪', happiness: 5 },
-            { name: 'Фрукты', hunger: 30, price: 15, emoji: '🍎', health: 5 },
-            { name: 'Суши', hunger: 50, price: 30, emoji: '🍣', happiness: 10 },
-            { name: 'Торт', hunger: 40, happiness: 15, price: 35, emoji: '🍰' },
-            { name: 'Мороженое', hunger: 25, happiness: 20, price: 25, emoji: '🍦' },
-            { name: 'Пицца', hunger: 60, price: 40, emoji: '🍕', happiness: 10 },
-            { name: 'Витамины', health: 30, price: 50, emoji: '💊' },
-            { name: 'Энергетик', energy: 40, price: 30, emoji: '⚡' },
-            { name: 'Бургер', hunger: 45, price: 28, emoji: '🍔', happiness: 8 },
-            { name: 'Рыба', hunger: 35, health: 10, price: 22, emoji: '🐟' },
-            { name: 'Салат', health: 15, cleanliness: 10, price: 18, emoji: '🥗' },
-            { name: 'Молоко', hunger: 15, health: 8, price: 12, emoji: '🥛' }
+            { name: 'Печенье', hunger: 20, price: 20, emoji: '🍪', happiness: 5 },
+            { name: 'Фрукты', hunger: 30, price: 35, emoji: '🍎', health: 5 },
+            { name: 'Суши', hunger: 50, price: 65, emoji: '🍣', happiness: 10 },
+            { name: 'Торт', hunger: 40, happiness: 15, price: 75, emoji: '🍰' },
+            { name: 'Мороженое', hunger: 25, happiness: 20, price: 45, emoji: '🍦' },
+            { name: 'Пицца', hunger: 60, price: 80, emoji: '🍕', happiness: 10 },
+            { name: 'Витамины', health: 30, price: 95, emoji: '💊' },
+            { name: 'Энергетик', energy: 40, price: 55, emoji: '⚡' },
+            { name: 'Бургер', hunger: 45, price: 50, emoji: '🍔', happiness: 8 },
+            { name: 'Рыба', hunger: 35, health: 10, price: 45, emoji: '🐟' },
+            { name: 'Салат', health: 15, cleanliness: 10, price: 40, emoji: '🥗' },
+            { name: 'Молоко', hunger: 15, health: 8, price: 25, emoji: '🥛' }
         ];
         
         // 20 мини-игр
@@ -262,6 +322,11 @@ class LabubuCareGame {
         localStorage.setItem('sound_enabled', this.soundEnabled.toString());
         localStorage.setItem('telegram_connected', this.telegramConnected.toString());
         localStorage.setItem('game_user_id', this.gameUserId);
+        localStorage.setItem('shared_current_skin', this.currentSkin);
+        localStorage.setItem('shared_unlocked_skins', JSON.stringify(this.unlockedSkins));
+        localStorage.setItem('shared_chest_count', this.chestCount.toString());
+        localStorage.setItem('shared_friends_invited', this.friendsInvited.toString());
+        localStorage.setItem('shared_last_chest_level', this.lastChestLevel.toString());
         
         // Обновить статистики в Telegram
         this.updateTelegramStats();
@@ -369,7 +434,7 @@ class LabubuCareGame {
         if (evolutionStage) evolutionStage.textContent = this.evolutionStages[this.evolutionStage].name;
         
         // Изображение питомца
-        if (petImage) petImage.src = this.evolutionStages[this.evolutionStage].image;
+        if (petImage) petImage.src = this.skins[this.currentSkin].image;
         
         // Сон и индикаторы
         const sleepIndicator = document.getElementById('sleepIndicator');
@@ -418,7 +483,58 @@ class LabubuCareGame {
                     outfitImg.className += ' top-8 left-1/2 transform -translate-x-1/2 w-16 h-8';
                     outfitImg.style.zIndex = '10';
                 } else if (this.outfit === 'formal') {
-                    outfitImg.className += ' top-12 left-1/2 transform -translate-x-1/2 w-20 h-24';
+                    outfitImg.className += ' top-8 left-1/2 transform -translate-x-1/2 w-28 h-32';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'winter') {
+                    outfitImg.className += ' top-6 left-1/2 transform -translate-x-1/2 w-30 h-34';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'summer') {
+                    outfitImg.className += ' top-2 left-1/2 transform -translate-x-1/2 w-28 h-28';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'ninja') {
+                    outfitImg.className += ' top-4 left-1/2 transform -translate-x-1/2 w-32 h-36';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'pirate') {
+                    outfitImg.className += ' top-6 left-1/2 transform -translate-x-1/2 w-30 h-34';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'wizard') {
+                    outfitImg.className += ' top-0 left-1/2 transform -translate-x-1/2 w-32 h-40';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'school') {
+                    outfitImg.className += ' top-8 left-1/2 transform -translate-x-1/2 w-28 h-32';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'chef') {
+                    outfitImg.className += ' top-2 left-1/2 transform -translate-x-1/2 w-30 h-34';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'superhero') {
+                    outfitImg.className += ' top-4 left-1/2 transform -translate-x-1/2 w-32 h-36';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'princess') {
+                    outfitImg.className += ' top-6 left-1/2 transform -translate-x-1/2 w-32 h-36';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'astronaut') {
+                    outfitImg.className += ' top-2 left-1/2 transform -translate-x-1/2 w-32 h-38';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'detective') {
+                    outfitImg.className += ' top-4 left-1/2 transform -translate-x-1/2 w-30 h-34';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'doctor') {
+                    outfitImg.className += ' top-6 left-1/2 transform -translate-x-1/2 w-28 h-32';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'dancer') {
+                    outfitImg.className += ' top-8 left-1/2 transform -translate-x-1/2 w-30 h-32';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'knight') {
+                    outfitImg.className += ' top-4 left-1/2 transform -translate-x-1/2 w-32 h-36';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'vampire') {
+                    outfitImg.className += ' top-2 left-1/2 transform -translate-x-1/2 w-34 h-38';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'angel') {
+                    outfitImg.className += ' top-0 left-1/2 transform -translate-x-1/2 w-36 h-40';
+                    outfitImg.style.zIndex = '10';
+                } else if (this.outfit === 'robot') {
+                    outfitImg.className += ' top-2 left-1/2 transform -translate-x-1/2 w-34 h-38';
                     outfitImg.style.zIndex = '10';
                 }
                 
@@ -605,6 +721,8 @@ class LabubuCareGame {
                 return this.getGamesTabContent();
             case 'shop':
                 return this.getShopTabContent();
+            case 'chests':
+                return this.getChestsTabContent();
             case 'pets':
                 return this.getPetsTabContent();
             case 'info':
@@ -717,8 +835,15 @@ class LabubuCareGame {
                 <h3 class="font-bold mb-3 text-purple-800 text-sm">ℹ️ Информация</h3>
                 <div class="space-y-3 text-xs">
                     <div class="bg-blue-50 p-2 rounded">
-                        <h4 class="font-bold text-blue-800 mb-1">💾 Сохранение игры</h4>
-                        <p class="text-blue-700">Игра автоматически сохраняется в браузере. Ваш прогресс не потеряется!</p>
+                        <h4 class="font-bold text-blue-800 mb-1">🚀 Будущие обновления</h4>
+                        <p class="text-blue-700">Бот будет регулярно обновляться! Ожидайте:</p>
+                        <ul class="list-disc list-inside text-blue-700 mt-1">
+                            <li>Новые мини-игры и развлечения</li>
+                            <li>Дополнительные скины и одежда</li>
+                            <li>Особые события и праздники</li>
+                            <li>Улучшенная система эволюции</li>
+                            <li>Много других интересных функций!</li>
+                        </ul>
                     </div>
                     <div class="bg-green-50 p-2 rounded">
                         <h4 class="font-bold text-green-800 mb-1">🎮 Как играть</h4>
@@ -2386,6 +2511,239 @@ class LabubuCareGame {
             this.money += 50;
             this.playHappySound();
             this.showMessage('🎉 Уровень повышен! +50 монет!');
+            
+            // Проверка сундуков за уровни
+            this.checkChestReward();
+        }
+    }
+    
+    checkChestReward() {
+        const chestsEarned = Math.floor(this.level / 10);
+        const chestsToAdd = chestsEarned - Math.floor(this.lastChestLevel / 10);
+        
+        if (chestsToAdd > 0) {
+            this.chestCount += chestsToAdd;
+            this.lastChestLevel = this.level;
+            this.showMessage(`🎁 Получен${chestsToAdd > 1 ? 'о' : ''} ${chestsToAdd} сундук${chestsToAdd > 1 ? 'а' : ''}!`);
+            this.saveData();
+        }
+    }
+    
+    getChestsTabContent() {
+        const availableChests = this.chestCount;
+        const chestsFromFriends = Math.floor(this.friendsInvited / 5);
+        const totalChests = availableChests + chestsFromFriends;
+        
+        return `
+            <div class="space-y-3">
+                <div class="bg-white rounded-lg p-3 shadow">
+                    <h3 class="font-bold mb-2 text-purple-800 text-sm">📦 Сундуки</h3>
+                    <div class="text-center mb-4">
+                        <div class="text-3xl mb-2">📦</div>
+                        <p class="text-lg font-bold">Доступно сундуков: ${totalChests}</p>
+                        <p class="text-xs text-gray-600">За уровни: ${availableChests} • За друзей: ${chestsFromFriends}</p>
+                    </div>
+                    
+                    ${totalChests > 0 ? `
+                        <button onclick="game.openChest()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-3 px-4 rounded-lg font-bold transition-colors animate-pulse">
+                            🎁 Открыть сундук
+                        </button>
+                    ` : `
+                        <div class="text-center text-gray-500 py-4">
+                            <p class="mb-2">🔒 Нет доступных сундуков</p>
+                            <p class="text-xs">Получайте уровни или приглашайте друзей!</p>
+                        </div>
+                    `}
+                </div>
+                
+                <div class="bg-white rounded-lg p-3 shadow">
+                    <h3 class="font-bold mb-2 text-purple-800 text-sm">🎯 Как получить сундуки</h3>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between items-center p-2 bg-blue-50 rounded">
+                            <span>📈 Каждые 10 уровней</span>
+                            <span class="font-bold text-blue-600">+1 сундук</span>
+                        </div>
+                        <div class="flex justify-between items-center p-2 bg-green-50 rounded">
+                            <span>👥 Каждые 5 друзей</span>
+                            <span class="font-bold text-green-600">+1 сундук</span>
+                        </div>
+                    </div>
+                    <div class="mt-3 text-xs text-gray-600">
+                        <p>До следующего сундука: ${10 - (this.level % 10)} уровней</p>
+                        <p>Приглашено друзей: ${this.friendsInvited}/5</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg p-3 shadow">
+                    <h3 class="font-bold mb-2 text-purple-800 text-sm">💎 Возможные награды</h3>
+                    <div class="grid grid-cols-1 gap-1 text-xs">
+                        ${Object.entries(this.skins).map(([key, skin]) => `
+                            <div class="flex items-center justify-between p-2 rounded" style="background-color: ${skin.color}22;">
+                                <div class="flex items-center space-x-2">
+                                    <span>${this.rarities[skin.rarity].emoji}</span>
+                                    <span class="font-medium">${skin.name}</span>
+                                    <span class="text-xs" style="color: ${this.rarities[skin.rarity].color};">${this.rarities[skin.rarity].name}</span>
+                                </div>
+                                <span class="font-bold">${skin.chance}%</span>
+                            </div>
+                        `).join('')}
+                        <div class="flex items-center justify-between p-2 bg-yellow-50 rounded">
+                            <div class="flex items-center space-x-2">
+                                <span>💰</span>
+                                <span class="font-medium">100 монет</span>
+                            </div>
+                            <span class="font-bold">90%</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-lg p-3 shadow">
+                    <h3 class="font-bold mb-2 text-purple-800 text-sm">👗 Инвентарь скинов</h3>
+                    <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                        ${this.unlockedSkins.map(skinKey => {
+                            const skin = this.skins[skinKey];
+                            const isActive = this.currentSkin === skinKey;
+                            return `
+                                <button onclick="game.selectSkin('${skinKey}')" class="p-2 rounded-lg text-xs transition-colors ${
+                                    isActive ? 'bg-green-100 border-2 border-green-500' : 'bg-gray-100 hover:bg-gray-200'
+                                }">
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 mx-auto mb-1 rounded-full flex items-center justify-center text-lg" style="background-color: ${skin.color};">
+                                            🐰
+                                        </div>
+                                        <div class="font-medium">${skin.name}</div>
+                                        <div class="text-xs" style="color: ${this.rarities[skin.rarity].color};">
+                                            ${this.rarities[skin.rarity].emoji} ${this.rarities[skin.rarity].name}
+                                        </div>
+                                        ${isActive ? '<div class="text-green-600 font-bold mt-1">✓ Активен</div>' : ''}
+                                    </div>
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    openChest() {
+        if (this.chestCount <= 0) {
+            this.showMessage('❌ Нет доступных сундуков!');
+            return;
+        }
+        
+        this.chestCount--;
+        
+        // Определяем награду
+        const random = Math.random() * 100;
+        let reward = null;
+        
+        // 90% шанс на монеты (только если не выпали скины)
+        if (random <= 90) {
+            // Проверяем, выпал ли скин
+            let skinChance = 0;
+            let foundSkin = null;
+            
+            for (const [key, skin] of Object.entries(this.skins)) {
+                skinChance += skin.chance;
+                if (random <= skinChance) {
+                    foundSkin = key;
+                    break;
+                }
+            }
+            
+            if (foundSkin && !this.unlockedSkins.includes(foundSkin)) {
+                // Выпал новый скин
+                reward = { type: 'skin', key: foundSkin, skin: this.skins[foundSkin] };
+                this.unlockedSkins.push(foundSkin);
+            } else {
+                // Выпали монеты
+                reward = { type: 'money', amount: 100 };
+                this.money += 100;
+            }
+        } else {
+            // Пытаемся дать скин
+            let cumulativeChance = 0;
+            for (const [key, skin] of Object.entries(this.skins)) {
+                cumulativeChance += skin.chance;
+                if (random <= cumulativeChance) {
+                    if (!this.unlockedSkins.includes(key)) {
+                        reward = { type: 'skin', key: key, skin: skin };
+                        this.unlockedSkins.push(key);
+                    } else {
+                        reward = { type: 'money', amount: 100 };
+                        this.money += 100;
+                    }
+                    break;
+                }
+            }
+        }
+        
+        this.playHappySound();
+        this.saveData();
+        this.updateDisplay();
+        
+        // Показать результат
+        this.showChestResult(reward);
+    }
+    
+    showChestResult(reward) {
+        let message = '';
+        let className = '';
+        
+        if (reward.type === 'skin') {
+            message = `🎉 Новый скин: ${reward.skin.name}!`;
+            className = 'bg-purple-100 border-purple-500 text-purple-700';
+        } else {
+            message = `💰 Получено ${reward.amount} монет!`;
+            className = 'bg-yellow-100 border-yellow-500 text-yellow-700';
+        }
+        
+        // Создать модальное окно результата
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        modal.innerHTML = `
+            <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+                <div class="text-center">
+                    <div class="text-4xl mb-4">🎁</div>
+                    <h3 class="text-lg font-bold mb-2">Сундук открыт!</h3>
+                    <div class="p-4 rounded-lg mb-4 ${className}">
+                        ${message}
+                    </div>
+                    ${reward.type === 'skin' ? `
+                        <div class="mb-4">
+                            <div class="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl" style="background-color: ${reward.skin.color};">
+                                🐰
+                            </div>
+                            <p class="text-sm mt-2" style="color: ${this.rarities[reward.skin.rarity].color};">
+                                ${this.rarities[reward.skin.rarity].emoji} ${this.rarities[reward.skin.rarity].name}
+                            </p>
+                        </div>
+                    ` : ''}
+                    <button onclick="this.parentElement.parentElement.parentElement.remove()" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-bold">
+                        Отлично!
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Автоматически обновить отображение через небольшую задержку
+        setTimeout(() => {
+            this.switchTab('chests');
+        }, 100);
+    }
+    
+    selectSkin(skinKey) {
+        if (this.unlockedSkins.includes(skinKey)) {
+            this.currentSkin = skinKey;
+            this.saveData();
+            this.updateDisplay();
+            this.showMessage(`✨ Выбран скин: ${this.skins[skinKey].name}!`);
+            this.switchTab('chests');
+        } else {
+            this.showMessage('❌ Скин не разблокирован!');
         }
     }
     
@@ -2435,20 +2793,20 @@ class LabubuCareGame {
                 this.lastUpdate = now;
             }
             
-            // Снижение статистик каждые 10 минут (600 секунд)
-            if (timeDiff >= 600) {
+            // Снижение статистик каждые 5 минут (300 секунд) - теперь падают постоянно
+            if (timeDiff >= 300) {
                 if (!this.isSleeping) {
-                    this.stats.hunger = Math.max(0, this.stats.hunger - 2);
-                    this.stats.happiness = Math.max(0, this.stats.happiness - 1);
-                    this.stats.cleanliness = Math.max(0, this.stats.cleanliness - 1);
-                    this.stats.health = Math.max(0, this.stats.health - (this.stats.hunger < 20 ? 2 : 0));
-                    this.stats.energy = Math.max(0, this.stats.energy - 2);
-                    this.stats.sleep = Math.max(0, this.stats.sleep - 2);
+                    this.stats.hunger = Math.max(0, this.stats.hunger - 3);
+                    this.stats.happiness = Math.max(0, this.stats.happiness - 2);
+                    this.stats.cleanliness = Math.max(0, this.stats.cleanliness - 2);
+                    this.stats.health = Math.max(0, this.stats.health - (this.stats.hunger < 20 ? 3 : 1));
+                    this.stats.energy = Math.max(0, this.stats.energy - 3);
+                    this.stats.sleep = Math.max(0, this.stats.sleep - 3);
                     
                     this.checkNotifications();
                 } else {
-                    this.stats.energy = Math.min(100, this.stats.energy + 5);
-                    this.stats.sleep = Math.min(100, this.stats.sleep + 8);
+                    this.stats.energy = Math.min(100, this.stats.energy + 8);
+                    this.stats.sleep = Math.min(100, this.stats.sleep + 12);
                 }
                 
                 this.lastUpdate = now;
