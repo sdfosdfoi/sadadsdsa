@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Labubu TBB Game - Полная версия</title>
+    <title>Labubu Care Game - Полная версия</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .notification-enter {
@@ -190,7 +190,28 @@ class LabubuCareGame {
             { id: 'pattern', name: 'Узор', emoji: '🎨', description: 'Повтори узор', reward: { happiness: 34, experience: 28, money: 23 } }
         ];
         
-        // Инициализация данных
+        // Инициализация данных и инвентаря с системой защиты от повторных покупок
+        this.inventory = {
+            money: 100,
+            purchasedItems: [], // История покупок для защиты от повторных покупок
+            accessories: {
+                hats: [],
+                glasses: [],
+                necklaces: [],
+                toys: [],
+                backgrounds: [],
+                special: []
+            },
+            equippedAccessories: {
+                hat: null,
+                glasses: null,
+                necklace: null,
+                toy: null,
+                background: null,
+                special: null
+            }
+        };
+        
         this.initializeData();
         
         // Звуковая система
@@ -255,6 +276,8 @@ class LabubuCareGame {
                 this.evolutionStage = this.loadData('shared_labubu_evolution', 'baby', 'string');
                 this.lastUpdate = this.loadData('shared_labubu_last_update', Date.now(), 'number');
                 this.lastNotification = this.loadData('shared_labubu_last_notification', Date.now(), 'number');
+                this.lastRestTime = this.loadData('shared_labubu_last_rest', 0, 'number'); // Загружаем время последнего отдыха
+        this.lastRestTime = this.loadData('shared_labubu_last_rest', 0, 'number'); // Время последнего отдыха
                 this.petName = this.loadData('shared_pet_name', 'Labubu', 'string');
                 this.isSleeping = this.loadData('shared_labubu_sleeping', false, 'boolean');
                 this.currentSkin = this.loadData('shared_current_skin', 'default', 'string');
@@ -262,6 +285,35 @@ class LabubuCareGame {
                 this.chestCount = this.loadData('shared_chest_count', 0, 'number');
                 this.friendsInvited = this.loadData('shared_friends_invited', 0, 'number');
                 this.lastChestLevel = this.loadData('shared_last_chest_level', 0, 'number');
+                
+                // Загружаем инвентарь с защитой от отсутствующих полей
+                const savedInventory = this.loadData('labubu_inventory', null);
+                if (savedInventory && this.inventory) {
+                    this.inventory = {
+                        ...this.inventory,
+                        ...savedInventory,
+                        // Обеспечиваем наличие purchasedItems если их нет
+                        purchasedItems: savedInventory.purchasedItems || [],
+                        accessories: {
+                            hats: [],
+                            glasses: [],
+                            necklaces: [],
+                            toys: [],
+                            backgrounds: [],
+                            special: [],
+                            ...(savedInventory.accessories || {})
+                        },
+                        equippedAccessories: {
+                            hat: null,
+                            glasses: null,
+                            necklace: null,
+                            toy: null,
+                            background: null,
+                            special: null,
+                            ...(savedInventory.equippedAccessories || {})
+                        }
+                    };
+                }
                 
                 console.log('⚠️ Используются локальные данные из-за недоступности БД');
             }
@@ -922,7 +974,10 @@ class LabubuCareGame {
         // Безопасная проверка stats для индикаторов
         if (this.stats && typeof this.stats === 'object') {
             const avgStats = Object.values(this.stats).reduce((a, b) => a + b, 0) / 6;
-            if (criticalIndicator) criticalIndicator.classList.toggle('hidden', avgStats > 10);
+            const lowEnergy = this.stats.energy < 20;
+            
+            // Показать красный индикатор при критически низких статистиках ИЛИ низкой энергии
+            if (criticalIndicator) criticalIndicator.classList.toggle('hidden', avgStats > 10 && !lowEnergy);
         }
         
         if (moodIndicator && mood) {
@@ -1041,7 +1096,7 @@ class LabubuCareGame {
             <div class="mb-2">
                 <div class="flex justify-between mb-1">
                     <span class="text-xs font-medium">${stat.label}</span>
-                    <span class="text-xs">${stat.value}%</span>
+                    <span class="text-xs">${Math.round(stat.value)}%</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-1.5">
                     <div class="h-1.5 rounded-full transition-all duration-300 ${stat.color}" style="width: ${stat.value}%"></div>
@@ -1233,7 +1288,7 @@ class LabubuCareGame {
                 </div>
                 <div class="bg-white rounded-lg p-3 shadow">
                     <h3 class="font-bold mb-2 text-purple-800 text-sm">⚡ Действия</h3>
-                    <div class="grid grid-cols-3 gap-1">
+                    <div class="grid grid-cols-2 gap-1">
                         <button onclick="game.washPet()" class="bg-blue-100 hover:bg-blue-200 p-2 rounded text-xs transition-colors" ${this.isSleeping ? 'disabled' : ''}>
                             <div class="text-sm">🛁</div>
                             <div class="font-medium">Мыть</div>
@@ -1242,6 +1297,11 @@ class LabubuCareGame {
                             <div class="text-sm">💊</div>
                             <div class="font-medium">Лечить</div>
                             <div class="text-xs">30💰</div>
+                        </button>
+                        <button onclick="game.restPet()" class="bg-green-100 hover:bg-green-200 p-2 rounded text-xs transition-colors" ${this.isSleeping || this.isRestOnCooldown() ? 'disabled' : ''}>
+                            <div class="text-sm">⚡</div>
+                            <div class="font-medium">Отдых</div>
+                            <div class="text-xs">${this.isRestOnCooldown() ? this.getRestCooldownText() : 'Мгновенно +25'}</div>
                         </button>
                         <button onclick="game.toggleSleep()" class="bg-purple-100 hover:bg-purple-200 p-2 rounded text-xs transition-colors">
                             <div class="text-sm">${this.isSleeping ? '☀️' : '😴'}</div>
@@ -1272,30 +1332,79 @@ class LabubuCareGame {
     }
     
     getShopTabContent() {
-        const outfitsList = Object.entries(this.outfits).map(([key, item]) => `
-            <button onclick="game.buyOutfit('${key}')" class="w-full p-2 rounded-lg text-xs transition-colors flex items-center justify-between ${
-                this.outfit === key ? 'bg-green-100 border-2 border-green-500' : 'bg-gray-100 hover:bg-gray-200'
-            }">
-                <div class="flex items-center space-x-2">
-                    <span class="text-lg">${item.emoji}</span>
-                    <div class="text-left">
-                        <div class="font-medium">${item.name}</div>
-                        <div class="text-xs text-gray-500">${item.description}</div>
-                        <div class="text-xs text-gray-600 font-bold">
-                            ${item.price === 0 ? 'Бесплатно' : `${item.price}💰`}
+        const outfitsList = Object.entries(this.outfits).map(([key, item]) => {
+            const isCurrentlyWearing = this.outfit === key;
+            const isAlreadyPurchased = this.isItemPurchased(key);
+            const canAfford = this.money >= item.price;
+            
+            let buttonClass = 'w-full p-2 rounded-lg text-xs transition-colors flex items-center justify-between ';
+            let statusIcon = '';
+            
+            if (isCurrentlyWearing) {
+                buttonClass += 'bg-green-100 border-2 border-green-500';
+                statusIcon = '<span class="text-green-600 font-bold">✓ Надето</span>';
+            } else if (isAlreadyPurchased) {
+                buttonClass += 'bg-blue-100 border-2 border-blue-500';
+                statusIcon = '<span class="text-blue-600 font-bold">📦 Куплено</span>';
+            } else if (canAfford) {
+                buttonClass += 'bg-gray-100 hover:bg-gray-200';
+                statusIcon = '<span class="text-gray-600">Купить</span>';
+            } else {
+                buttonClass += 'bg-red-50 border border-red-200';
+                statusIcon = '<span class="text-red-600">💰</span>';
+            }
+            
+            return `
+                <button onclick="game.handleShopItemClick('${key}')" class="${buttonClass}">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-lg">${item.emoji}</span>
+                        <div class="text-left">
+                            <div class="font-medium">${item.name}</div>
+                            <div class="text-xs text-gray-500">${item.description}</div>
+                            <div class="text-xs text-gray-600 font-bold">
+                                ${item.price === 0 ? 'Бесплатно' : `${item.price}💰`}
+                            </div>
                         </div>
                     </div>
-                </div>
-                ${this.outfit === key ? '<span class="text-green-600 font-bold">✓</span>' : ''}
-            </button>
-        `).join('');
-        
+                    ${statusIcon}
+                </button>
+            `;
+        }).join('');
+
+        const purchasedCount = this.inventory && this.inventory.purchasedItems ? this.inventory.purchasedItems.length : 0;
+
         return `
             <div class="bg-white rounded-lg p-3 shadow">
                 <h3 class="font-bold mb-2 text-purple-800 text-sm">👗 Магазин одежды</h3>
+                <div class="text-xs text-gray-600 mb-3">
+                    💰 Ваши монеты: ${this.money} | 
+                    📦 Купленных предметов: ${purchasedCount}
+                </div>
                 <div class="grid grid-cols-1 gap-1 max-h-64 overflow-y-auto">${outfitsList}</div>
             </div>
         `;
+    }
+
+    // Обработчик клика по предмету в магазине
+    handleShopItemClick(outfitKey) {
+        const isCurrentlyWearing = this.outfit === outfitKey;
+        const isAlreadyPurchased = this.isItemPurchased(outfitKey);
+        
+        if (isCurrentlyWearing) {
+            this.showMessage('✅ Этот предмет уже надет!');
+        } else if (isAlreadyPurchased) {
+            // Если уже куплен - экипируем
+            this.outfit = outfitKey;
+            this.stats.happiness = Math.min(100, this.stats.happiness + 5); // Меньший бонус за переодевание
+            this.playHappySound();
+            this.showMessage(`👕 Надел: ${this.outfits[outfitKey].name}!`);
+            this.saveData();
+            this.updateDisplay();
+            this.switchTab('shop');
+        } else {
+            // Если не куплен - покупаем
+            this.buyOutfit(outfitKey);
+        }
     }
     
     getPetsTabContent() {
@@ -1342,6 +1451,19 @@ class LabubuCareGame {
                                 <li>Ваш питомец эволюционирует с возрастом!</li>
                             </ul>
                         </div>
+                        
+                        <div class="bg-blue-50 p-2 rounded">
+                            <h4 class="font-bold text-blue-800 mb-1">⚡ Новая система энергии</h4>
+                            <ul class="list-disc list-inside text-blue-700">
+                                <li><strong>ЭНЕРГИЯ ВСЕГДА ВОССТАНАВЛИВАЕТСЯ!</strong></li>
+                                <li>Во время игры: +0.5 каждые 30 секунд</li>
+                                <li>Вне игры (бодрствует): +2 каждые 2 минуты</li>
+                                <li>Во время сна: +10 каждые 2 минуты</li>
+                                <li>Быстрый отдых: мгновенно +25</li>
+                                <li>Еда: дополнительно +15 энергии</li>
+                                <li>Теперь питомец не устает навсегда! 🎉</li>
+                            </ul>
+                        </div>
                         <div class="bg-purple-50 p-2 rounded">
                             <h4 class="font-bold text-purple-800 mb-1">✨ Особенности</h4>
                             <ul class="list-disc list-inside text-purple-700">
@@ -1366,6 +1488,8 @@ class LabubuCareGame {
                                 <li>При чистоте < 50%: "Я грязный!"</li>
                             </ul>
                         </div>
+                        
+
                         <div class="text-center text-gray-500">
                             <p>🐰 Создано с любовью для ${this.petName}! 💕</p>
                             <p class="text-xs mt-1">Версия 4.0 - Enhanced Save System</p>
@@ -1392,15 +1516,18 @@ class LabubuCareGame {
             this.stats.energy = Math.min(100, this.stats.energy + (food.energy || 0));
             this.stats.cleanliness = Math.min(100, this.stats.cleanliness + (food.cleanliness || 0));
             
-            // Больший бонус энергии от еды
+            // УВЕЛИЧЕННЫЙ бонус энергии от еды
             if (!food.energy) {
-                this.stats.energy = Math.min(100, this.stats.energy + 10); // Увеличен бонус энергии
+                this.stats.energy = Math.min(100, this.stats.energy + 15); // Увеличен с 10 до 15
             }
+            
+            // Кормление тратит энергию питомца на переваривание
+            this.stats.energy = Math.max(0, this.stats.energy - 3);
             
             this.experience += 10;
             
             this.playSound(800, 150);
-            this.showMessage(`${this.petName} съел ${food.name}! ${food.emoji}`);
+            this.showMessage(`${this.petName} съел ${food.name}! ${food.emoji} (-3 энергии на переваривание)`);
             this.checkLevelUp();
             this.saveData();
             this.updateDisplay();
@@ -1415,12 +1542,19 @@ class LabubuCareGame {
             return;
         }
         
+        // Проверяем энергию
+        if (this.stats.energy < 5) {
+            this.showMessage(`${this.petName} слишком устал для купания! Нужен отдых.`);
+            return;
+        }
+        
         this.stats.cleanliness = 100;
         this.stats.happiness = Math.min(100, this.stats.happiness + 10);
+        this.stats.energy = Math.max(0, this.stats.energy - 5); // Купание тратит энергию
         this.experience += 8;
         
         this.playSound(400, 200);
-        this.showMessage(`${this.petName} чистый и счастливый! 🛁`);
+        this.showMessage(`${this.petName} чистый и счастливый! 🛁 (-5 энергии)`);
         this.checkLevelUp();
         this.saveData();
         this.updateDisplay();
@@ -1440,6 +1574,41 @@ class LabubuCareGame {
         } else {
             this.showMessage('Недостаточно монет для лечения!');
         }
+    }
+    
+    restPet() {
+        if (this.isSleeping) {
+            this.showMessage(`${this.petName} уже спит! 😴`);
+            return;
+        }
+        
+        if (this.stats.energy >= 90) {
+            this.showMessage(`${this.petName} полон энергии! ⚡`);
+            return;
+        }
+        
+        // Проверяем кулдаун отдыха (10 минут = 600000 миллисекунд)
+        const now = Date.now();
+        const timeSinceLastRest = now - this.lastRestTime;
+        const restCooldown = 10 * 60 * 1000; // 10 минут в миллисекундах
+        
+        if (timeSinceLastRest < restCooldown) {
+            const remainingMinutes = Math.ceil((restCooldown - timeSinceLastRest) / (60 * 1000));
+            this.showMessage(`⏰ Отдых доступен через ${remainingMinutes} мин.`);
+            return;
+        }
+        
+        // Быстрый отдых восстанавливает энергию
+        this.stats.energy = Math.min(100, this.stats.energy + 25);
+        this.stats.happiness = Math.min(100, this.stats.happiness + 5);
+        this.experience += 5;
+        this.lastRestTime = now; // Обновляем время последнего отдыха
+        
+        this.playSound(600, 200);
+        this.showMessage(`${this.petName} отдохнул и восстановил энергию! ⚡ (+25 энергии)`);
+        this.checkLevelUp();
+        this.saveData();
+        this.updateDisplay();
     }
     
     toggleSleep() {
@@ -1466,8 +1635,21 @@ class LabubuCareGame {
             return;
         }
         
+        // Проверяем, не куплен ли уже этот предмет
+        if (this.isItemPurchased(outfitKey)) {
+            this.showMessage('❌ Этот предмет уже куплен! Экипируйте его в инвентаре.');
+            return;
+        }
+        
         if (this.money >= outfit.price) {
             this.money -= outfit.price;
+            
+            // Добавляем в историю покупок
+            if (!this.inventory.purchasedItems) {
+                this.inventory.purchasedItems = [];
+            }
+            this.inventory.purchasedItems.push(outfitKey);
+            
             this.outfit = outfitKey;
             this.stats.happiness = Math.min(100, this.stats.happiness + 20);
             
@@ -1479,6 +1661,109 @@ class LabubuCareGame {
         } else {
             this.showMessage('Недостаточно монет!');
         }
+    }
+    
+    // Проверка покупки предмета
+    isItemPurchased(itemId) {
+        if (!this.inventory || !this.inventory.purchasedItems) {
+            return false;
+        }
+        return this.inventory.purchasedItems.includes(itemId);
+    }
+    
+    // Проверка кулдауна отдыха
+    isRestOnCooldown() {
+        const now = Date.now();
+        const timeSinceLastRest = now - this.lastRestTime;
+        const restCooldown = 10 * 60 * 1000; // 10 минут в миллисекундах
+        return timeSinceLastRest < restCooldown;
+    }
+    
+    // Получить текст кулдауна отдыха
+    getRestCooldownText() {
+        if (!this.isRestOnCooldown()) return 'Мгновенно +25';
+        
+        const now = Date.now();
+        const timeSinceLastRest = now - this.lastRestTime;
+        const restCooldown = 10 * 60 * 1000; // 10 минут в миллисекундах
+        const remainingMinutes = Math.ceil((restCooldown - timeSinceLastRest) / (60 * 1000));
+        
+        return `Через ${remainingMinutes}мин`;
+    }
+    
+    // Обработчик клика по предмету в магазине
+    handleShopItemClick(outfitKey) {
+        const isCurrentlyWearing = this.outfit === outfitKey;
+        const isAlreadyPurchased = this.isItemPurchased(outfitKey);
+        
+        if (isCurrentlyWearing) {
+            this.showMessage('✅ Этот предмет уже надет!');
+        } else if (isAlreadyPurchased) {
+            // Если уже куплен - экипируем
+            this.outfit = outfitKey;
+            this.stats.happiness = Math.min(100, this.stats.happiness + 5); // Меньший бонус за переодевание
+            this.playHappySound();
+            this.showMessage(`👕 Надел: ${this.outfits[outfitKey].name}!`);
+            this.saveData();
+            this.updateDisplay();
+            this.switchTab('shop');
+        } else {
+            // Если не куплен - покупаем
+            this.buyOutfit(outfitKey);
+        }
+    }
+    
+    // Проверка покупки предмета
+    isItemPurchased(itemId) {
+        if (!this.inventory.purchasedItems) {
+            this.inventory.purchasedItems = [];
+        }
+        return this.inventory.purchasedItems.includes(itemId);
+    }
+    
+    // Экипировка аксессуара (только купленные предметы)
+    equipAccessory(category, itemId = null) {
+        // Если itemId = null, снимаем аксессуар
+        if (itemId === null) {
+            if (!this.inventory.equippedAccessories) {
+                this.inventory.equippedAccessories = {};
+            }
+            this.inventory.equippedAccessories[category] = null;
+            this.showMessage(`Снят аксессуар: ${category}`);
+            this.saveData();
+            return true;
+        }
+        
+        // Проверяем, есть ли аксессуар в инвентаре
+        const categoryMap = {
+            'hat': 'hats',
+            'glasses': 'glasses',
+            'necklace': 'necklaces',
+            'toy': 'toys',
+            'background': 'backgrounds',
+            'special': 'special'
+        };
+        
+        const accessoryCategory = categoryMap[category];
+        if (!accessoryCategory || !this.inventory.accessories[accessoryCategory]) {
+            this.showMessage('❌ Неизвестная категория аксессуара!');
+            return false;
+        }
+        
+        if (!this.inventory.accessories[accessoryCategory].includes(itemId)) {
+            this.showMessage('❌ У вас нет этого аксессуара! Сначала купите его.');
+            return false;
+        }
+        
+        // Экипируем аксессуар
+        if (!this.inventory.equippedAccessories) {
+            this.inventory.equippedAccessories = {};
+        }
+        this.inventory.equippedAccessories[category] = itemId;
+        this.showMessage(`✅ Экипирован: ${itemId}`);
+        this.saveData();
+        
+        return true;
     }
     
     createNewPet() {
@@ -2121,7 +2406,8 @@ class LabubuCareGame {
                 friendsInvited: this.friendsInvited,
                 lastChestLevel: this.lastChestLevel,
                 isSleeping: this.isSleeping,
-                lastUpdate: this.lastUpdate
+                lastUpdate: this.lastUpdate,
+                lastRestTime: this.lastRestTime // Добавляем время последнего отдыха в данные для БД
             };
 
             const response = await fetch('https://labubu-server.onrender.com/api/save-game', {
@@ -2190,6 +2476,7 @@ class LabubuCareGame {
                     this.petName = gameData.petName || 'Labubu';
                     this.lastUpdate = gameData.lastUpdate || Date.now();
                     this.lastNotification = this.loadData('shared_labubu_last_notification', Date.now(), 'number');
+                    this.lastRestTime = gameData.lastRestTime || 0; // Загружаем время последнего отдыха из БД
                     
                     // Сразу сохраняем в localStorage как кэш
                     this.saveToLocalStorage();
@@ -2292,6 +2579,12 @@ class LabubuCareGame {
         this.saveValue('shared_friends_invited', this.friendsInvited);
         this.saveValue('shared_last_chest_level', this.lastChestLevel);
         this.saveValue('shared_labubu_last_notification', this.lastNotification);
+        this.saveValue('shared_labubu_last_rest', this.lastRestTime); // Сохраняем время последнего отдыха
+        
+        // Сохраняем инвентарь с защитой от ошибок
+        if (this.inventory) {
+            this.saveValue('labubu_inventory', this.inventory);
+        }
     }
     
     // Игра "Реакция"
@@ -3503,40 +3796,99 @@ class LabubuCareGame {
     }
     
     startGameLoop() {
+        // КРИТИЧЕСКИ ВАЖНО: Обработка времени вне игры при загрузке
+        this.processOfflineTime();
+        
+        // Основной игровой цикл - каждые 30 секунд для более частых обновлений
         setInterval(() => {
-            const now = Date.now();
-            const timeDiff = Math.floor((now - this.lastUpdate) / 1000);
+            this.processGameTick();
+        }, 30000); // Проверка каждые 30 секунд
+        
+        // Дополнительная проверка каждую минуту для надежности
+        setInterval(() => {
+            this.processOfflineTime();
+        }, 60000);
+    }
+    
+    processOfflineTime() {
+        const now = Date.now();
+        const timeDiff = Math.floor((now - this.lastUpdate) / 1000);
+        
+        console.log(`⏰ Проверка времени: прошло ${Math.floor(timeDiff/60)} минут с последнего обновления`);
+        
+        if (timeDiff >= 60) { // Если прошла минута или больше
+            const minutesPassed = Math.floor(timeDiff / 60);
             
-            // Старение: 1 реальный день = 1 день питомца (86400 секунд = 1 день)
-            if (timeDiff >= 86400) {
-                const daysToAdd = Math.floor(timeDiff / 86400);
+            // Старение: каждые 24 часа (1440 минут) = +1 день
+            if (minutesPassed >= 1440) {
+                const daysToAdd = Math.floor(minutesPassed / 1440);
                 this.age += daysToAdd;
                 this.checkEvolution();
-                this.lastUpdate = now;
+                console.log(`📅 Питомец постарел на ${daysToAdd} дней`);
             }
             
-            // Снижение статистик каждые 5 минут (300 секунд)
-            if (timeDiff >= 300) {
-                if (!this.isSleeping) {
-                    this.stats.hunger = Math.max(0, this.stats.hunger - 3); // ВОЗВРАЩЕНО к исходному
-                    this.stats.happiness = Math.max(0, this.stats.happiness - 2);
-                    this.stats.cleanliness = Math.max(0, this.stats.cleanliness - 2);
-                    this.stats.health = Math.max(0, this.stats.health - (this.stats.hunger < 20 ? 3 : 1));
-                    this.stats.energy = Math.max(0, this.stats.energy - 3); // ВОЗВРАЩЕНО к исходному
-                    this.stats.sleep = Math.max(0, this.stats.sleep - 3);
-                    
-                    this.checkNotifications();
-                } else {
-                    // Восстановление во время сна
-                    this.stats.energy = Math.min(100, this.stats.energy + 8);
-                    this.stats.sleep = Math.min(100, this.stats.sleep + 12);
+            // АГРЕССИВНОЕ снижение статистик - каждые 2 минуты!
+            const statDecayIntervals = Math.floor(minutesPassed / 2);
+            
+            if (statDecayIntervals > 0) {
+                console.log(`📉 Применяем снижение статистик за ${statDecayIntervals} интервалов (${minutesPassed} минут)`);
+                
+                for (let i = 0; i < statDecayIntervals; i++) {
+                    if (!this.isSleeping) {
+                        // АГРЕССИВНОЕ снижение каждые 2 минуты, НО ЭНЕРГИЯ ВОССТАНАВЛИВАЕТСЯ!
+                        this.stats.hunger = Math.max(0, this.stats.hunger - 5);      // Было 3, стало 5
+                        this.stats.happiness = Math.max(0, this.stats.happiness - 4); // Было 2, стало 4  
+                        this.stats.cleanliness = Math.max(0, this.stats.cleanliness - 3); // Было 2, стало 3
+                        this.stats.health = Math.max(0, this.stats.health - (this.stats.hunger < 20 ? 6 : 3)); // Было 3:1, стало 6:3
+                        this.stats.energy = Math.min(100, this.stats.energy + 2);    // ⚡ ЭНЕРГИЯ ВОССТАНАВЛИВАЕТСЯ ДАЖЕ В АКТИВНОМ СОСТОЯНИИ!
+                        this.stats.sleep = Math.max(0, this.stats.sleep - 4);        // Было 3, стало 4
+                    } else {
+                        // БЫСТРОЕ восстановление во время сна
+                        this.stats.energy = Math.min(100, this.stats.energy + 10);  // УВЕЛИЧЕНО с 5 до 10 для сна!
+                        this.stats.sleep = Math.min(100, this.stats.sleep + 12);    // Увеличено с 8 до 12
+                        
+                        // Во сне статистики почти не падают
+                        this.stats.hunger = Math.max(0, this.stats.hunger - 0.5);   // Уменьшено с 1 до 0.5
+                        this.stats.happiness = Math.max(0, this.stats.happiness - 0.2); // Уменьшено с 0.5 до 0.2
+                        this.stats.cleanliness = Math.max(0, this.stats.cleanliness - 0.2); // Уменьшено с 0.5 до 0.2
+                    }
                 }
                 
                 this.lastUpdate = now;
                 this.saveData();
                 this.updateDisplay();
+                this.checkNotifications();
+                
+                console.log(`✅ Статистики обновлены: Голод ${Math.round(this.stats.hunger)}%, Энергия ${Math.round(this.stats.energy)}% (восстанавливается!)`);
+                this.showMessage(`⏰ Обновлено за ${minutesPassed}мин: Голод ${Math.round(this.stats.hunger)}%, Энергия ${Math.round(this.stats.energy)}% ⚡+`);
             }
-        }, 60000); // Проверка каждую минуту
+        }
+    }
+    
+    processGameTick() {
+        // Обычный игровой тик когда игра активна
+        const now = Date.now();
+        const timeDiff = Math.floor((now - this.lastUpdate) / 1000);
+        
+        // Снижение каждые 30 секунд когда игра активна
+        if (timeDiff >= 30) {
+            if (!this.isSleeping) {
+                // Легкое снижение во время активной игры + ВОССТАНОВЛЕНИЕ ЭНЕРГИИ
+                this.stats.hunger = Math.max(0, this.stats.hunger - 0.5);
+                this.stats.happiness = Math.max(0, this.stats.happiness - 0.3);
+                this.stats.cleanliness = Math.max(0, this.stats.cleanliness - 0.2);
+                this.stats.health = Math.max(0, this.stats.health - (this.stats.hunger < 20 ? 0.5 : 0.1));
+                this.stats.energy = Math.min(100, this.stats.energy + 0.5); // ⚡ ЭНЕРГИЯ ВОССТАНАВЛИВАЕТСЯ ДАЖЕ ВО ВРЕМЯ ИГРЫ!
+                this.stats.sleep = Math.max(0, this.stats.sleep - 0.4);
+            } else {
+                // БЫСТРОЕ восстановление во сне
+                this.stats.energy = Math.min(100, this.stats.energy + 4);  // Увеличено с 2 до 4
+                this.stats.sleep = Math.min(100, this.stats.sleep + 5);    // Увеличено с 3 до 5
+            }
+            
+            this.lastUpdate = now;
+            this.updateDisplay();
+        }
     }
     
     startNotificationTimer() {
