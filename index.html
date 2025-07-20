@@ -605,21 +605,28 @@ class LabubuCareGame {
         
         console.log('✅ Игра загружена!');
         
-        // Проверка админа и создание команд для @sdkksddas
+        // Проверка админа и создание команд для Jojo (Telegram ID: 5224479471)
         this.isAdmin = () => {
-            // Админы: @sdkksddas и ваш Hatch ID
-            const adminUsers = ['@sdkksddas', 'sdkksddas', 'Jojo'];
+            // Админы: Jojo с Telegram ID 5224479471 и Hatch ID
+            const adminUsers = ['Jojo', 'jojo', '@jojez'];
+            const adminTelegramId = '5224479471';
+            const adminHatchId = 'user_2z7V9FOEAACKKYnUxFVldLTZhFE';
             
             // Проверяем через различные способы идентификации
             if (typeof window !== 'undefined' && window.hatch && window.hatch.useUser) {
                 try {
                     const user = window.hatch.useUser();
-                    if (user && (adminUsers.includes(user.name) || user.id === 'user_2z7V9FOEAACKKYnUxFVldLTZhFE')) {
+                    if (user && (adminUsers.includes(user.name) || user.id === adminHatchId)) {
                         return true;
                     }
                 } catch (e) {
                     // Если hatch.useUser недоступен
                 }
+            }
+            
+            // Дополнительная проверка через Telegram ID (если доступен)
+            if (typeof window !== 'undefined' && window.telegramUserId === adminTelegramId) {
+                return true;
             }
             
             return false;
@@ -636,8 +643,8 @@ class LabubuCareGame {
                 return true;
             },
             
-            // Дать ресурсы @sdkksddas
-            givePlayerResources: (gameUserId = '@sdkksddas', money = 100000, chests = 1000) => {
+            // Дать ресурсы Jojo (Telegram ID: 5224479471)
+            givePlayerResources: (gameUserId = 'Jojo', money = 100000, chests = 1000) => {
                 if (!adminCommands.checkAccess()) return false;
                 
                 try {
@@ -719,34 +726,35 @@ class LabubuCareGame {
                 if (!adminCommands.checkAccess()) return false;
                 
                 console.log(`
-👑 АДМИНСКИЕ КОМАНДЫ (только для @sdkksddas):
+👑 АДМИНСКИЕ КОМАНДЫ (только для Jojo - Telegram ID: 5224479471):
 
-💰 adminCommands.givePlayerResources('@sdkksddas', 100000, 1000) - дать ресурсы
+💰 adminCommands.givePlayerResources('Jojo', 100000, 1000) - дать ресурсы
 ⭐ adminCommands.maxResources() - максимальные ресурсы (999,999 монет)
 🔋 adminCommands.fullRestore() - восстановить все статистики
 🚀 adminCommands.maxLevel() - максимальный уровень (100)
 ❓ adminCommands.help() - эта справка
 
-БЫСТРЫЕ КОМАНДЫ ДЛЯ @sdkksddas:
-> adminCommands.givePlayerResources('@sdkksddas', 100000, 1000)
+БЫСТРЫЕ КОМАНДЫ ДЛЯ JOJO:
+> adminCommands.givePlayerResources('Jojo', 100000, 1000)
 > adminCommands.maxResources()
 > adminCommands.fullRestore()
 > adminCommands.maxLevel()
 
-🔒 БЕЗОПАСНОСТЬ: Доступ есть только у @sdkksddas
+🔒 БЕЗОПАСНОСТЬ: Доступ есть только у Jojo (Telegram ID: 5224479471)
                 `);
                 return 'Команды выведены в консоль';
             }
         };
         
-        // Показываем админские команды только @sdkksddas
+        // Показываем админские команды только для Jojo (Telegram ID: 5224479471)
         setTimeout(() => {
             if (this.isAdmin()) {
-                console.log('%c👑 АДМИНСКИЕ КОМАНДЫ ДОСТУПНЫ ДЛЯ @sdkksddas!', 'color: #FF6B35; font-size: 16px; font-weight: bold;');
+                console.log('%c👑 АДМИНСКИЕ КОМАНДЫ ДОСТУПНЫ ДЛЯ JOJO!', 'color: #FF6B35; font-size: 16px; font-weight: bold;');
+                console.log('%cВаш Telegram ID: 5224479471', 'color: #4A90E2; font-size: 14px;');
                 console.log('%cВведите adminCommands.help() для просмотра всех команд', 'color: #4A90E2; font-size: 14px;');
-                console.log('%c🎯 Быстрая команда для @sdkksddas:', 'color: #22c55e; font-size: 14px;');
-                console.log('%cadminCommands.givePlayerResources("@sdkksddas", 100000, 1000)', 'color: #6366f1; font-size: 12px; background: #f1f5f9; padding: 4px;');
-                console.log('%c🔒 Доступ есть только у вас как у @sdkksddas', 'color: #ef4444; font-size: 12px;');
+                console.log('%c🎯 Быстрая команда для вас:', 'color: #22c55e; font-size: 14px;');
+                console.log('%cadminCommands.givePlayerResources("Jojo", 100000, 1000)', 'color: #6366f1; font-size: 12px; background: #f1f5f9; padding: 4px;');
+                console.log('%c🔒 Доступ есть только у вас (Telegram ID: 5224479471)', 'color: #ef4444; font-size: 12px;');
             } else {
                 console.log('%c🎮 Добро пожаловать в Labubu Care!', 'color: #8b5cf6; font-size: 16px; font-weight: bold;');
                 console.log('%cЗаботьтесь о своем питомце и наслаждайтесь игрой!', 'color: #6b7280; font-size: 14px;');
