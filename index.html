@@ -244,39 +244,35 @@ class LabubuCareGame {
             } else {
                 console.log('📱 БД недоступна, загружаем из localStorage как резерв...');
                 
-                // Если БД недоступна, загружаем из localStorage
-                this.stats = this.loadData('shared_labubu_stats', {
+                // Если БД недоступна, загружаем из localStorage для ЭТОГО пользователя
+                this.stats = this.loadData('labubu_stats', {
                     hunger: 100, happiness: 100, cleanliness: 100,
                     health: 100, energy: 100, sleep: 100
                 });
                 
-                this.money = this.loadData('shared_labubu_money', 100, 'number');
-                this.outfit = this.loadData('shared_labubu_outfit', 'default', 'string');
-        this.ownedOutfits = this.loadData('shared_owned_outfits', ['default']);
-        this.lastStatDecay = this.loadData('shared_last_stat_decay', Date.now(), 'number');
-        this.ownedOutfits = this.loadData('shared_owned_outfits', ['default']);
-        this.lastStatDecay = this.loadData('shared_last_stat_decay', Date.now(), 'number');
-        this.ownedOutfits = this.loadData('shared_owned_outfits', ['default']);
-        this.lastStatDecay = this.loadData('shared_last_stat_decay', Date.now(), 'number');
-                this.level = this.loadData('shared_labubu_level', 1, 'number');
-                this.experience = this.loadData('shared_labubu_experience', 0, 'number');
-                this.age = this.loadData('shared_labubu_age', 0, 'number');
-                this.evolutionStage = this.loadData('shared_labubu_evolution', 'baby', 'string');
-                this.lastUpdate = this.loadData('shared_labubu_last_update', Date.now(), 'number');
-                this.lastNotification = this.loadData('shared_labubu_last_notification', Date.now(), 'number');
-                this.petName = this.loadData('shared_pet_name', 'Labubu', 'string');
-                this.isSleeping = this.loadData('shared_labubu_sleeping', false, 'boolean');
-                this.currentSkin = this.loadData('shared_current_skin', 'default', 'string');
-                this.unlockedSkins = this.loadData('shared_unlocked_skins', ['default']);
-                this.chestCount = this.loadData('shared_chest_count', 0, 'number');
-                this.friendsInvited = this.loadData('shared_friends_invited', 0, 'number');
-                this.lastChestLevel = this.loadData('shared_last_chest_level', 0, 'number');
+                this.money = this.loadData('labubu_money', 100, 'number');
+                this.outfit = this.loadData('labubu_outfit', 'default', 'string');
+                this.ownedOutfits = this.loadData('owned_outfits', ['default']);
+                this.lastStatDecay = this.loadData('last_stat_decay', Date.now(), 'number');
+                this.level = this.loadData('labubu_level', 1, 'number');
+                this.experience = this.loadData('labubu_experience', 0, 'number');
+                this.age = this.loadData('labubu_age', 0, 'number');
+                this.evolutionStage = this.loadData('labubu_evolution', 'baby', 'string');
+                this.lastUpdate = this.loadData('labubu_last_update', Date.now(), 'number');
+                this.lastNotification = this.loadData('labubu_last_notification', Date.now(), 'number');
+                this.petName = this.loadData('pet_name', 'Labubu', 'string');
+                this.isSleeping = this.loadData('labubu_sleeping', false, 'boolean');
+                this.currentSkin = this.loadData('current_skin', 'default', 'string');
+                this.unlockedSkins = this.loadData('unlocked_skins', ['default']);
+                this.chestCount = this.loadData('chest_count', 0, 'number');
+                this.friendsInvited = this.loadData('friends_invited', 0, 'number');
+                this.lastChestLevel = this.loadData('last_chest_level', 0, 'number');
                 
                 console.log('⚠️ Используются локальные данные из-за недоступности БД');
             }
             
-            // Загрузка данных питомцев (всегда из localStorage как дополнение)
-            this.pets = this.loadData('shared_labubu_pets', [
+            // Загрузка данных питомцев (индивидуально для каждого пользователя)
+            this.pets = this.loadData('labubu_pets', [
                 { 
                     id: 'pet1', 
                     name: this.petName, 
@@ -287,7 +283,7 @@ class LabubuCareGame {
                     currentSkin: this.currentSkin
                 }
             ]);
-            this.activePetId = this.loadData('shared_active_pet_id', 'pet1', 'string');
+            this.activePetId = this.loadData('active_pet_id', 'pet1', 'string');
             
             // Валидация загруженных данных
             this.validateGameData();
@@ -393,7 +389,9 @@ class LabubuCareGame {
     
     loadData(key, defaultValue, type = 'auto') {
         try {
-            const saved = localStorage.getItem(key);
+            // Создаем уникальный ключ для каждого пользователя
+            const userKey = `${this.gameUserId}_${key}`;
+            const saved = localStorage.getItem(userKey);
             
             if (saved === null || saved === undefined) {
                 return defaultValue;
@@ -416,7 +414,7 @@ class LabubuCareGame {
                     try {
                         return JSON.parse(saved);
                     } catch (parseError) {
-                        console.warn(`Ошибка парсинга для ключа ${key}:`, parseError);
+                        console.warn(`Ошибка парсинга для ключа ${userKey}:`, parseError);
                         return defaultValue;
                     }
             }
@@ -461,10 +459,12 @@ class LabubuCareGame {
     
     saveValue(key, value) {
         try {
+            // Создаем уникальный ключ для каждого пользователя
+            const userKey = `${this.gameUserId}_${key}`;
             if (typeof value === 'object') {
-                localStorage.setItem(key, JSON.stringify(value));
+                localStorage.setItem(userKey, JSON.stringify(value));
             } else {
-                localStorage.setItem(key, value.toString());
+                localStorage.setItem(userKey, value.toString());
             }
         } catch (error) {
             console.error(`Ошибка сохранения ${key}:`, error);
@@ -560,6 +560,7 @@ class LabubuCareGame {
             const backupData = {
                 timestamp: Date.now(),
                 version: '4.0',
+                gameUserId: this.gameUserId,
                 data: {
                     stats: this.stats,
                     money: this.money,
@@ -574,21 +575,26 @@ class LabubuCareGame {
                     unlockedSkins: this.unlockedSkins,
                     chestCount: this.chestCount,
                     friendsInvited: this.friendsInvited,
-                    pets: this.pets
+                    pets: this.pets,
+                    ownedOutfits: this.ownedOutfits
                 }
             };
             
-            localStorage.setItem('labubu_backup', JSON.stringify(backupData));
+            // Индивидуальный бэкап для каждого пользователя
+            const backupKey = `${this.gameUserId}_labubu_backup`;
+            const historyKey = `${this.gameUserId}_labubu_backup_history`;
+            
+            localStorage.setItem(backupKey, JSON.stringify(backupData));
             
             // Хранить только последние 3 резервные копии
-            const backupHistory = JSON.parse(localStorage.getItem('labubu_backup_history') || '[]');
+            const backupHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
             backupHistory.push(backupData);
             
             if (backupHistory.length > 3) {
                 backupHistory.shift();
             }
             
-            localStorage.setItem('labubu_backup_history', JSON.stringify(backupHistory));
+            localStorage.setItem(historyKey, JSON.stringify(backupHistory));
             
         } catch (error) {
             console.error('Ошибка создания резервной копии:', error);
@@ -597,9 +603,10 @@ class LabubuCareGame {
     
     restoreFromBackup() {
         try {
-            const backup = JSON.parse(localStorage.getItem('labubu_backup') || '{}');
+            const backupKey = `${this.gameUserId}_labubu_backup`;
+            const backup = JSON.parse(localStorage.getItem(backupKey) || '{}');
             
-            if (backup.data && backup.timestamp) {
+            if (backup.data && backup.timestamp && backup.gameUserId === this.gameUserId) {
                 const data = backup.data;
                 
                 this.stats = data.stats || this.stats;
@@ -616,6 +623,7 @@ class LabubuCareGame {
                 this.chestCount = data.chestCount || this.chestCount;
                 this.friendsInvited = data.friendsInvited || this.friendsInvited;
                 this.pets = data.pets || this.pets;
+                this.ownedOutfits = data.ownedOutfits || this.ownedOutfits;
                 
                 this.saveData();
                 this.updateDisplay();
@@ -1346,13 +1354,24 @@ class LabubuCareGame {
     getPetsTabContent() {
         return `
             <div class="bg-white rounded-lg p-3 shadow">
-                <h3 class="font-bold mb-2 text-purple-800 text-sm">🐰 Управление питомцами</h3>
-                <button onclick="game.createNewPet()" class="w-full mb-3 p-3 bg-green-100 hover:bg-green-200 rounded-lg text-sm transition-colors">
-                    ➕ Создать нового питомца
-                </button>
+                <h3 class="font-bold mb-2 text-purple-800 text-sm">🐰 Ваш личный питомец</h3>
+                <div class="text-center mb-4">
+                    <div class="text-4xl mb-2">🐰</div>
+                    <h4 class="font-bold text-lg text-purple-800">${this.petName}</h4>
+                    <p class="text-sm text-gray-600">Ваш уникальный питомец</p>
+                    <div class="bg-green-50 p-2 rounded-lg mt-3">
+                        <p class="text-xs text-green-800">🔒 Только вы можете ухаживать за ${this.petName}</p>
+                        <p class="text-xs text-green-600">💾 Все ваши данные сохраняются индивидуально</p>
+                    </div>
+                </div>
                 <div class="bg-blue-50 p-3 rounded-lg">
-                    <h4 class="font-bold text-sm text-blue-800 mb-2">👥 Совместное воспитание</h4>
-                    <p class="text-xs text-blue-700">Все изменения синхронизируются в реальном времени!</p>
+                    <h4 class="font-bold text-sm text-blue-800 mb-2">🆔 Информация об аккаунте</h4>
+                    <div class="text-xs text-blue-700 space-y-1">
+                        <p><strong>ID игрока:</strong> ${this.gameUserId.slice(-8)}</p>
+                        <p><strong>Имя питомца:</strong> ${this.petName}</p>
+                        <p><strong>Возраст:</strong> ${this.age} дней</p>
+                        <p><strong>Уровень:</strong> ${this.level}</p>
+                    </div>
                 </div>
             </div>
         `;
@@ -1395,9 +1414,10 @@ class LabubuCareGame {
                                 <li>6 редких скинов персонажей</li>
                                 <li>5 стадий эволюции</li>
                                 <li>Реалистичное старение (1 день = 1 день)</li>
+                                <li>🔒 Индивидуальный питомец для каждого игрока</li>
+                                <li>💾 Персональные сохранения и бэкапы</li>
                                 <li>Автоматические уведомления</li>
                                 <li>Звуковые эффекты</li>
-                                <li>Автосохранение и резервные копии</li>
                             </ul>
                         </div>
                         <div class="bg-orange-50 p-2 rounded">
@@ -1413,7 +1433,11 @@ class LabubuCareGame {
                         </div>
                         <div class="text-center text-gray-500">
                             <p>🐰 Создано с любовью для ${this.petName}! 💕</p>
-                            <p class="text-xs mt-1">Версия 4.0 - Enhanced Save System</p>
+                            <p class="text-xs mt-1">Версия 4.1 - Индивидуальные питомцы</p>
+                            <div class="bg-green-50 p-2 rounded mt-2">
+                                <p class="text-xs text-green-700">🎯 У каждого игрока теперь свой уникальный питомец!</p>
+                                <p class="text-xs text-green-600">ID: ${this.gameUserId.slice(-8)}</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2062,29 +2086,36 @@ class LabubuCareGame {
     }
     
     resetGamePrompt() {
-        const confirmation = prompt(`🗑️ ВНИМАНИЕ! Это полностью сбросит игру!\n\nВсе данные, включая:\n• Уровень ${this.level} и ${this.experience} опыта\n• ${this.money} монет\n• ${this.unlockedSkins.length} разблокированных скинов\n• ${this.chestCount} сундуков\n• Возраст ${this.age} дней\n\nНапишите "СБРОС" чтобы подтвердить:`);
+        const confirmation = prompt(`🗑️ ВНИМАНИЕ! Это полностью сбросит ВАШУ игру!\n\nВсе ваши данные, включая:\n• Уровень ${this.level} и ${this.experience} опыта\n• ${this.money} монет\n• ${this.unlockedSkins.length} разблокированных скинов\n• ${this.chestCount} сундуков\n• Возраст ${this.age} дней\n\nЭто затронет только ВАШЕГО питомца!\n\nНапишите "СБРОС" чтобы подтвердить:`);
         
         if (confirmation === 'СБРОС') {
-            // Очистить localStorage
+            // Очистить только СВОИ данные из localStorage
             const keysToRemove = [
-                'shared_labubu_stats', 'shared_labubu_money', 'shared_labubu_outfit',
-                'shared_labubu_level', 'shared_labubu_experience', 'shared_labubu_age',
-                'shared_labubu_evolution', 'shared_labubu_last_update', 'shared_pet_name',
-                'shared_labubu_sleeping', 'shared_labubu_pets', 'shared_active_pet_id',
-                'shared_current_skin', 'shared_unlocked_skins', 'shared_chest_count',
-                'shared_friends_invited', 'shared_last_chest_level', 'shared_labubu_last_notification',
-                'labubu_backup', 'labubu_backup_history'
+                'labubu_stats', 'labubu_money', 'labubu_outfit',
+                'labubu_level', 'labubu_experience', 'labubu_age',
+                'labubu_evolution', 'labubu_last_update', 'pet_name',
+                'labubu_sleeping', 'labubu_pets', 'active_pet_id',
+                'current_skin', 'unlocked_skins', 'chest_count',
+                'friends_invited', 'last_chest_level', 'labubu_last_notification',
+                'owned_outfits', 'last_stat_decay'
             ];
             
             keysToRemove.forEach(key => {
-                localStorage.removeItem(key);
+                const userKey = `${this.gameUserId}_${key}`;
+                localStorage.removeItem(userKey);
             });
+            
+            // Удаляем личные бэкапы
+            const backupKey = `${this.gameUserId}_labubu_backup`;
+            const historyKey = `${this.gameUserId}_labubu_backup_history`;
+            localStorage.removeItem(backupKey);
+            localStorage.removeItem(historyKey);
             
             this.resetToDefaults();
             this.updateDisplay();
             this.switchTab('care');
             
-            this.showMessage('🗑️ Игра полностью сброшена! Добро пожаловать, новый владелец Лабубу!');
+            this.showMessage('🗑️ Ваша игра полностью сброшена! Добро пожаловать, новый владелец Лабубу!');
         } else {
             this.showMessage('❌ Сброс отменен.');
         }
@@ -2327,31 +2358,27 @@ class LabubuCareGame {
     }
 
     saveToLocalStorage() {
-        // Сохранение только в localStorage (без БД)
-        this.saveValue('shared_labubu_stats', this.stats);
-        this.saveValue('shared_labubu_money', this.money);
-        this.saveValue('shared_labubu_outfit', this.outfit);
-        this.saveValue('shared_labubu_level', this.level);
-        this.saveValue('shared_labubu_experience', this.experience);
-        this.saveValue('shared_labubu_age', this.age);
-        this.saveValue('shared_labubu_evolution', this.evolutionStage);
-        this.saveValue('shared_labubu_last_update', Date.now());
-        this.saveValue('shared_pet_name', this.petName);
-        this.saveValue('shared_labubu_sleeping', this.isSleeping);
-        this.saveValue('shared_current_skin', this.currentSkin);
-        this.saveValue('shared_unlocked_skins', this.unlockedSkins);
-        this.saveValue('shared_chest_count', this.chestCount);
-        this.saveValue('shared_friends_invited', this.friendsInvited);
-        this.saveValue('shared_last_chest_level', this.lastChestLevel);
-        this.saveValue('shared_labubu_last_notification', this.lastNotification);
-        this.saveValue('shared_owned_outfits', this.ownedOutfits);
-        this.saveValue('shared_last_stat_decay', this.lastStatDecay);
-        this.saveValue('shared_owned_outfits', this.ownedOutfits);
-        this.saveValue('shared_last_stat_decay', this.lastStatDecay);
-        this.saveValue('shared_owned_outfits', this.ownedOutfits);
-        this.saveValue('shared_last_stat_decay', this.lastStatDecay);
-        this.saveValue('shared_owned_outfits', this.ownedOutfits);
-        this.saveValue('shared_last_stat_decay', this.lastStatDecay);
+        // Сохранение только в localStorage (индивидуально для каждого пользователя)
+        this.saveValue('labubu_stats', this.stats);
+        this.saveValue('labubu_money', this.money);
+        this.saveValue('labubu_outfit', this.outfit);
+        this.saveValue('labubu_level', this.level);
+        this.saveValue('labubu_experience', this.experience);
+        this.saveValue('labubu_age', this.age);
+        this.saveValue('labubu_evolution', this.evolutionStage);
+        this.saveValue('labubu_last_update', Date.now());
+        this.saveValue('pet_name', this.petName);
+        this.saveValue('labubu_sleeping', this.isSleeping);
+        this.saveValue('current_skin', this.currentSkin);
+        this.saveValue('unlocked_skins', this.unlockedSkins);
+        this.saveValue('chest_count', this.chestCount);
+        this.saveValue('friends_invited', this.friendsInvited);
+        this.saveValue('last_chest_level', this.lastChestLevel);
+        this.saveValue('labubu_last_notification', this.lastNotification);
+        this.saveValue('owned_outfits', this.ownedOutfits);
+        this.saveValue('last_stat_decay', this.lastStatDecay);
+        this.saveValue('labubu_pets', this.pets);
+        this.saveValue('active_pet_id', this.activePetId);
     }
     
     // Игра "Реакция"
