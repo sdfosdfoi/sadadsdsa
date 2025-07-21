@@ -122,6 +122,10 @@
 <script>
 class LabubuCareGame {
     constructor() {
+        // ВАЖНО: Сначала устанавливаем gameUserId
+        this.gameUserId = this.generateUserId();
+        console.log('🆔 Создан gameUserId:', this.gameUserId);
+        
         // Инициализация свойств до загрузки данных
         this.stats = {
             hunger: 100, happiness: 100, cleanliness: 100,
@@ -208,6 +212,7 @@ class LabubuCareGame {
         // Принудительно обновляем отображение сразу после инициализации данных
         setTimeout(() => {
             this.updateDisplay();
+            this.debugSaveSystem();
         }, 50);
         
         // Инициализация
@@ -229,8 +234,15 @@ class LabubuCareGame {
         console.log('🔄 Загрузка данных игры...');
         
         try {
-            // Загружаем только системные данные из localStorage
-            this.gameUserId = this.loadData('game_user_id', this.generateUserId(), 'string');
+            // Загружаем или создаем gameUserId
+        const existingUserId = localStorage.getItem('game_user_id');
+        if (existingUserId) {
+            this.gameUserId = existingUserId;
+        } else {
+            this.gameUserId = this.generateUserId();
+            localStorage.setItem('game_user_id', this.gameUserId);
+        }
+        console.log('🆔 Используется gameUserId:', this.gameUserId);
             this.telegramConnected = this.loadData('telegram_connected', false, 'boolean');
             this.telegramChatId = this.loadData('telegram_chat_id', '', 'string');
             
@@ -389,6 +401,13 @@ class LabubuCareGame {
     
     loadData(key, defaultValue, type = 'auto') {
         try {
+            // Проверяем, есть ли gameUserId
+            if (!this.gameUserId) {
+                console.warn('⚠️ gameUserId не установлен, используем обычный ключ');
+                const saved = localStorage.getItem(key);
+                return saved ? this.parseValue(saved, type, defaultValue) : defaultValue;
+            }
+            
             // Создаем уникальный ключ для каждого пользователя
             const userKey = `${this.gameUserId}_${key}`;
             const saved = localStorage.getItem(userKey);
@@ -397,6 +416,15 @@ class LabubuCareGame {
                 return defaultValue;
             }
             
+            return this.parseValue(saved, type, defaultValue);
+        } catch (error) {
+            console.error(`Ошибка загрузки данных для ключа ${key}:`, error);
+            return defaultValue;
+        }
+    }
+    
+    parseValue(saved, type, defaultValue) {
+        try {
             // Обработка разных типов данных
             switch (type) {
                 case 'string':
@@ -414,12 +442,11 @@ class LabubuCareGame {
                     try {
                         return JSON.parse(saved);
                     } catch (parseError) {
-                        console.warn(`Ошибка парсинга для ключа ${userKey}:`, parseError);
+                        console.warn(`Ошибка парсинга значения:`, parseError);
                         return defaultValue;
                     }
             }
         } catch (error) {
-            console.error(`Ошибка загрузки данных для ключа ${key}:`, error);
             return defaultValue;
         }
     }
@@ -427,6 +454,7 @@ class LabubuCareGame {
     saveData() {
         try {
             console.log('💾 Сохранение данных игры...');
+            console.log('🆔 gameUserId для сохранения:', this.gameUserId);
             
             // Обновляем время последнего обновления
             this.lastUpdate = Date.now();
@@ -459,6 +487,17 @@ class LabubuCareGame {
     
     saveValue(key, value) {
         try {
+            // Проверяем, есть ли gameUserId
+            if (!this.gameUserId) {
+                console.warn('⚠️ gameUserId не установлен, используем обычный ключ');
+                if (typeof value === 'object') {
+                    localStorage.setItem(key, JSON.stringify(value));
+                } else {
+                    localStorage.setItem(key, value.toString());
+                }
+                return;
+            }
+            
             // Создаем уникальный ключ для каждого пользователя
             const userKey = `${this.gameUserId}_${key}`;
             if (typeof value === 'object') {
@@ -466,6 +505,8 @@ class LabubuCareGame {
             } else {
                 localStorage.setItem(userKey, value.toString());
             }
+            
+            console.log(`💾 Сохранено: ${userKey} = ${typeof value === 'object' ? JSON.stringify(value) : value}`);
         } catch (error) {
             console.error(`Ошибка сохранения ${key}:`, error);
         }
@@ -1431,9 +1472,35 @@ class LabubuCareGame {
                                 <li>При чистоте < 50%: "Я грязный!"</li>
                             </ul>
                         </div>
+                        <div class="bg-yellow-50 p-2 rounded">
+                            <h4 class="font-bold text-yellow-800 mb-1">🔧 Тест сохранения</h4>
+                            <div class="grid grid-cols-2 gap-1">
+                                <button onclick="game.testSave()" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs">
+                                    💾 Тест сохранения
+                                </button>
+                                <button onclick="game.testLoad()" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                                    📂 Тест загрузки
+                                </button>
+                                <button onclick="game.debugSaveSystem()" class="bg-purple-500 hover:bg-purple-600 text-white px-2 py-1 rounded text-xs">
+                                    🔍 Debug
+                                </button>
+                                <button onclick="game.clearSave()" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs">
+                                    🗑️ Очистить
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1 mt-2">
+                                <button onclick="game.forceSave()" class="bg-orange-500 hover:bg-orange-600 text-white px-2 py-1 rounded text-xs">
+                                    💾 Принудительное сохранение
+                                </button>
+                                <button onclick="game.checkSaveIntegrity()" class="bg-cyan-500 hover:bg-cyan-600 text-white px-2 py-1 rounded text-xs">
+                                    🔍 Проверить целостность
+                                </button>
+                            </div>
+                        </div>
+                        
                         <div class="text-center text-gray-500">
                             <p>🐰 Создано с любовью для ${this.petName}! 💕</p>
-                            <p class="text-xs mt-1">Версия 4.1 - Индивидуальные питомцы</p>
+                            <p class="text-xs mt-1">Версия 4.2 - Исправлена система сохранения</p>
                             <div class="bg-green-50 p-2 rounded mt-2">
                                 <p class="text-xs text-green-700">🎯 У каждого игрока теперь свой уникальный питомец!</p>
                                 <p class="text-xs text-green-600">ID: ${this.gameUserId.slice(-8)}</p>
@@ -2055,6 +2122,21 @@ class LabubuCareGame {
     
     generateUserId() {
         return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    }
+    
+    debugSaveSystem() {
+        console.log('🔍 ОТЛАДКА СИСТЕМЫ СОХРАНЕНИЯ:');
+        console.log('gameUserId:', this.gameUserId);
+        console.log('petName:', this.petName);
+        console.log('money:', this.money);
+        console.log('level:', this.level);
+        console.log('stats:', this.stats);
+        
+        // Проверяем что сохранено в localStorage
+        console.log('💾 В localStorage:');
+        console.log(`${this.gameUserId}_pet_name:`, localStorage.getItem(`${this.gameUserId}_pet_name`));
+        console.log(`${this.gameUserId}_labubu_money:`, localStorage.getItem(`${this.gameUserId}_labubu_money`));
+        console.log(`${this.gameUserId}_labubu_level:`, localStorage.getItem(`${this.gameUserId}_labubu_level`));
     }
     
     handleFileImport(event) {
@@ -3306,6 +3388,120 @@ class LabubuCareGame {
     
     selectSequenceNumber(selectedNumber) {
         this.completeMiniGame(selectedNumber === this.currentSequence.next);
+    }
+    
+    // ТЕСТОВЫЕ ФУНКЦИИ ДЛЯ ОТЛАДКИ СОХРАНЕНИЯ
+    testSave() {
+        console.log('🧪 ТЕСТ СОХРАНЕНИЯ');
+        const oldMoney = this.money;
+        const oldLevel = this.level;
+        
+        this.money += 100;
+        this.level += 1;
+        this.petName = 'Test Pet ' + Math.floor(Math.random() * 100);
+        this.saveData();
+        this.updateDisplay();
+        
+        console.log(`✅ Изменения: Деньги ${oldMoney} → ${this.money}, Уровень ${oldLevel} → ${this.level}`);
+        this.showMessage('💾 Тест сохранения - добавлено 100 монет и 1 уровень!');
+    }
+    
+    testLoad() {
+        console.log('🧪 ТЕСТ ЗАГРУЗКИ');
+        // Проверяем что именно сохранено в localStorage
+        const userKeys = Object.keys(localStorage).filter(key => key.startsWith(this.gameUserId));
+        console.log('🔍 Найдены ключи пользователя:', userKeys);
+        
+        const savedMoney = this.loadData('labubu_money', 100, 'number');
+        const savedLevel = this.loadData('labubu_level', 1, 'number'); 
+        const savedPetName = this.loadData('pet_name', 'Labubu', 'string');
+        
+        console.log('📂 Загруженные данные:', { savedMoney, savedLevel, savedPetName });
+        console.log('💾 Ключи в localStorage:', userKeys.length);
+        this.showMessage(`📂 Данные: ${savedMoney} монет, ${savedLevel} уровень, ${savedPetName} (${userKeys.length} ключей)`);
+    }
+    
+    clearSave() {
+        console.log('🗑️ ОЧИСТКА СОХРАНЕНИЯ');
+        const keys = [
+            'labubu_stats', 'labubu_money', 'labubu_outfit',
+            'labubu_level', 'labubu_experience', 'labubu_age',
+            'labubu_evolution', 'labubu_last_update', 'pet_name',
+            'labubu_sleeping', 'current_skin', 'unlocked_skins',
+            'owned_outfits', 'last_stat_decay', 'labubu_pets', 'active_pet_id'
+        ];
+        
+        let deletedCount = 0;
+        keys.forEach(key => {
+            const userKey = `${this.gameUserId}_${key}`;
+            if (localStorage.getItem(userKey)) {
+                localStorage.removeItem(userKey);
+                deletedCount++;
+                console.log('✅ Удален ключ:', userKey);
+            }
+        });
+        
+        console.log(`🗑️ Удалено ${deletedCount} ключей из ${keys.length}`);
+        this.showMessage(`🗑️ Очищено ${deletedCount} ключей! Перезагрузите страницу для сброса.`);
+    }
+    
+    forceSave() {
+        console.log('💾 ПРИНУДИТЕЛЬНОЕ СОХРАНЕНИЕ');
+        console.log('📊 Текущее состояние игры:');
+        console.log('- petName:', this.petName);
+        console.log('- money:', this.money);
+        console.log('- level:', this.level);
+        console.log('- experience:', this.experience);
+        console.log('- stats:', this.stats);
+        
+        // Принудительно сохраняем все ключевые данные
+        this.saveValue('pet_name', this.petName);
+        this.saveValue('labubu_money', this.money);
+        this.saveValue('labubu_level', this.level);
+        this.saveValue('labubu_experience', this.experience);
+        this.saveValue('labubu_stats', this.stats);
+        this.saveValue('labubu_age', this.age);
+        this.saveValue('owned_outfits', this.ownedOutfits);
+        this.saveValue('last_stat_decay', this.lastStatDecay);
+        
+        console.log('✅ Принудительное сохранение завершено');
+        this.showMessage('💾 Все данные принудительно сохранены!');
+    }
+    
+    checkSaveIntegrity() {
+        console.log('🔍 ПРОВЕРКА ЦЕЛОСТНОСТИ ДАННЫХ');
+        
+        const currentData = {
+            petName: this.petName,
+            money: this.money,
+            level: this.level,
+            experience: this.experience
+        };
+        
+        const savedData = {
+            petName: this.loadData('pet_name', 'DEFAULT'),
+            money: this.loadData('labubu_money', -1, 'number'),
+            level: this.loadData('labubu_level', -1, 'number'),
+            experience: this.loadData('labubu_experience', -1, 'number')
+        };
+        
+        console.log('📊 Текущие данные:', currentData);
+        console.log('💾 Сохраненные данные:', savedData);
+        
+        let issuesFound = 0;
+        Object.keys(currentData).forEach(key => {
+            if (currentData[key] !== savedData[key]) {
+                console.warn(`⚠️ Несоответствие ${key}: текущее=${currentData[key]}, сохраненное=${savedData[key]}`);
+                issuesFound++;
+            }
+        });
+        
+        const message = issuesFound === 0 
+            ? '✅ Данные синхронизированы!'
+            : `⚠️ Найдено ${issuesFound} несоответствий (см. консоль)`;
+            
+        this.showMessage(message);
+        console.log(`🔍 Проверка завершена: ${issuesFound} проблем`);
     }
     
     checkLevelUp() {
