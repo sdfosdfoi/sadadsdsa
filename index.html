@@ -209,6 +209,9 @@ class LabubuCareGame {
         // Проверяем возраст при инициализации
         this.checkEvolution();
         
+        // Обрабатываем время отсутствия при загрузке
+        this.processTimeAway();
+        
         // Принудительно обновляем отображение сразу после инициализации данных
         setTimeout(() => {
             this.updateDisplay();
@@ -473,6 +476,11 @@ class LabubuCareGame {
             
             // Дублирование в localStorage как кэш
             this.saveToLocalStorage();
+        
+        // Инициализируем lastStatDecay если не загружено
+        if (!this.lastStatDecay) {
+            this.lastStatDecay = this.loadData('last_stat_decay', Date.now(), 'number');
+        }
             
             // Создание резервной копии
             this.createBackup();
@@ -1496,6 +1504,14 @@ class LabubuCareGame {
                                     🔍 Проверить целостность
                                 </button>
                             </div>
+                            <div class="grid grid-cols-2 gap-1 mt-2">
+                                <button onclick="game.testStatDecay()" class="bg-indigo-500 hover:bg-indigo-600 text-white px-2 py-1 rounded text-xs">
+                                    📉 Тест снижения статистик
+                                </button>
+                                <button onclick="game.simulateTimeAway(10)" class="bg-teal-500 hover:bg-teal-600 text-white px-2 py-1 rounded text-xs">
+                                    ⏰ Симуляция 10 минут отсутствия
+                                </button>
+                            </div>
                         </div>
                         
                         <div class="text-center text-gray-500">
@@ -2124,6 +2140,88 @@ class LabubuCareGame {
         return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
     }
     
+    processTimeAway() {
+        const now = Date.now();
+        const timeSinceLastDecay = now - this.lastStatDecay;
+        const minutesAway = Math.floor(timeSinceLastDecay / (1000 * 60));
+        
+        console.log(`⏰ Проверка времени отсутствия: ${minutesAway} минут с последнего обновления статистик`);
+        
+        if (minutesAway >= 2) { // Если отсутствовали больше 2 минут
+            const changeIntervals = Math.floor(minutesAway / 2); // Интервалы по 2 минуты
+            
+            console.log(`📊 Обработка ${changeIntervals} интервалов отсутствия`);
+            
+            let newStats = { ...this.stats };
+            let wasAsleep = this.isSleeping;
+            
+            // Предполагаем, что если игрок долго отсутствовал, питомец мог спать
+            // Проверяем время суток для более реалистичного поведения
+            const hour = new Date().getHours();
+            const isNightTime = hour >= 22 || hour <= 6;
+            
+            // Если отсутствовали больше 4 часов и ночное время, предполагаем что спал
+            if (minutesAway > 240 && isNightTime && !this.isSleeping) {
+                console.log('🌙 Длительное отсутствие в ночное время - питомец мог спать');
+                wasAsleep = true;
+            }
+            
+            if (wasAsleep) {
+                console.log(`😴 Обработка отсутствия во время сна (${changeIntervals} интервалов)`);
+                // Во время сна: энергия и сон восстанавливаются быстро, остальное падает медленно
+                newStats.energy = Math.min(100, newStats.energy + (changeIntervals * 15)); // +15 каждые 2 минуты
+                newStats.sleep = Math.min(100, newStats.sleep + (changeIntervals * 20)); // +20 каждые 2 минуты
+                newStats.hunger = Math.max(0, newStats.hunger - (changeIntervals * 1)); // -1 каждые 2 минуты
+                newStats.happiness = Math.max(0, newStats.happiness - (changeIntervals * 0.5)); // -0.5 каждые 2 минуты
+                newStats.cleanliness = Math.max(0, newStats.cleanliness - (changeIntervals * 1)); // -1 каждые 2 минуты
+                newStats.health = Math.max(0, newStats.health - (changeIntervals * 0.5)); // -0.5 каждые 2 минуты
+            } else {
+                console.log(`🏃 Обработка отсутствия в активном состоянии (${changeIntervals} интервалов)`);
+                // В активном состоянии: все снижается, энергия восстанавливается медленно
+                newStats.hunger = Math.max(0, newStats.hunger - (changeIntervals * 3)); // -3 каждые 2 минуты
+                newStats.happiness = Math.max(0, newStats.happiness - (changeIntervals * 2)); // -2 каждые 2 минуты
+                newStats.cleanliness = Math.max(0, newStats.cleanliness - (changeIntervals * 2)); // -2 каждые 2 минуты
+                newStats.health = Math.max(0, newStats.health - (changeIntervals * 1)); // -1 каждые 2 минуты
+                newStats.energy = Math.min(100, newStats.energy + (changeIntervals * 2)); // +2 каждые 2 минуты (медленное восстановление)
+                newStats.sleep = Math.max(0, newStats.sleep - (changeIntervals * 4)); // -4 каждые 2 минуты
+            }
+            
+            // Округляем все значения
+            Object.keys(newStats).forEach(key => {
+                newStats[key] = Math.round(newStats[key]);
+            });
+            
+            // Проверяем, изменились ли статистики
+            const statsChanged = Object.keys(newStats).some(key => 
+                this.stats[key] !== newStats[key]
+            );
+            
+            if (statsChanged) {
+                console.log('📈 Статистики обновлены после отсутствия:', {
+                    minutesAway: minutesAway,
+                    intervals: changeIntervals,
+                    wasAsleep: wasAsleep,
+                    before: this.stats,
+                    after: newStats
+                });
+                
+                this.stats = newStats;
+                this.lastStatDecay = now;
+                
+                // Показываем сообщение игроку
+                let message = `⏰ Вы отсутствовали ${minutesAway} минут. `;
+                if (wasAsleep) {
+                    message += `${this.petName} хорошо отдохнул! ⚡ Энергия восстановлена.`;
+                } else {
+                    message += `${this.petName} скучал! 📉 Некоторые показатели снизились.`;
+                }
+                this.showMessage(message);
+                
+                this.saveData();
+            }
+        }
+    }
+    
     debugSaveSystem() {
         console.log('🔍 ОТЛАДКА СИСТЕМЫ СОХРАНЕНИЯ:');
         console.log('gameUserId:', this.gameUserId);
@@ -2131,12 +2229,14 @@ class LabubuCareGame {
         console.log('money:', this.money);
         console.log('level:', this.level);
         console.log('stats:', this.stats);
+        console.log('lastStatDecay:', new Date(this.lastStatDecay));
         
         // Проверяем что сохранено в localStorage
         console.log('💾 В localStorage:');
         console.log(`${this.gameUserId}_pet_name:`, localStorage.getItem(`${this.gameUserId}_pet_name`));
         console.log(`${this.gameUserId}_labubu_money:`, localStorage.getItem(`${this.gameUserId}_labubu_money`));
         console.log(`${this.gameUserId}_labubu_level:`, localStorage.getItem(`${this.gameUserId}_labubu_level`));
+        console.log(`${this.gameUserId}_last_stat_decay:`, localStorage.getItem(`${this.gameUserId}_last_stat_decay`));
     }
     
     handleFileImport(event) {
@@ -2461,6 +2561,8 @@ class LabubuCareGame {
         this.saveValue('last_stat_decay', this.lastStatDecay);
         this.saveValue('labubu_pets', this.pets);
         this.saveValue('active_pet_id', this.activePetId);
+        this.saveValue('last_stat_decay', this.lastStatDecay || Date.now());
+        this.saveValue('last_stat_decay', this.lastStatDecay);
     }
     
     // Игра "Реакция"
@@ -3504,6 +3606,39 @@ class LabubuCareGame {
         console.log(`🔍 Проверка завершена: ${issuesFound} проблем`);
     }
     
+    testStatDecay() {
+        console.log('🧪 ТЕСТ СИСТЕМЫ СНИЖЕНИЯ СТАТИСТИК');
+        console.log('📊 Статистики ДО теста:', this.stats);
+        console.log('💤 Спит ли питомец:', this.isSleeping);
+        
+        // Принудительно вызываем обработку изменения статистик
+        this.processStatChanges();
+        
+        console.log('📊 Статистики ПОСЛЕ теста:', this.stats);
+        this.showMessage('📉 Тест системы снижения статистик выполнен (смотрите консоль F12)');
+    }
+    
+    simulateTimeAway(minutesAway) {
+        console.log(`⏰ СИМУЛЯЦИЯ ${minutesAway} МИНУТ ОТСУТСТВИЯ`);
+        console.log('📊 Статистики ДО симуляции:', this.stats);
+        
+        // Сохраняем текущие данные
+        const originalLastStatDecay = this.lastStatDecay;
+        
+        // Изменяем время последнего снижения на указанное количество минут назад
+        this.lastStatDecay = Date.now() - (minutesAway * 60 * 1000);
+        
+        console.log(`🕐 Установлено время последнего изменения: ${new Date(this.lastStatDecay)}`);
+        
+        // Обрабатываем время отсутствия
+        this.processTimeAway();
+        
+        console.log('📊 Статистики ПОСЛЕ симуляции:', this.stats);
+        this.showMessage(`⏰ Симуляция ${minutesAway} минут отсутствия выполнена!`);
+        
+        this.updateDisplay();
+    }
+    
     checkLevelUp() {
         const newLevel = Math.floor(this.experience / 100) + 1;
         if (newLevel > this.level) {
@@ -3795,49 +3930,134 @@ class LabubuCareGame {
     }
     
     startGameLoop() {
+        // ОСНОВНОЙ ЦИКЛ - каждые 30 секунд для лучшей отзывчивости
         setInterval(() => {
-            const now = Date.now();
-            const timeDiff = Math.floor((now - this.lastStatDecay) / 1000);
+            this.processStatChanges();
+        }, 30000); // Каждые 30 секунд
+        
+        // ДОПОЛНИТЕЛЬНЫЙ ЦИКЛ - каждую минуту для проверки старения
+        setInterval(() => {
+            this.processAging();
+        }, 60000); // Каждую минуту
+        
+        console.log('🔄 Система автоматического изменения статистик запущена!');
+        console.log('📉 Статистики будут снижаться каждые 30 секунд');
+        console.log('⚡ Энергия будет восстанавливаться постоянно');
+    }
+    
+    processStatChanges() {
+        const now = Date.now();
+        const timeSinceLastDecay = now - this.lastStatDecay;
+        const minutesPassed = Math.floor(timeSinceLastDecay / (1000 * 60));
+        
+        // Проверяем, прошло ли достаточно времени (минимум 1 минута между изменениями)
+        if (minutesPassed >= 1) {
+            console.log(`📊 Обработка изменений статистик: ${minutesPassed} минут прошло`);
             
-            // Старение: 1 реальный день = 1 день питомца (86400 секунд = 1 день)
-            const agingTimeDiff = Math.floor((now - this.lastUpdate) / 1000);
-            if (agingTimeDiff >= 86400) {
-                const daysToAdd = Math.floor(agingTimeDiff / 86400);
-                this.age += daysToAdd;
-                this.lastUpdate = now - (agingTimeDiff % 86400) * 1000; // Сохраняем остаток времени
-                this.checkEvolution();
-                this.saveData();
-                console.log(`🎂 ${this.petName} состарился на ${daysToAdd} дней! Новый возраст: ${this.age}`);
-            }
+            // Вычисляем количество интервалов изменения (каждые 2 минуты)
+            const changeIntervals = Math.floor(minutesPassed / 2);
             
-            // Снижение статистик каждые 5 минут (300 секунд)
-            if (timeDiff >= 300) {
-                const intervalsPassed = Math.floor(timeDiff / 300);
+            if (changeIntervals > 0) {
+                let newStats = { ...this.stats };
                 
-                if (!this.isSleeping) {
-                    this.stats.hunger = Math.max(0, this.stats.hunger - (3 * intervalsPassed));
-                    this.stats.happiness = Math.max(0, this.stats.happiness - (2 * intervalsPassed));
-                    this.stats.cleanliness = Math.max(0, this.stats.cleanliness - (2 * intervalsPassed));
-                    this.stats.health = Math.max(0, this.stats.health - (1 * intervalsPassed));
-                    this.stats.energy = Math.min(100, this.stats.energy + (1 * intervalsPassed)); // Медленное восстановление
-                    this.stats.sleep = Math.max(0, this.stats.sleep - (3 * intervalsPassed));
-                    
-                    this.checkNotifications();
+                if (this.isSleeping) {
+                    console.log(`😴 ${this.petName} спит - восстанавливается энергия и сон`);
+                    // Во время сна: энергия и сон восстанавливаются быстро, остальное падает медленно
+                    newStats.energy = Math.min(100, newStats.energy + (changeIntervals * 15)); // +15 каждые 2 минуты
+                    newStats.sleep = Math.min(100, newStats.sleep + (changeIntervals * 20)); // +20 каждые 2 минуты
+                    newStats.hunger = Math.max(0, newStats.hunger - (changeIntervals * 1)); // -1 каждые 2 минуты
+                    newStats.happiness = Math.max(0, newStats.happiness - (changeIntervals * 0.5)); // -0.5 каждые 2 минуты
+                    newStats.cleanliness = Math.max(0, newStats.cleanliness - (changeIntervals * 1)); // -1 каждые 2 минуты
+                    newStats.health = Math.max(0, newStats.health - (changeIntervals * 0.5)); // -0.5 каждые 2 минуты
                 } else {
-                    // Восстановление во время сна
-                    this.stats.energy = Math.min(100, this.stats.energy + (8 * intervalsPassed)); // Быстрое восстановление
-                    this.stats.sleep = Math.min(100, this.stats.sleep + (12 * intervalsPassed));
-                    this.stats.hunger = Math.max(0, this.stats.hunger - (1 * intervalsPassed)); // Медленное снижение
-                    this.stats.happiness = Math.max(0, this.stats.happiness - (1 * intervalsPassed));
-                    this.stats.cleanliness = Math.max(0, this.stats.cleanliness - (1 * intervalsPassed));
-                    this.stats.health = Math.max(0, this.stats.health - (0.5 * intervalsPassed));
+                    console.log(`🏃 ${this.petName} активен - статистики снижаются`);
+                    // В активном состоянии: все снижается, энергия восстанавливается медленно
+                    newStats.hunger = Math.max(0, newStats.hunger - (changeIntervals * 3)); // -3 каждые 2 минуты
+                    newStats.happiness = Math.max(0, newStats.happiness - (changeIntervals * 2)); // -2 каждые 2 минуты
+                    newStats.cleanliness = Math.max(0, newStats.cleanliness - (changeIntervals * 2)); // -2 каждые 2 минуты
+                    newStats.health = Math.max(0, newStats.health - (changeIntervals * 1)); // -1 каждые 2 минуты
+                    newStats.energy = Math.min(100, newStats.energy + (changeIntervals * 2)); // +2 каждые 2 минуты (медленное восстановление)
+                    newStats.sleep = Math.max(0, newStats.sleep - (changeIntervals * 4)); // -4 каждые 2 минуты
                 }
                 
-                this.lastStatDecay = now;
-                this.saveData();
-                this.updateDisplay();
+                // Округляем все значения
+                Object.keys(newStats).forEach(key => {
+                    newStats[key] = Math.round(newStats[key]);
+                });
+                
+                // Проверяем, изменились ли статистики
+                const statsChanged = Object.keys(newStats).some(key => 
+                    this.stats[key] !== newStats[key]
+                );
+                
+                if (statsChanged) {
+                    console.log('📉 Статистики изменены:', {
+                        old: this.stats,
+                        new: newStats,
+                        sleeping: this.isSleeping,
+                        intervals: changeIntervals
+                    });
+                    
+                    this.stats = newStats;
+                    this.lastStatDecay = now;
+                    
+                    // Сохраняем данные и обновляем отображение
+                    this.saveData();
+                    this.updateDisplay();
+                    
+                    // Проверяем уведомления
+                    this.checkNotifications();
+                }
+            } else {
+                // Восстановление энергии даже без полного интервала (каждую минуту понемногу)
+                let energyChanged = false;
+                
+                if (this.isSleeping) {
+                    // Быстрое восстановление энергии во сне
+                    const newEnergy = Math.min(100, this.stats.energy + Math.floor(minutesPassed * 2)); // +2 в минуту во сне
+                    if (newEnergy !== this.stats.energy) {
+                        this.stats.energy = newEnergy;
+                        energyChanged = true;
+                    }
+                    
+                    // Восстановление сна
+                    const newSleep = Math.min(100, this.stats.sleep + Math.floor(minutesPassed * 3)); // +3 в минуту во сне
+                    if (newSleep !== this.stats.sleep) {
+                        this.stats.sleep = newSleep;
+                        energyChanged = true;
+                    }
+                } else {
+                    // Медленное восстановление энергии в активном состоянии
+                    const newEnergy = Math.min(100, this.stats.energy + Math.floor(minutesPassed * 0.5)); // +0.5 в минуту активно
+                    if (newEnergy !== this.stats.energy) {
+                        this.stats.energy = newEnergy;
+                        energyChanged = true;
+                    }
+                }
+                
+                if (energyChanged) {
+                    console.log(`⚡ Обновлена энергия: ${this.stats.energy}% (спит: ${this.isSleeping})`);
+                    this.lastStatDecay = now;
+                    this.saveData();
+                    this.updateDisplay();
+                }
             }
-        }, 60000); // Проверка каждую минуту
+        }
+    }
+    
+    processAging() {
+        const now = Date.now();
+        const agingTimeDiff = Math.floor((now - this.lastUpdate) / 1000);
+        
+        // Старение: 1 реальный день = 1 день питомца (86400 секунд = 1 день)
+        if (agingTimeDiff >= 86400) {
+            const daysToAdd = Math.floor(agingTimeDiff / 86400);
+            this.age += daysToAdd;
+            this.lastUpdate = now - (agingTimeDiff % 86400) * 1000; // Сохраняем остаток времени
+            this.checkEvolution();
+            this.saveData();
+            console.log(`🎂 ${this.petName} состарился на ${daysToAdd} дней! Новый возраст: ${this.age}`);
+        }
     }
     
     startNotificationTimer() {
