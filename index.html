@@ -1147,8 +1147,7 @@ class LabubuCareGame {
         const mood = this.getMood();
         const moodEmoji = document.getElementById('moodEmoji');
         const moodStatus = document.getElementById('moodStatus');
-        const evolutionStage = document.getElementById('evolutionStage');
-        const petImage = document.getElementById('petImage');
+        const petImageForMood = document.getElementById('petImage');
         
         if (moodEmoji && mood) moodEmoji.textContent = mood.emoji;
         if (moodStatus && mood) moodStatus.textContent = mood.status;
