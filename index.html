@@ -121,8 +121,47 @@
 
 <script>
 class LabubuCareGame {
+    // ==== НОВОЕ: ЕЖЕДНЕВНЫЕ ЗАДАНИЯ ====
+    dailyMissions = [
+        { id: 'feed', desc: 'Покормите питомца 3 раза', progress: 0, req: 3, done: false, reward: 'х5 монет' },
+        { id: 'clean', desc: 'Помойте питомца 1 раз', progress: 0, req: 1, done: false, reward: '1 энергитик' },
+        { id: 'play', desc: 'Сыграйте 2 мини-игры', progress: 0, req: 2, done: false, reward: '5 опыта' },
+        { id: 'invite', desc: 'Пригласите друга', progress: 0, req: 1, done: false, reward: '1 сундук' }
+    ];
+    dailyResetAt = 0; // timestamp
+    // ---- END ----
     constructor() {
+        // Сброс миссий если сменился день
+        this.loadDailyMissions();
+        // <<<<< ПАДЕНИЕ СТАТОВ >>>>>
+        this.decayStep = {
+            hunger: 2, happiness: 1, cleanliness: 2, health: 1, energy: 1, sleep: 1
+        };
+        this.decayIntervalMs = 60000; // 1 минута
+
+        // Дополнительная еда:
+        this.foodExtended = [
+            { name: 'Пельмени', hunger: 45, price: 60, emoji: '🥟', health: 7 },
+            { name: 'Плов', hunger: 55, price: 85, emoji: '🍛', happiness: 10 },
+            { name: 'Суп', hunger: 30, price: 40, emoji: '🥣', health: 6 },
+            { name: 'Круассан', hunger: 22, price: 25, emoji: '🥐', happiness: 6 },
+            { name: 'Смузи', happiness: 15, health: 10, price: 50, emoji: '🥤' },
+            { name: 'Пицца XXL', hunger: 80, price: 140, emoji: '🍕', happiness: 20 },
+            { name: 'Газировка', happiness: 8, price: 10, emoji: '🥤', energy: 6 }
+        ];
         // ВАЖНО: Сначала устанавливаем gameUserId
+        this.statusTitles = [
+            {min: 0, title: 'Новичок', frame: '', color: '#bbb'},
+            {min: 5, title: 'Друг', frame: '🟦', color: '#6EE7B7'},
+            {min: 15, title: 'Герой', frame: '🟨', color: '#FACC15'},
+            {min: 25, title: 'Король', frame: '👑', color: '#F59E42'},
+            {min: 40, title: 'Легенда', frame: '🌟', color: '#9152F8'}
+        ];
+        this.friendsCodes = [];
+        this.collaborators = [];
+        this.nextStatusFrame = null;
+        this.lastInviteTime = 0;
+        this.lastDecayTime = Date.now() - 60000; // Время последнего понижения статов
         this.gameUserId = this.generateUserId();
         console.log('🆔 Создан gameUserId:', this.gameUserId);
         
@@ -171,6 +210,8 @@ class LabubuCareGame {
             { name: 'Молоко', hunger: 15, health: 8, price: 25, emoji: '🥛' }
         ];
         
+        // МНОГО ЕДЫ:
+        this.food = this.food.concat(this.foodExtended);
         this.miniGames = [
             { id: 'memory', name: 'Мемори', emoji: '🧠', description: 'Запомни последовательность', reward: { happiness: 25, experience: 20, money: 15 } },
             { id: 'reaction', name: 'Реакция', emoji: '⚡', description: 'Нажми когда появится сигнал', reward: { happiness: 20, experience: 15, money: 10 } },
@@ -222,6 +263,7 @@ class LabubuCareGame {
         this.init();
         this.startGameLoop();
         this.startNotificationTimer();
+        this.startStatsDecay(); // Падение статов
         
         // Автосохранение каждые 30 секунд
         this.startAutoSave();
@@ -600,6 +642,136 @@ class LabubuCareGame {
         });
     }
     
+    // ==== ЕЖЕДНЕВНЫЕ МИССИИ ====
+    getMissionsTabContent() {
+        this.checkDailyMissions();
+        return `
+            <div class="bg-white rounded-lg p-4 shadow">
+                <h3 class="font-bold text-purple-800 text-sm mb-4">🗓️ Ежедневные задания</h3>
+                <div>
+                ${this.dailyMissions.map(m=>`
+                    <div class="flex items-center mb-3">
+                        <span class="inline-block px-2 py-1 mr-2 rounded text-xs ${m.done?'bg-green-200 text-green-700':'bg-gray-100 text-gray-800'}">${m.desc}</span>
+                        <span class="text-xs text-gray-500">${m.progress}/${m.req}</span>
+                        ${m.done?'<span class="ml-2 text-green-600 font-bold">✅</span>':
+                         `<button class="ml-2 bg-blue-200 text-xs px-2 py-1 rounded" onclick="game.claimDailyMission('${m.id}')">Получить</button>`}
+                    </div>
+                `).join('')}
+                </div>
+                <div class="mt-3 text-xs text-gray-600">💡 Задания обновляются раз в сутки.</div>
+            </div>
+        `;
+    }
+
+    checkDailyMissions() {
+        const now = Math.floor(Date.now()/1000);
+        const oneDay = 86400;
+        if (!this.dailyResetAt || now >= this.dailyResetAt) this.resetDailyMissions();
+        // обновить done для текущих
+        this.dailyMissions.forEach(m => m.done = (m.progress >= m.req));
+        // автосейв
+        this.saveData();
+    }
+    // Сохранить/загрузить миссии
+    saveDailyMissions() {
+        localStorage.setItem(`${this.gameUserId}_daily_missions`, JSON.stringify(this.dailyMissions));
+        localStorage.setItem(`${this.gameUserId}_missions_reset_at`, `${this.dailyResetAt}`);
+    }
+    loadDailyMissions() {
+        try {
+            const missionsRaw = localStorage.getItem(`${this.gameUserId}_daily_missions`);
+            if (missionsRaw) this.dailyMissions = JSON.parse(missionsRaw);
+            const resetRaw = localStorage.getItem(`${this.gameUserId}_missions_reset_at`);
+            if (resetRaw) this.dailyResetAt = parseInt(resetRaw);
+        } catch(e) { this.resetDailyMissions(); }
+    }
+    resetDailyMissions() {
+        this.dailyMissions = [
+            { id: 'feed', desc: 'Покормите питомца 3 раза', progress: 0, req: 3, done: false, reward: 'х5 монет' },
+            { id: 'clean', desc: 'Помойте питомца 1 раз', progress: 0, req: 1, done: false, reward: '1 энергетик' },
+            { id: 'play', desc: 'Сыграйте 2 мини-игры', progress: 0, req: 2, done: false, reward: '5 опыта' },
+            { id: 'invite', desc: 'Пригласите друга', progress: 0, req: 1, done: false, reward: '1 сундук' }
+        ];
+        this.dailyResetAt = Math.floor(Date.now()/1000) + 86400;
+        this.saveDailyMissions();
+    }
+    claimDailyMission(missionId) {
+        const m = this.dailyMissions.find(x=>x.id===missionId);
+        if (!m || !m.done) return this.showMessage('Выполните все условия!');
+        // выдать награду
+        switch(missionId) {
+            case 'feed': this.money += 5; break;
+            case 'clean': this.stats.energy = Math.min(100,this.stats.energy+25); break;
+            case 'play': this.experience += 5; break;
+            case 'invite': this.chestCount += 1; break;
+        }
+        m.done = false;
+        m.progress = 0;
+        this.saveDailyMissions();
+        this.saveData();
+        this.updateDisplay();
+        this.showMessage('Награда за миссию получена!');
+    }
+
+    // ===== КОНЕЦ блока миссий =====
+
+    // ==== Приглашения ==== 
+    inviteFriend(code) {
+        let mission = this.dailyMissions.find(x=>x.id==='invite');
+        if (mission && !mission.done){mission.progress=Math.min(mission.req,mission.progress+1);this.saveDailyMissions();}
+        if (!code || code === this.gameUserId.substring(0,6) || this.collaborators.includes(code)) return this.showMessage('Некорректный код!');
+        this.collaborators.push(code);
+        this.friendsInvited += 1;
+        this.chestCount = (this.chestCount||0) + 1;
+        this.saveData();
+        this.showMessage('Друг добавлен! Получен сундук!');
+        this.updateDisplay();
+    }
+    acceptFriendInvite() {
+        const code = document.getElementById('inviteCodeInput').value.trim();
+        this.inviteFriend(code);
+        document.getElementById('inviteCodeInput').value = '';
+    }
+
+    // ==== Открытие сундука ====
+    openChest() {
+        if (!this.chestCount || this.chestCount === 0) return this.showMessage('Нет сундуков.');
+        const rewards = [
+            {type: 'money', amount: Math.floor(Math.random()*150+50), msg: 'Монеты'},
+            {type: 'food', idx: Math.floor(Math.random()*this.food.length), msg: 'Эксклюзивная еда'},
+            {type: 'skin', skin: 'golden', msg: 'Легендарный скин!'},
+            {type: 'energy', amount: 30, msg: 'Энергия'},
+            {type: 'happiness', amount: 30, msg: 'Счастье'},
+            {type: 'cleanliness', amount: 35, msg: 'Чистота'},
+        ];
+        const choice = rewards[Math.floor(Math.random()*rewards.length)];
+        if (choice.type === 'money') this.money += choice.amount;
+        if (choice.type === 'food') this.stats.hunger = Math.min(100, this.stats.hunger + 35);
+        if (choice.type === 'skin') if(!this.unlockedSkins.includes(choice.skin)) this.unlockedSkins.push(choice.skin);
+        if (choice.type === 'energy') this.stats.energy = Math.min(100, this.stats.energy + choice.amount);
+        if (choice.type === 'happiness') this.stats.happiness = Math.min(100, this.stats.happiness + choice.amount);
+        if (choice.type === 'cleanliness') this.stats.cleanliness = Math.min(100, this.stats.cleanliness + choice.amount);
+        this.chestCount--;
+        this.saveData();
+        document.getElementById('chestRewardMsg').innerHTML = `<b>Награда:</b> ${choice.msg}`;
+        this.updateDisplay();
+    }
+
+    // ==== Падение шкал ====
+    startStatsDecay() {
+        setInterval(()=>{
+            // Кооперация уменьшает падения
+            const isCoop = this.collaborators.length > 0;
+            for (let key of Object.keys(this.decayStep)) {
+                let dec = this.decayStep[key];
+                if(isCoop) dec = Math.floor(dec/2) + 1;
+                this.stats[key] = Math.max(0, this.stats[key] - dec);
+            }
+            this.saveData();
+            this.updateDisplay();
+        }, this.decayIntervalMs);
+    }
+    
     // Функция удалена - каждый игрок имеет одного питомца
     
     createBackup() {
@@ -906,6 +1078,26 @@ class LabubuCareGame {
     
     updateDisplay() {
         console.log('🔄 Обновление отображения...', {
+        // Рамка статуса
+        const petImage = document.getElementById('petImage');
+        const avgStats = Object.values(this.stats).reduce((a, b) => a + b, 0) / 6;
+        let frame = '', frameColor = '', statusTitle = '';
+        for (let i = this.statusTitles.length - 1; i >= 0; i--) {
+            if (this.level >= this.statusTitles[i].min) {
+                frame = this.statusTitles[i].frame;
+                frameColor = this.statusTitles[i].color;
+                statusTitle = this.statusTitles[i].title;
+                break;
+            }
+        }
+        if (petImage) {
+            petImage.style.border = frame ? '4px solid ' + frameColor : 'none';
+            petImage.style.boxShadow = frame ? '0 0 24px ' + frameColor : 'none';
+        }
+        const evolutionStage = document.getElementById('evolutionStage');
+        if(evolutionStage && statusTitle) {
+            evolutionStage.innerHTML += ` <span style="color:${frameColor};font-weight:bold;">${frame} <span>${statusTitle}</span></span>`;
+        }
             petName: this.petName,
             level: this.level,
             money: this.money,
@@ -1245,6 +1437,8 @@ class LabubuCareGame {
     }
     
     switchTab(tab) {
+        // Ежедневное обновление миссий
+        if (tab === 'missions') this.checkDailyMissions();
         this.activeTab = tab;
         
         // Обновить кнопки
@@ -1263,6 +1457,8 @@ class LabubuCareGame {
     
     getTabContent(tab) {
         switch (tab) {
+            case 'missions':
+                return this.getMissionsTabContent();
             case 'care':
                 return this.getCareTabContent();
             case 'games':
@@ -1402,7 +1598,18 @@ class LabubuCareGame {
         return `
             <div class="bg-white rounded-lg p-3 shadow">
                 <h3 class="font-bold mb-2 text-purple-800 text-sm">🐰 Мои питомцы</h3>
-                
+                <div class="mb-2">
+                    <input type="text" id="inviteCodeInput" class="border rounded px-2 py-1 text-xs" placeholder="Ввести код друга">
+                    <button onclick="game.acceptFriendInvite()" class="ml-1 text-xs px-2 py-1 bg-orange-200 rounded">Принять приглашение</button>
+                </div>
+                <div class="mb-2">
+                    Ваш код приглашения: <b id="myFriendCode">${this.gameUserId.substring(0,6)}</b> <button onclick="navigator.clipboard.writeText('${this.gameUserId.substring(0,6)}')" class="text-xs px-1 py-1 bg-blue-200 rounded">Скопировать</button>
+                </div>
+                <div id="collaboratorsList" class="text-xs text-purple-700 mt-2 mb-2">
+                    Приглашено друзей: <b>${this.friendsInvited}</b><br>
+                    ${this.collaborators.length > 0 ? this.collaborators.map(c=>`👥 Друг: ${c}`).join('<br>') : 'Нет друзей для совместного ухода.'}
+                </div>
+            
                 <div class="text-center mb-4">
                     <div class="text-4xl mb-2">🐰</div>
                     <h4 class="font-bold text-lg text-purple-800">${this.petName}</h4>
@@ -1478,8 +1685,17 @@ class LabubuCareGame {
     }
     
     getInfoTabContent() {
+        // Новая вкладка — ежедневные миссии
         return `
             <div class="space-y-3">
+                <button class="w-full bg-orange-300 rounded px-2 py-1 font-bold text-white" onclick="game.switchTab('missions')">Ежедневные задания ➡️</button>
+            </div>` +
+        return `
+            <div class="space-y-3">
+                <div class="bg-orange-100 rounded-lg p-2 mb-2 text-xs text-orange-700">
+                    <b>Система приглашения</b>: получите секретный код и пригласите друга (вкладка PET). Когда друг введет ваш код, оба получите сундук!
+                </div>
+            
 
                 
                 <div class="bg-white rounded-lg p-3 shadow">
@@ -1549,6 +1765,9 @@ class LabubuCareGame {
     
     // Игровая логика
     feedPet(foodIndex) {
+        // Прогресс миссии
+        let mission = this.dailyMissions.find(x=>x.id==='feed');
+        if(mission&&!mission.done){mission.progress=Math.min(mission.req,mission.progress+1);this.saveDailyMissions();}
         if (this.isSleeping) {
             this.showMessage(`${this.petName} спит! 😴`);
             return;
@@ -1581,6 +1800,9 @@ class LabubuCareGame {
     }
     
     washPet() {
+        // Прогресс миссии
+        let mission = this.dailyMissions.find(x=>x.id==='clean');
+        if(mission&&!mission.done){mission.progress=Math.min(mission.req,mission.progress+1);this.saveDailyMissions();}
         if (this.isSleeping) {
             this.showMessage(`Не буди спящего ${this.petName}! 😴`);
             return;
@@ -2230,6 +2452,9 @@ class LabubuCareGame {
     }
     
     completeMiniGame(success = null) {
+        // Прогресс миссии
+        let mission = this.dailyMissions.find(x=>x.id==='play');
+        if(success && mission && !mission.done){mission.progress=Math.min(mission.req,mission.progress+1);this.saveDailyMissions();}
         if (success === null) {
             success = Math.random() > 0.3; // 70% шанс успеха
         }
@@ -3680,6 +3905,13 @@ class LabubuCareGame {
     }
     
     getChestsTabContent() {
+        return `<div class="bg-white rounded-lg p-4 shadow">
+            <h3 class="font-bold text-purple-800 text-sm mb-2">📦 Сундуки</h3>
+            <div>У вас <b>${this.chestCount || 0}</b> сундуков.</div>
+            <button onclick="game.openChest()" ${(!this.chestCount||this.chestCount===0)?'disabled':''} class="bg-yellow-400 hover:bg-yellow-500 rounded px-3 py-1 mt-2">Открыть сундук</button>
+            <div id="chestRewardMsg"></div>
+        </div>`;
+    }
         const availableChests = this.chestCount;
         const chestsFromFriends = Math.floor(this.friendsInvited / 5);
         const totalChests = availableChests + chestsFromFriends;
