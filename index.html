@@ -378,57 +378,174 @@ class LabubuCareGame {
             void: { name: 'Пустота', price: 75000, emoji: '🌑', description: 'Абсолютная тьма', gradient: 'from-black via-gray-900 to-purple-900', rarity: 'mythic', chance: 0.8 },
             celestial: { name: 'Небесный', price: 100000, emoji: '⭐', description: 'Звездная корона', gradient: 'from-indigo-800 via-blue-600 to-cyan-400', rarity: 'mythic', chance: 0.5 },
             temporal: { name: 'Временной', price: 150000, emoji: '⏳', description: 'Искажение времени', gradient: 'from-purple-800 via-pink-600 to-orange-400', rarity: 'mythic', chance: 0.3 },
-            infinity: { name: 'Бесконечность', price: 250000, emoji: '∞', description: 'За пределами понимания', gradient: 'from-gray-900 via-purple-800 via-blue-700 via-teal-600 to-green-500', rarity: 'mythic', chance: 0.1 }
+            infinity: { name: 'Бесконечность', price: 250000, emoji: '∞', description: 'За пределами понимания', gradient: 'from-gray-900 via-purple-800 via-blue-700 via-teal-600 to-green-500', rarity: 'mythic', chance: 0.1 },
+            
+            // ВСЕ ДОПОЛНИТЕЛЬНЫЕ ФОНЫ (33 ШТУКИ ВСЕГО)
+            autumn: { name: 'Осень', price: 2500, emoji: '🍂', description: 'Золотая осень', gradient: 'from-yellow-600 via-orange-500 to-red-500', rarity: 'common', chance: 12 },
+            spring: { name: 'Весна', price: 1800, emoji: '🌱', description: 'Свежая зелень', gradient: 'from-lime-200 via-green-200 to-emerald-200', rarity: 'common', chance: 12 },
+            winter: { name: 'Зима', price: 2200, emoji: '❄️', description: 'Снежная сказка', gradient: 'from-blue-100 via-white to-gray-100', rarity: 'common', chance: 12 },
+            tropical: { name: 'Тропики', price: 4000, emoji: '🌺', description: 'Райские тропики', gradient: 'from-green-400 via-blue-400 to-cyan-300', rarity: 'rare', chance: 12 },
+            desert: { name: 'Пустыня', price: 4500, emoji: '🏜️', description: 'Песчаные дюны', gradient: 'from-yellow-500 via-orange-400 to-red-400', rarity: 'rare', chance: 12 },
+            deep_sea: { name: 'Глубины океана', price: 7500, emoji: '🐙', description: 'Таинственные глубины', gradient: 'from-blue-900 via-teal-800 to-cyan-900', rarity: 'rare', chance: 12 },
+            crystal: { name: 'Кристальный', price: 8000, emoji: '💎', description: 'Сверкающие кристаллы', gradient: 'from-cyan-300 via-blue-300 to-purple-300', rarity: 'rare', chance: 12 },
+            volcano: { name: 'Вулкан', price: 7000, emoji: '🌋', description: 'Огненная лава', gradient: 'from-red-600 via-orange-500 to-yellow-400', rarity: 'rare', chance: 12 },
+            mountain: { name: 'Горы', price: 3200, emoji: '🏔️', description: 'Заснеженные вершины', gradient: 'from-gray-400 via-blue-300 to-white', rarity: 'rare', chance: 12 },
+            space: { name: 'Открытый космос', price: 6500, emoji: '🌌', description: 'Бескрайние звезды', gradient: 'from-black via-purple-900 to-indigo-900', rarity: 'rare', chance: 12 },
+            moonlight: { name: 'Лунный свет', price: 20000, emoji: '🌙', description: 'Серебристое сияние', gradient: 'from-gray-700 via-blue-800 to-indigo-900', rarity: 'legendary', chance: 12 },
+            enchanted: { name: 'Зачарованный', price: 22000, emoji: '🧚', description: 'Магический лес', gradient: 'from-purple-600 via-pink-500 to-green-400', rarity: 'legendary', chance: 12 },
+            phoenix: { name: 'Феникс', price: 18000, emoji: '🔥', description: 'Возрождение из пепла', gradient: 'from-red-500 via-orange-400 to-yellow-300', rarity: 'legendary', chance: 12 },
+            mystical: { name: 'Мистический', price: 25000, emoji: '🔮', description: 'Магическая энергия', gradient: 'from-purple-800 via-blue-700 to-indigo-800', rarity: 'legendary', chance: 12 },
+            neon: { name: 'Неоновый', price: 30000, emoji: '💡', description: 'Кибер будущее', gradient: 'from-pink-500 via-cyan-400 to-purple-500', rarity: 'legendary', chance: 12 },
+            underwater: { name: 'Подводный мир', price: 16000, emoji: '🐠', description: 'Коралловые рифы', gradient: 'from-teal-400 via-blue-500 to-cyan-600', rarity: 'legendary', chance: 12 },
+            steampunk: { name: 'Стимпанк', price: 28000, emoji: '⚙️', description: 'Механический мир', gradient: 'from-amber-600 via-orange-700 to-red-800', rarity: 'legendary', chance: 12 },
+            candy: { name: 'Конфетный', price: 14000, emoji: '🍭', description: 'Сладкий рай', gradient: 'from-pink-300 via-purple-300 to-blue-300', rarity: 'legendary', chance: 12 },
+            void: { name: 'Пустота', price: 75000, emoji: '🌑', description: 'Абсолютная тьма', gradient: 'from-black via-gray-900 to-purple-900', rarity: 'mythic', chance: 12 },
+            temporal: { name: 'Временной', price: 150000, emoji: '⏳', description: 'Искажение времени', gradient: 'from-purple-800 via-pink-600 to-orange-400', rarity: 'mythic', chance: 12 },
+            matrix: { name: 'Матрица', price: 85000, emoji: '💻', description: 'Цифровая реальность', gradient: 'from-green-900 via-green-700 to-black', rarity: 'mythic', chance: 12 },
+            apocalypse: { name: 'Апокалипсис', price: 95000, emoji: '💥', description: 'Конец света', gradient: 'from-red-900 via-orange-800 to-black', rarity: 'mythic', chance: 12 },
+            paradise: { name: 'Рай', price: 120000, emoji: '☁️', description: 'Небесное блаженство', gradient: 'from-white via-blue-200 to-yellow-200', rarity: 'mythic', chance: 12 },
+            nightmare: { name: 'Кошмар', price: 110000, emoji: '👻', description: 'Темные сны', gradient: 'from-purple-900 via-black to-red-900', rarity: 'mythic', chance: 12 },
+            
+            // НОВЫЕ ПРИКОЛЬНЫЕ ФОНЫ (добавляем еще 9 штук)
+            kawaii: { name: 'Кавайный', price: 12000, emoji: '💖', description: 'Милые сердечки и звездочки', gradient: 'from-pink-200 via-purple-200 to-blue-200', rarity: 'legendary', chance: 12 },
+            graffiti: { name: 'Граффити', price: 15000, emoji: '🎨', description: 'Уличное искусство', gradient: 'from-orange-400 via-red-500 to-purple-600', rarity: 'legendary', chance: 12 },
+            holographic: { name: 'Голографический', price: 65000, emoji: '✨', description: 'Переливающаяся голограмма', gradient: 'from-cyan-300 via-purple-400 to-pink-400', rarity: 'mythic', chance: 12 },
+            retro: { name: 'Ретро', price: 8500, emoji: '📼', description: 'Винтаж 80-х', gradient: 'from-purple-600 via-pink-500 to-orange-400', rarity: 'rare', chance: 12 },
+            jungle: { name: 'Джунгли', price: 5200, emoji: '🦜', description: 'Тропические заросли', gradient: 'from-green-600 via-lime-500 to-yellow-400', rarity: 'rare', chance: 12 },
+            arctic: { name: 'Арктика', price: 7800, emoji: '🐧', description: 'Ледяные просторы', gradient: 'from-blue-200 via-cyan-300 to-white', rarity: 'rare', chance: 12 },
+            sakura: { name: 'Цветение сакуры', price: 9500, emoji: '🌸', description: 'Японская весна', gradient: 'from-pink-200 via-rose-300 to-red-200', rarity: 'rare', chance: 12 },
+            cybercity: { name: 'Киберсити', price: 45000, emoji: '🏙️', description: 'Город будущего', gradient: 'from-blue-600 via-purple-700 to-pink-800', rarity: 'mythic', chance: 12 },
+            dimension: { name: 'Другое измерение', price: 200000, emoji: '🌀', description: 'За гранью реальности', gradient: 'from-indigo-900 via-purple-800 via-pink-700 via-orange-600 to-yellow-500', rarity: 'mythic', chance: 12 },
+            
+            // ДОПОЛНИТЕЛЬНЫЕ ФОНЫ до 33 штук (добавляем еще 8)
+            pastel: { name: 'Пастельный', price: 1600, emoji: '🌈', description: 'Нежные пастельные тона', gradient: 'from-pink-200 via-purple-200 to-blue-200', rarity: 'common', chance: 12 },
+            mountain: { name: 'Горы', price: 3200, emoji: '🏔️', description: 'Заснеженные вершины', gradient: 'from-gray-400 via-blue-300 to-white', rarity: 'rare', chance: 12 },
+            space: { name: 'Открытый космос', price: 6500, emoji: '🌌', description: 'Бескрайние звезды', gradient: 'from-black via-purple-900 to-indigo-900', rarity: 'rare', chance: 12 },
+            steampunk: { name: 'Стимпанк', price: 28000, emoji: '⚙️', description: 'Механический мир', gradient: 'from-amber-600 via-orange-700 to-red-800', rarity: 'legendary', chance: 12 },
+            candy: { name: 'Конфетный', price: 14000, emoji: '🍭', description: 'Сладкий рай', gradient: 'from-pink-300 via-purple-300 to-blue-300', rarity: 'legendary', chance: 12 },
+            kawaii: { name: 'Кавайный', price: 12000, emoji: '💖', description: 'Милые сердечки и звездочки', gradient: 'from-pink-200 via-purple-200 to-blue-200', rarity: 'legendary', chance: 12 },
+            graffiti: { name: 'Граффити', price: 15000, emoji: '🎨', description: 'Уличное искусство', gradient: 'from-orange-400 via-red-500 to-purple-600', rarity: 'legendary', chance: 12 },
+            holographic: { name: 'Голографический', price: 65000, emoji: '✨', description: 'Переливающаяся голограмма', gradient: 'from-cyan-300 via-purple-400 to-pink-400', rarity: 'mythic', chance: 12 }
         };
 
         // ПОСЛЕ определения backgrounds загружаем текущие настройки фонов
         this.currentBackground = this.loadData('current_background', 'default', 'string');
         this.unlockedBackgrounds = this.loadData('unlocked_backgrounds', ['default'], 'array');
+        
+        // Инициализация новых систем
+        this.unlockedFrames = this.loadData('unlocked_frames', ['default'], 'array');
+        this.currentFrame = this.loadData('current_frame', 'default', 'string');
+        // АКСЕССУАРЫ УБРАНЫ ИЗ ИГРЫ
 
         // Скины персонажей с редкостями и шансами
         this.skins = {
             default: { 
                 name: 'Базовый Лабубу', 
                 rarity: 'common', 
-                chance: 50, 
+                chance: 30, 
                 image: 'https://i.ebayimg.com/images/g/yVoAAOSwiqJnxCvP/s-l1600.jpg',
                 color: '#DEB887'
             },
             pink: { 
                 name: 'Розовый Лабубу', 
                 rarity: 'rare', 
-                chance: 27, 
+                chance: 15, 
                 image: 'https://i.postimg.cc/8s8qs9Sv/photo-2025-06-29-05-15-51.jpg',
                 color: '#FFB6C1'
             },
             orange: { 
                 name: 'Оранжевый Лабубу', 
                 rarity: 'rare', 
-                chance: 26.5, 
+                chance: 15, 
                 image: 'https://i.postimg.cc/C5n3hYWY/photo-2025-06-29-05-16-06.jpg',
                 color: '#FFA500'
             },
             blue: { 
                 name: 'Голубой Лабубу', 
                 rarity: 'rare', 
-                chance: 25, 
+                chance: 14, 
                 image: 'https://i.postimg.cc/QNBC97DN/photo-2025-06-29-05-16-17.jpg',
                 color: '#87CEEB'
+            },
+            purple: { 
+                name: 'Фиолетовый Лабубу', 
+                rarity: 'rare', 
+                chance: 12, 
+                image: 'https://i.postimg.cc/76PxzfKW/purple-labubu.jpg',
+                color: '#9370DB'
+            },
+            green: { 
+                name: 'Зеленый Лабубу', 
+                rarity: 'rare', 
+                chance: 12, 
+                image: 'https://i.postimg.cc/2y8PzDnm/green-labubu.jpg',
+                color: '#32CD32'
             },
             rainbow: { 
                 name: 'Радужный Лабубу', 
                 rarity: 'legendary', 
-                chance: 9, 
+                chance: 6, 
                 image: 'https://i.postimg.cc/SQwsW-KQ6/photo-2025-06-29-05-16-29.jpg',
                 color: '#FF69B4'
+            },
+            cosmic: { 
+                name: 'Космический Лабубу', 
+                rarity: 'legendary', 
+                chance: 4, 
+                image: 'https://i.postimg.cc/5NxQz8Vh/cosmic-labubu.jpg',
+                color: '#191970'
+            },
+            cyber: { 
+                name: 'Киберпанк Лабубу', 
+                rarity: 'legendary', 
+                chance: 4, 
+                image: 'https://i.postimg.cc/28Kx5RDQ/cyber-labubu.jpg',
+                color: '#00FFFF'
             },
             golden: { 
                 name: 'Золотой Лабубу', 
                 rarity: 'mythic', 
-                chance: 1, 
+                chance: 2, 
                 image: 'https://i.postimg.cc/wTLBFd3S/photo-2025-06-29-05-16-38.jpg',
                 color: '#FFD700'
+            },
+            diamond: { 
+                name: 'Алмазный Лабубу', 
+                rarity: 'mythic', 
+                chance: 1, 
+                image: 'https://i.postimg.cc/DZzK8xN4/diamond-labubu.jpg',
+                color: '#B9F2FF'
             }
+        };
+
+
+
+        // РАМКИ ВОКРУГ ЛАБУБУ С ШАНСОМ 2%
+        this.frames = {
+            // Простые рамки
+            wooden: { name: 'Деревянная рамка', chance: 2, style: 'border-4 border-yellow-800 bg-gradient-to-r from-yellow-700 to-yellow-900', description: 'Классическая деревянная рамка', rarity: 'rare' },
+            silver: { name: 'Серебряная рамка', chance: 2, style: 'border-4 border-gray-400 bg-gradient-to-r from-gray-300 to-gray-500 shadow-xl', description: 'Элегантная серебряная рамка', rarity: 'rare' },
+            bronze: { name: 'Бронзовая рамка', chance: 2, style: 'border-4 border-yellow-600 bg-gradient-to-r from-yellow-500 to-orange-600', description: 'Античная бронзовая рамка', rarity: 'rare' },
+            
+            // Драгоценные рамки
+            golden: { name: 'Золотая рамка', chance: 2, style: 'border-6 border-yellow-400 bg-gradient-to-r from-yellow-400 to-yellow-600 shadow-2xl animate-pulse', description: 'Роскошная золотая рамка', rarity: 'legendary' },
+            platinum: { name: 'Платиновая рамка', chance: 2, style: 'border-6 border-gray-200 bg-gradient-to-r from-gray-100 to-gray-300 shadow-2xl', description: 'Рамка из чистой платины', rarity: 'legendary' },
+            diamond: { name: 'Алмазная рамка', chance: 2, style: 'border-8 border-blue-200 bg-gradient-to-r from-blue-100 to-cyan-200 shadow-2xl animate-pulse ring-4 ring-blue-300', description: 'Сверкающая алмазная рамка', rarity: 'mythic' },
+            
+            // Магические рамки
+            fire: { name: 'Огненная рамка', chance: 2, style: 'border-6 border-red-500 bg-gradient-to-r from-red-400 to-orange-500 shadow-2xl animate-pulse', description: 'Пылающая магическая рамка', rarity: 'legendary', effect: 'fire' },
+            ice: { name: 'Ледяная рамка', chance: 2, style: 'border-6 border-blue-300 bg-gradient-to-r from-blue-200 to-cyan-300 shadow-2xl', description: 'Морозная кристальная рамка', rarity: 'legendary', effect: 'ice' },
+            lightning: { name: 'Молниевая рамка', chance: 2, style: 'border-6 border-purple-400 bg-gradient-to-r from-purple-300 to-indigo-400 shadow-2xl animate-pulse', description: 'Электрическая энергетическая рамка', rarity: 'mythic', effect: 'lightning' },
+            
+            // Уникальные рамки
+            rainbow: { name: 'Радужная рамка', chance: 2, style: 'border-8 bg-gradient-to-r from-red-400 via-yellow-400 via-green-400 via-blue-400 to-purple-400 shadow-2xl animate-pulse', description: 'Переливающаяся всеми цветами', rarity: 'mythic', effect: 'rainbow' },
+            cosmic: { name: 'Космическая рамка', chance: 2, style: 'border-8 border-indigo-900 bg-gradient-to-r from-indigo-900 via-purple-800 to-blue-900 shadow-2xl animate-pulse', description: 'Из глубин космоса', rarity: 'mythic', effect: 'cosmic' },
+            divine: { name: 'Божественная рамка', chance: 2, style: 'border-10 border-yellow-300 bg-gradient-to-r from-yellow-200 via-white to-yellow-200 shadow-2xl animate-pulse ring-6 ring-yellow-400 ring-opacity-75', description: 'Благословенная богами рамка', rarity: 'mythic', effect: 'divine' },
+            
+            // Тематические рамки
+            nature: { name: 'Природная рамка', chance: 2, style: 'border-6 border-green-500 bg-gradient-to-r from-green-400 to-lime-500 shadow-xl', description: 'Украшена листьями и цветами', rarity: 'legendary' },
+            tech: { name: 'Технологическая рамка', chance: 2, style: 'border-6 border-cyan-400 bg-gradient-to-r from-cyan-300 to-blue-400 shadow-xl animate-pulse', description: 'Футуристический дизайн', rarity: 'legendary' },
+            ancient: { name: 'Древняя рамка', chance: 2, style: 'border-8 border-amber-600 bg-gradient-to-r from-amber-500 to-yellow-700 shadow-2xl', description: 'Реликвия древних цивилизаций', rarity: 'mythic' }
         };
 
         // Редкости
@@ -448,20 +565,48 @@ class LabubuCareGame {
             elder: { name: 'Мудрец', minAge: 100 }
         };
         
-        // Система фонов игры
+        // Система фонов игры - ВСЕ 33 ФОНА (исправлено количество)
         this.backgrounds = {
-            default: { name: 'Обычный фон', price: 0, emoji: '🎨', description: 'Стандартный фон', gradient: 'from-pink-100 via-purple-100 to-blue-100', rarity: 'common', chance: 0 },
-            sunset: { name: 'Закат', price: 1000, emoji: '🌅', description: 'Красивый закат', gradient: 'from-orange-300 via-red-300 to-pink-300', rarity: 'common', chance: 15 },
-            ocean: { name: 'Океан', price: 1500, emoji: '🌊', description: 'Морские волны', gradient: 'from-blue-300 via-cyan-300 to-teal-300', rarity: 'common', chance: 15 },
-            forest: { name: 'Лес', price: 2000, emoji: '🌲', description: 'Зеленый лес', gradient: 'from-green-300 via-emerald-300 to-lime-300', rarity: 'common', chance: 15 },
-            lavender: { name: 'Лаванда', price: 2500, emoji: '💜', description: 'Поле лаванды', gradient: 'from-purple-300 via-violet-300 to-indigo-300', rarity: 'common', chance: 15 },
-            cherry: { name: 'Сакура', price: 3000, emoji: '🌸', description: 'Цветение сакуры', gradient: 'from-pink-300 via-rose-300 to-red-300', rarity: 'rare', chance: 12 },
-            galaxy: { name: 'Галактика', price: 5000, emoji: '🌌', description: 'Звездная галактика', gradient: 'from-purple-900 via-blue-900 to-indigo-900', rarity: 'rare', chance: 10 },
-            aurora: { name: 'Северное сияние', price: 7500, emoji: '🌈', description: 'Мерцающее сияние', gradient: 'from-green-400 via-blue-400 to-purple-400', rarity: 'rare', chance: 8 },
-            golden: { name: 'Золотой', price: 10000, emoji: '✨', description: 'Роскошный золотой', gradient: 'from-yellow-400 via-amber-400 to-orange-400', rarity: 'legendary', chance: 5 },
-            rainbow: { name: 'Радужный', price: 15000, emoji: '🌈', description: 'Все цвета радуги', gradient: 'from-red-400 via-yellow-400 via-green-400 via-blue-400 to-purple-400', rarity: 'legendary', chance: 3 },
-            cosmic: { name: 'Космический', price: 25000, emoji: '🚀', description: 'Бескрайний космос', gradient: 'from-black via-purple-900 to-blue-900', rarity: 'mythic', chance: 1 },
-            divine: { name: 'Божественный', price: 50000, emoji: '👑', description: 'Сияние богов', gradient: 'from-white via-yellow-200 to-gold', rarity: 'mythic', chance: 0.5 }
+            // ОБЫЧНЫЕ ФОНЫ (9 штук)
+            default: { name: 'Обычный фон', price: 0, emoji: '🎨', description: 'Стандартный фон', gradient: 'from-pink-100 via-purple-100 to-blue-100', rarity: 'common', chance: 12 },
+            sunset: { name: 'Закат', price: 800, emoji: '🌅', description: 'Теплый закат', gradient: 'from-orange-300 via-red-300 to-pink-300', rarity: 'common', chance: 12 },
+            ocean: { name: 'Океан', price: 1200, emoji: '🌊', description: 'Глубокие воды', gradient: 'from-blue-300 via-cyan-300 to-teal-300', rarity: 'common', chance: 12 },
+            forest: { name: 'Лес', price: 1500, emoji: '🌲', description: 'Зеленая природа', gradient: 'from-green-300 via-emerald-300 to-lime-300', rarity: 'common', chance: 12 },
+            lavender: { name: 'Лаванда', price: 2000, emoji: '💜', description: 'Ароматные поля', gradient: 'from-purple-300 via-violet-300 to-indigo-300', rarity: 'common', chance: 12 },
+            autumn: { name: 'Осень', price: 2500, emoji: '🍂', description: 'Золотая осень', gradient: 'from-yellow-600 via-orange-500 to-red-500', rarity: 'common', chance: 12 },
+            spring: { name: 'Весна', price: 1800, emoji: '🌱', description: 'Свежая зелень', gradient: 'from-lime-200 via-green-200 to-emerald-200', rarity: 'common', chance: 12 },
+            winter: { name: 'Зима', price: 2200, emoji: '❄️', description: 'Снежная сказка', gradient: 'from-blue-100 via-white to-gray-100', rarity: 'common', chance: 12 },
+            pastel: { name: 'Пастельный', price: 1600, emoji: '🌈', description: 'Нежные пастельные тона', gradient: 'from-pink-200 via-purple-200 to-blue-200', rarity: 'common', chance: 12 },
+            
+            // РЕДКИЕ ФОНЫ (8 штук)
+            cherry: { name: 'Сакура', price: 3500, emoji: '🌸', description: 'Японская красота', gradient: 'from-pink-300 via-rose-300 to-red-300', rarity: 'rare', chance: 12 },
+            galaxy: { name: 'Галактика', price: 5000, emoji: '🌌', description: 'Звездные просторы', gradient: 'from-purple-900 via-blue-900 to-indigo-900', rarity: 'rare', chance: 12 },
+            aurora: { name: 'Северное сияние', price: 6000, emoji: '🌈', description: 'Магическое свечение', gradient: 'from-green-400 via-blue-400 to-purple-400', rarity: 'rare', chance: 12 },
+            tropical: { name: 'Тропики', price: 4000, emoji: '🌺', description: 'Райские тропики', gradient: 'from-green-400 via-blue-400 to-cyan-300', rarity: 'rare', chance: 12 },
+            desert: { name: 'Пустыня', price: 4500, emoji: '🏜️', description: 'Песчаные дюны', gradient: 'from-yellow-500 via-orange-400 to-red-400', rarity: 'rare', chance: 12 },
+            volcano: { name: 'Вулкан', price: 7000, emoji: '🌋', description: 'Огненная лава', gradient: 'from-red-600 via-orange-500 to-yellow-400', rarity: 'rare', chance: 12 },
+            crystal: { name: 'Кристальный', price: 8000, emoji: '💎', description: 'Сверкающие кристаллы', gradient: 'from-cyan-300 via-blue-300 to-purple-300', rarity: 'rare', chance: 12 },
+            retro: { name: 'Ретро', price: 8500, emoji: '📼', description: 'Винтаж 80-х', gradient: 'from-purple-600 via-pink-500 to-orange-400', rarity: 'rare', chance: 12 },
+            
+            // ЛЕГЕНДАРНЫЕ ФОНЫ (8 штук)
+            golden: { name: 'Золотой', price: 12000, emoji: '✨', description: 'Роскошное золото', gradient: 'from-yellow-400 via-amber-400 to-orange-400', rarity: 'legendary', chance: 12 },
+            rainbow: { name: 'Радужный', price: 15000, emoji: '🌈', description: 'Все цвета спектра', gradient: 'from-red-400 via-yellow-400 via-green-400 via-blue-400 to-purple-400', rarity: 'legendary', chance: 12 },
+            phoenix: { name: 'Феникс', price: 18000, emoji: '🔥', description: 'Возрождение из пепла', gradient: 'from-red-500 via-orange-400 to-yellow-300', rarity: 'legendary', chance: 12 },
+            moonlight: { name: 'Лунный свет', price: 20000, emoji: '🌙', description: 'Серебристое сияние', gradient: 'from-gray-700 via-blue-800 to-indigo-900', rarity: 'legendary', chance: 12 },
+            enchanted: { name: 'Зачарованный', price: 22000, emoji: '🧚', description: 'Магический лес', gradient: 'from-purple-600 via-pink-500 to-green-400', rarity: 'legendary', chance: 12 },
+            mystical: { name: 'Мистический', price: 25000, emoji: '🔮', description: 'Магическая энергия', gradient: 'from-purple-800 via-blue-700 to-indigo-800', rarity: 'legendary', chance: 12 },
+            neon: { name: 'Неоновый', price: 30000, emoji: '💡', description: 'Кибер будущее', gradient: 'from-pink-500 via-cyan-400 to-purple-500', rarity: 'legendary', chance: 12 },
+            underwater: { name: 'Подводный мир', price: 16000, emoji: '🐠', description: 'Коралловые рифы', gradient: 'from-teal-400 via-blue-500 to-cyan-600', rarity: 'legendary', chance: 12 },
+            
+            // МИФИЧЕСКИЕ ФОНЫ (8 штук)
+            cosmic: { name: 'Космический', price: 35000, emoji: '🚀', description: 'Бескрайний космос', gradient: 'from-black via-purple-900 to-blue-900', rarity: 'mythic', chance: 12 },
+            divine: { name: 'Божественный', price: 50000, emoji: '👑', description: 'Сияние богов', gradient: 'from-white via-yellow-200 to-gold', rarity: 'mythic', chance: 12 },
+            void: { name: 'Пустота', price: 75000, emoji: '🌑', description: 'Абсолютная тьма', gradient: 'from-black via-gray-900 to-purple-900', rarity: 'mythic', chance: 12 },
+            celestial: { name: 'Небесный', price: 100000, emoji: '⭐', description: 'Звездная корона', gradient: 'from-indigo-800 via-blue-600 to-cyan-400', rarity: 'mythic', chance: 12 },
+            temporal: { name: 'Временной', price: 150000, emoji: '⏳', description: 'Искажение времени', gradient: 'from-purple-800 via-pink-600 to-orange-400', rarity: 'mythic', chance: 12 },
+            infinity: { name: 'Бесконечность', price: 250000, emoji: '∞', description: 'За пределами понимания', gradient: 'from-gray-900 via-purple-800 via-blue-700 via-teal-600 to-green-500', rarity: 'mythic', chance: 12 },
+            matrix: { name: 'Матрица', price: 85000, emoji: '💻', description: 'Цифровая реальность', gradient: 'from-green-900 via-green-700 to-black', rarity: 'mythic', chance: 12 },
+            dimension: { name: 'Другое измерение', price: 200000, emoji: '🌀', description: 'За гранью реальности', gradient: 'from-indigo-900 via-purple-800 via-pink-700 via-orange-600 to-yellow-500', rarity: 'mythic', chance: 12 }
         };
 
         // ПОСЛЕ определения backgrounds загружаем текущие настройки фонов
@@ -1307,8 +1452,13 @@ class LabubuCareGame {
         this.activeTab = tab;
         
         // Проверяем задания при переключении на вкладку заданий
-        if (tab === 'tasks' && this.checkAllTasksStatus) {
-            this.checkAllTasksStatus();
+        if (tab === 'tasks') {
+            if (this.validateTaskProgress) {
+                this.validateTaskProgress();
+            }
+            if (this.checkAllTasksStatus) {
+                this.checkAllTasksStatus();
+            }
         }
         
         // Обновить кнопки
@@ -1587,100 +1737,123 @@ class LabubuCareGame {
                 <div class="bg-white rounded-lg p-3 shadow">
                     <h3 class="font-bold mb-3 text-purple-800 text-sm">🎨 Коллекция фонов (${Object.keys(this.backgrounds).length} вариантов)</h3>
                     
-                    <div class="space-y-4 text-xs max-h-80 overflow-y-auto">
+                    <div class="space-y-2 text-xs max-h-64 overflow-y-scroll scrollbar-hide" style="scrollbar-width: none; -ms-overflow-style: none;">
                         ${Object.entries(this.backgrounds).map(([key, bg]) => {
                             const isActive = this.currentBackground === key;
                             const isUnlocked = this.unlockedBackgrounds.includes(key);
                             
-                            // Определяем стиль рамки на основе редкости (как у статусов)
+                            // Определяем стиль рамки как у статусов с полными эффектами
                             let frameClass = '';
                             let bgClass = '';
                             let specialEffects = '';
                             let rarityIcon = '';
                             let priceClass = '';
+                            let sparkles = '';
                             
                             if (bg.rarity === 'common') {
-                                frameClass = 'border-2 border-gray-300 shadow-md';
+                                frameClass = 'border-2 border-gray-300 shadow-sm';
                                 bgClass = 'bg-gray-50';
                                 rarityIcon = '⚪';
                                 priceClass = 'text-gray-700';
+                                specialEffects = 'hover:shadow-md transform transition-all duration-300';
                             } else if (bg.rarity === 'rare') {
                                 frameClass = 'border-2 border-blue-400 shadow-lg shadow-blue-200';
                                 bgClass = 'bg-gradient-to-br from-blue-50 to-blue-100';
                                 rarityIcon = '🔵';
                                 priceClass = 'text-blue-700';
-                                specialEffects = 'hover:shadow-xl';
+                                specialEffects = 'hover:shadow-xl hover:shadow-blue-300 transform transition-all duration-300 hover:scale-105';
                             } else if (bg.rarity === 'legendary') {
                                 frameClass = 'border-3 border-purple-400 shadow-xl shadow-purple-300';
                                 bgClass = 'bg-gradient-to-br from-purple-50 via-purple-100 to-pink-50';
-                                specialEffects = 'animate-pulse hover:shadow-2xl ring-1 ring-purple-200';
+                                specialEffects = 'animate-pulse hover:shadow-2xl hover:shadow-purple-400 ring-1 ring-purple-200 hover:ring-2 hover:ring-purple-400 transform transition-all duration-500 hover:scale-105 hover:brightness-110';
                                 rarityIcon = '🟣';
                                 priceClass = 'text-purple-700';
+                                sparkles = '<div class="absolute -top-1 -right-1 text-purple-400 animate-pulse">✨</div>';
                             } else if (bg.rarity === 'mythic') {
-                                frameClass = 'border-4 border-yellow-400 shadow-2xl shadow-yellow-300';
-                                bgClass = 'bg-gradient-to-br from-yellow-50 via-yellow-100 to-orange-50';
-                                specialEffects = 'animate-pulse ring-2 ring-yellow-300 ring-opacity-75 ring-offset-1 hover:shadow-2xl hover:ring-4';
+                                frameClass = 'border-4 border-gradient-to-r from-yellow-400 via-orange-400 to-red-400 shadow-2xl shadow-yellow-400';
+                                bgClass = 'bg-gradient-to-br from-yellow-50 via-yellow-100 to-orange-100';
+                                specialEffects = 'animate-pulse ring-4 ring-yellow-300 ring-opacity-75 ring-offset-2 hover:shadow-2xl hover:shadow-orange-400 hover:ring-6 hover:ring-yellow-400 hover:ring-opacity-100 transform transition-all duration-700 hover:scale-110 hover:brightness-125 hover:saturate-150 hover:contrast-110';
                                 rarityIcon = '🟡';
                                 priceClass = 'text-yellow-700';
+                                sparkles = '<div class="absolute -top-2 -right-2 text-yellow-400 animate-spin text-lg">⭐</div><div class="absolute -top-1 -left-1 text-orange-400 animate-pulse">✨</div><div class="absolute -bottom-1 -right-1 text-yellow-300 animate-bounce">💫</div>';
                                 
-                                // Божественные эффекты для мифических
-                                if (key === 'divine' || key === 'celestial' || key === 'infinity') {
-                                    specialEffects += ' hover:brightness-110 hover:saturate-150';
+                                // Особые божественные эффекты для высших мифических
+                                if (key === 'divine') {
+                                    specialEffects += ' hover:drop-shadow-2xl hover:drop-shadow-yellow-400 hover:hue-rotate-15';
+                                    sparkles += '<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white animate-pulse text-xs">👑</div>';
+                                } else if (key === 'celestial') {
+                                    specialEffects += ' hover:drop-shadow-2xl hover:drop-shadow-blue-400 hover:hue-rotate-30';
+                                    sparkles += '<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-blue-300 animate-pulse text-xs">⭐</div>';
+                                } else if (key === 'infinity') {
+                                    specialEffects += ' hover:drop-shadow-2xl hover:drop-shadow-purple-400 hover:hue-rotate-45 hover:animate-spin';
+                                    sparkles += '<div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-purple-300 animate-spin text-sm">∞</div>';
                                 }
                             }
                             
                             return `
-                                <div onclick="game.buyBackground('${key}')" class="p-4 rounded-xl cursor-pointer transition-all duration-500 ${frameClass} ${bgClass} ${specialEffects} ${isActive ? 'ring-3 ring-green-500 ring-offset-2' : ''} hover:scale-[1.02] hover:-translate-y-1">
+                                <div onclick="game.buyBackground('${key}')" class="relative p-2 rounded-lg cursor-pointer ${frameClass} ${bgClass} ${specialEffects} ${isActive ? 'ring-2 ring-green-500 ring-offset-1 border-green-400' : ''} hover:-translate-y-0.5">
+                                    ${sparkles}
+                                    
                                     <!-- Заголовок с превью -->
-                                    <div class="flex items-center justify-between mb-3">
-                                        <div class="flex items-center space-x-3">
-                                            <div class="w-16 h-16 rounded-xl bg-gradient-to-br ${bg.gradient} flex items-center justify-center text-2xl shadow-lg border-2 border-white/80 ${bg.rarity === 'mythic' ? 'animate-pulse' : ''}">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="relative w-10 h-10 rounded-lg bg-gradient-to-br ${bg.gradient} flex items-center justify-center text-lg shadow-md border border-white/70 ${bg.rarity === 'mythic' ? 'animate-pulse' : ''} overflow-hidden">
                                                 ${bg.emoji}
+                                                ${bg.rarity === 'mythic' ? '<div class="absolute inset-0 bg-gradient-to-br from-transparent via-white/20 to-transparent animate-pulse"></div>' : ''}
                                             </div>
                                             <div class="flex-1">
-                                                <div class="font-bold text-sm mb-1 ${isActive ? 'text-green-800' : bg.rarity === 'legendary' ? 'text-purple-800' : bg.rarity === 'mythic' ? 'text-yellow-800' : bg.rarity === 'rare' ? 'text-blue-800' : 'text-gray-800'}">${bg.name}</div>
+                                                <div class="font-bold text-xs mb-1 ${isActive ? 'text-green-800' : bg.rarity === 'legendary' ? 'text-purple-800' : bg.rarity === 'mythic' ? 'text-yellow-800' : bg.rarity === 'rare' ? 'text-blue-800' : 'text-gray-800'}">${bg.name}</div>
                                                 <div class="text-xs ${isActive ? 'text-green-600' : 'text-gray-600'} mb-1">${bg.description}</div>
-                                                <!-- Мини превью градиента -->
-                                                <div class="w-20 h-3 rounded-full bg-gradient-to-r ${bg.gradient} border border-white/50 shadow-sm"></div>
+                                                <!-- Компактный превью градиента -->
+                                                <div class="w-16 h-2 rounded-full bg-gradient-to-r ${bg.gradient} border border-white/60 shadow-sm ${bg.rarity === 'mythic' ? 'animate-pulse' : ''}"></div>
                                             </div>
                                         </div>
                                         <div class="text-right">
-                                            ${isActive ? '<div class="text-green-600 font-bold text-2xl animate-bounce">✓</div>' : 
-                                              !isUnlocked && bg.price > 0 ? '<div class="text-red-500 text-2xl">🔒</div>' : 
-                                              '<div class="text-blue-500 text-2xl">📦</div>'}
+                                            ${isActive ? '<div class="text-green-600 font-bold text-lg animate-bounce">✓</div>' : 
+                                              !isUnlocked && bg.price > 0 ? '<div class="text-red-500 text-lg animate-pulse">🔒</div>' : 
+                                              '<div class="text-blue-500 text-lg">📦</div>'}
                                         </div>
                                     </div>
                                     
                                     <!-- Информация о редкости и цене -->
                                     <div class="flex items-center justify-between">
-                                        <div class="flex items-center space-x-2">
-                                            <span class="px-3 py-1 rounded-full text-xs font-bold shadow-sm ${
-                                                bg.rarity === 'common' ? 'bg-gray-200 text-gray-700' :
-                                                bg.rarity === 'rare' ? 'bg-blue-200 text-blue-700' :
-                                                bg.rarity === 'legendary' ? 'bg-purple-200 text-purple-700' :
-                                                'bg-yellow-200 text-yellow-700'
+                                        <div class="flex items-center space-x-1">
+                                            <span class="px-2 py-0.5 rounded-full text-xs font-bold shadow-sm border ${
+                                                bg.rarity === 'common' ? 'bg-gray-200 text-gray-700 border-gray-300' :
+                                                bg.rarity === 'rare' ? 'bg-blue-200 text-blue-700 border-blue-300' :
+                                                bg.rarity === 'legendary' ? 'bg-purple-200 text-purple-700 border-purple-300 animate-pulse' :
+                                                'bg-yellow-200 text-yellow-700 border-yellow-300 animate-pulse'
                                             }">
                                                 ${rarityIcon} ${bg.rarity === 'common' ? 'Обычный' :
                                                   bg.rarity === 'rare' ? 'Редкий' :
                                                   bg.rarity === 'legendary' ? 'Легендарный' :
                                                   'Мифический'}
                                             </span>
-                                            ${bg.rarity === 'mythic' ? '<span class="text-xs animate-pulse">✨</span>' : ''}
+                                            ${bg.rarity === 'mythic' ? '<span class="text-xs animate-spin">⚡</span>' : ''}
+                                            ${bg.rarity === 'legendary' ? '<span class="text-xs animate-pulse">✨</span>' : ''}
                                         </div>
                                         <div class="text-right">
-                                            <div class="font-bold text-lg ${bg.price === 0 ? 'text-green-600' : priceClass}">
+                                            <div class="font-bold text-xs ${bg.price === 0 ? 'text-green-600' : priceClass} ${bg.rarity === 'mythic' ? 'animate-pulse' : ''}">
                                                 ${bg.price === 0 ? '🆓 Бесплатно' : `💰 ${bg.price.toLocaleString()}`}
                                             </div>
                                             ${isActive ? '<div class="text-xs text-green-600 font-bold animate-pulse">🌟 Активен</div>' : 
-                                              !isUnlocked && bg.price > 0 ? '<div class="text-xs text-red-500">🔒 Заблокирован</div>' : 
+                                              !isUnlocked && bg.price > 0 ? '<div class="text-xs text-red-500 animate-pulse">🔒 Заблокирован</div>' : 
                                               isUnlocked && !isActive ? '<div class="text-xs text-blue-600">✅ В коллекции</div>' : ''}
                                         </div>
                                     </div>
                                     
                                     ${bg.rarity === 'mythic' ? `
-                                        <div class="mt-2 text-center">
-                                            <div class="text-xs font-bold ${priceClass} animate-pulse">
+                                        <div class="mt-1 text-center">
+                                            <div class="text-xs font-bold ${priceClass} animate-pulse bg-gradient-to-r from-yellow-100 to-orange-100 px-1 py-0.5 rounded border border-yellow-300">
                                                 ⚡ Божественная красота ⚡
+                                            </div>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${bg.rarity === 'legendary' ? `
+                                        <div class="mt-1 text-center">
+                                            <div class="text-xs font-bold ${priceClass} animate-pulse">
+                                                ✨ Легендарное великолепие ✨
                                             </div>
                                         </div>
                                     ` : ''}
@@ -1718,16 +1891,29 @@ class LabubuCareGame {
                         </div>
                         
                         <!-- Информация о редкостях -->
-                        <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                            <h4 class="font-bold text-blue-800 mb-2">🎨 Система редкости фонов:</h4>
-                            <div class="text-xs text-blue-700 space-y-1">
-                                <div class="flex justify-between"><span>⚪ <strong>Обычные:</strong> Доступные фоны</span><span>800-2,200💰</span></div>
-                                <div class="flex justify-between"><span>🔵 <strong>Редкие:</strong> Особые эффекты</span><span>3,500-8,000💰</span></div>
-                                <div class="flex justify-between"><span>🟣 <strong>Легендарные:</strong> Уникальная красота</span><span>12,000-22,000💰</span></div>
-                                <div class="flex justify-between"><span>🟡 <strong>Мифические:</strong> Божественное великолепие</span><span>35,000-250,000💰</span></div>
-                                <div class="mt-2 pt-2 border-t border-blue-200 text-center font-bold">
-                                    🌟 Фоны видны всем игрокам на холсте! 🌟
+                        <div class="p-3 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-blue-200">
+                            <h4 class="font-bold text-blue-800 mb-2 text-center">🎨 Система редкости фонов</h4>
+                            <div class="grid grid-cols-2 gap-1 text-xs">
+                                <div class="flex justify-between items-center p-1 bg-gray-100 rounded border-l-2 border-gray-400">
+                                    <span><strong>⚪ Обычные (9):</strong></span>
+                                    <span class="font-bold text-gray-700">800-2,500💰</span>
                                 </div>
+                                <div class="flex justify-between items-center p-1 bg-blue-100 rounded border-l-2 border-blue-400">
+                                    <span><strong>🔵 Редкие (8):</strong></span>
+                                    <span class="font-bold text-blue-700">3,500-8,000💰</span>
+                                </div>
+                                <div class="flex justify-between items-center p-1 bg-purple-100 rounded border-l-2 border-purple-400 animate-pulse">
+                                    <span><strong>🟣 Легендарные (8):</strong></span>
+                                    <span class="font-bold text-purple-700">12,000-30,000💰</span>
+                                </div>
+                                <div class="flex justify-between items-center p-1 bg-yellow-100 rounded border-l-2 border-yellow-400 animate-pulse">
+                                    <span><strong>🟡 Мифические (8):</strong></span>
+                                    <span class="font-bold text-yellow-700">35,000-250,000💰</span>
+                                </div>
+                            </div>
+                            <div class="mt-2 p-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded text-center border border-purple-200">
+                                <div class="font-bold text-purple-800 animate-pulse text-xs">🌟 Фоны видны всем игрокам на холсте! 🌟</div>
+                                <div class="text-xs text-purple-700 mt-1">Все ${Object.keys(this.backgrounds).length} фонов доступны для покупки!</div>
                             </div>
                         </div>
                     </div>
@@ -3751,41 +3937,117 @@ class LabubuCareGame {
                 </div>
                 
                 <div class="bg-white rounded-lg p-3 shadow">
-                    <h3 class="font-bold mb-2 text-purple-800 text-sm">💎 Возможные награды</h3>
-                    <div class="grid grid-cols-1 gap-1 text-xs">
-                        ${Object.entries(this.skins).map(([key, skin]) => `
-                            <div class="flex items-center justify-between p-2 rounded" style="background-color: ${skin.color}22;">
-                                <div class="flex items-center space-x-2">
-                                    <span>${this.rarities[skin.rarity].emoji}</span>
-                                    <span class="font-medium">${skin.name}</span>
-                                    <span class="text-xs" style="color: ${this.rarities[skin.rarity].color};">${this.rarities[skin.rarity].name}</span>
+                    <h3 class="font-bold mb-2 text-purple-800 text-sm">💎 Возможные награды из сундуков</h3>
+                    <div class="grid grid-cols-1 gap-1 text-xs max-h-48 overflow-y-auto">
+                        <!-- РАМКИ (2% шанс каждая) -->
+                        <div class="bg-yellow-50 p-2 rounded border-l-4 border-yellow-400">
+                            <div class="font-bold text-yellow-800 mb-1">🖼️ РАМКИ (шанс 2% каждая):</div>
+                            ${Object.entries(this.frames || {}).slice(0, 5).map(([key, frame]) => `
+                                <div class="flex items-center justify-between p-1 rounded bg-yellow-100 mb-1">
+                                    <span class="font-medium">${frame.name}</span>
+                                    <span class="font-bold text-yellow-700">${frame.chance}%</span>
                                 </div>
-                                <span class="font-bold">${skin.chance}%</span>
-                            </div>
-                        `).join('')}
-                        ${Object.entries(this.backgrounds).filter(([key, bg]) => bg.chance > 0).map(([key, bg]) => `
-                            <div class="flex items-center justify-between p-2 rounded bg-purple-50">
-                                <div class="flex items-center space-x-2">
-                                    <span>${bg.emoji}</span>
-                                    <span class="font-medium">${bg.name} фон</span>
-                                    <span class="text-xs text-purple-600">${bg.rarity}</span>
+                            `).join('')}
+                            <div class="text-xs text-yellow-600">+ еще ${Object.keys(this.frames || {}).length - 5} рамок...</div>
+                        </div>
+                        
+                        <!-- АКСЕССУАРЫ УБРАНЫ ИЗ СУНДУКОВ -->
+                        
+                        <!-- СКИНЫ -->
+                        <div class="bg-purple-50 p-2 rounded border-l-4 border-purple-400">
+                            <div class="font-bold text-purple-800 mb-1">🐰 СКИНЫ:</div>
+                            ${Object.entries(this.skins).slice(0, 4).map(([key, skin]) => `
+                                <div class="flex items-center justify-between p-1 rounded mb-1" style="background-color: ${skin.color}33;">
+                                    <div class="flex items-center space-x-1">
+                                        <span>${this.rarities[skin.rarity].emoji}</span>
+                                        <span class="font-medium">${skin.name}</span>
+                                    </div>
+                                    <span class="font-bold">${skin.chance}%</span>
                                 </div>
-                                <span class="font-bold">${bg.chance}%</span>
+                            `).join('')}
+                            <div class="text-xs text-purple-600">+ еще ${Object.keys(this.skins).length - 4} скинов...</div>
+                        </div>
+                        
+                        <!-- ФОНЫ (по редкости) -->
+                        <div class="bg-blue-50 p-2 rounded border-l-4 border-blue-400">
+                            <div class="font-bold text-blue-800 mb-1">🎨 ФОНЫ (по редкости):</div>
+                            <div class="grid grid-cols-1 gap-1 text-xs">
+                                <div class="flex justify-between items-center p-1 bg-gray-100 rounded">
+                                    <span><strong>⚪ Обычные (9 фонов):</strong></span>
+                                    <span class="font-bold text-gray-700">12% каждый</span>
+                                </div>
+                                <div class="flex justify-between items-center p-1 bg-blue-100 rounded">
+                                    <span><strong>🔵 Редкие (8 фонов):</strong></span>
+                                    <span class="font-bold text-blue-700">9% каждый</span>
+                                </div>
+                                <div class="flex justify-between items-center p-1 bg-purple-100 rounded">
+                                    <span><strong>🟣 Легендарные (8 фонов):</strong></span>
+                                    <span class="font-bold text-purple-700">6% каждый</span>
+                                </div>
+                                <div class="flex justify-between items-center p-1 bg-yellow-100 rounded">
+                                    <span><strong>🟡 Мифические (8 фонов):</strong></span>
+                                    <span class="font-bold text-yellow-700">3% каждый</span>
+                                </div>
                             </div>
-                        `).join('')}
-                        <div class="flex items-center justify-between p-2 bg-yellow-50 rounded">
-                            <div class="flex items-center space-x-2">
-                                <span>💰</span>
-                                <span class="font-medium">100 монет</span>
+                            <div class="text-xs text-blue-600 mt-1">Всего ${Object.keys(this.backgrounds).length} фонов с разными шансами!</div>
+                        </div>
+                        
+                        <!-- МОНЕТЫ - ОСНОВНАЯ НАГРАДА -->
+                        <div class="bg-yellow-50 p-2 rounded border-l-4 border-yellow-400">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-lg">💰</span>
+                                    <span class="font-medium">Монеты (100-500)</span>
+                                </div>
+                                <span class="font-bold text-yellow-700 animate-pulse">~90%</span>
                             </div>
-                            <span class="font-bold">40%</span>
+                            <div class="text-xs text-yellow-600 mt-1">Основная награда - надежный способ заработка!</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Статистика коллекции -->
+                    <div class="mt-3 p-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded border border-purple-200">
+                        <div class="text-center text-xs">
+                            <div class="font-bold text-purple-800">📊 ВСЕГО НАГРАД В ИГРЕ:</div>
+                            <div class="grid grid-cols-3 gap-1 mt-1">
+                                <div><span class="font-bold">${Object.keys(this.frames || {}).length}</span><br>🖼️ Рамок</div>
+                                <div><span class="font-bold">${Object.keys(this.skins).length}</span><br>🐰 Скинов</div>
+                                <div><span class="font-bold">${Object.keys(this.backgrounds).length}</span><br>🎨 Фонов</div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
+                <!-- ИНВЕНТАРЬ РАМОК -->
                 <div class="bg-white rounded-lg p-3 shadow">
-                    <h3 class="font-bold mb-2 text-purple-800 text-sm">👗 Инвентарь скинов</h3>
-                    <div class="grid grid-cols-2 gap-2 max-h-40 overflow-y-auto">
+                    <h3 class="font-bold mb-2 text-purple-800 text-sm">🖼️ Инвентарь рамок (${(this.unlockedFrames || ['default']).length})</h3>
+                    <div class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
+                        ${(this.unlockedFrames || ['default']).map(frameKey => {
+                            const frame = (this.frames && this.frames[frameKey]) || { name: 'Стандартная рамка', style: 'border-2 border-gray-300', description: 'Базовая рамка' };
+                            const isActive = (this.currentFrame || 'default') === frameKey;
+                            return `
+                                <button onclick="game.selectFrame('${frameKey}')" class="p-2 rounded-lg text-xs transition-colors ${
+                                    isActive ? 'bg-green-100 border-2 border-green-500' : 'bg-gray-100 hover:bg-gray-200'
+                                }">
+                                    <div class="text-center">
+                                        <div class="w-12 h-12 mx-auto mb-1 ${frame.style} rounded flex items-center justify-center">
+                                            <div class="w-8 h-8 bg-gray-200 rounded flex items-center justify-center text-xs">🐰</div>
+                                        </div>
+                                        <div class="font-medium">${frame.name}</div>
+                                        ${isActive ? '<div class="text-green-600 font-bold mt-1">✓ Активна</div>' : ''}
+                                    </div>
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+
+                <!-- АКСЕССУАРЫ УБРАНЫ ИЗ ИГРЫ -->
+
+                <!-- ИНВЕНТАРЬ СКИНОВ -->
+                <div class="bg-white rounded-lg p-3 shadow">
+                    <h3 class="font-bold mb-2 text-purple-800 text-sm">🐰 Инвентарь скинов (${this.unlockedSkins.length})</h3>
+                    <div class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto">
                         ${this.unlockedSkins.map(skinKey => {
                             const skin = this.skins[skinKey];
                             const isActive = this.currentSkin === skinKey;
@@ -3820,28 +4082,57 @@ class LabubuCareGame {
         
         this.chestCount--;
         
-        // Определяем награду
+        // Определяем награду с новой системой шансов
         const random = Math.random() * 100;
         let reward = null;
-        
-        // Определяем награду с учетом фонов
         let cumulativeChance = 0;
         
-        // Проверяем скины
-        for (const [key, skin] of Object.entries(this.skins)) {
-            cumulativeChance += skin.chance;
-            if (random <= cumulativeChance && !this.unlockedSkins.includes(key)) {
-                reward = { type: 'skin', key: key, skin: skin };
-                this.unlockedSkins.push(key);
+        // 1. Проверяем РАМКИ (шанс 2%)
+        if (!this.unlockedFrames) this.unlockedFrames = ['default'];
+        if (!this.currentFrame) this.currentFrame = 'default';
+        
+        for (const [key, frame] of Object.entries(this.frames || {})) {
+            cumulativeChance += frame.chance;
+            if (random <= cumulativeChance && !this.unlockedFrames.includes(key)) {
+                reward = { type: 'frame', key: key, frame: frame };
+                this.unlockedFrames.push(key);
+                this.saveValue('unlocked_frames', this.unlockedFrames);
                 break;
             }
         }
         
-        // Если скин не выпал, проверяем фоны
+
+        
+        // 2. Если рамка не выпала, проверяем СКИНЫ
+        if (!reward) {
+            for (const [key, skin] of Object.entries(this.skins)) {
+                cumulativeChance += skin.chance;
+                if (random <= cumulativeChance && !this.unlockedSkins.includes(key)) {
+                    reward = { type: 'skin', key: key, skin: skin };
+                    this.unlockedSkins.push(key);
+                    break;
+                }
+            }
+        }
+        
+        // 3. Если скин не выпал, проверяем ФОНЫ по редкости
         if (!reward) {
             for (const [key, bg] of Object.entries(this.backgrounds)) {
                 if (bg.chance > 0) {
-                    cumulativeChance += bg.chance;
+                    let bgChance = 0;
+                    
+                    // Шансы по редкости фонов
+                    if (bg.rarity === 'common') {
+                        bgChance = 12; // Обычные фоны - 12%
+                    } else if (bg.rarity === 'rare') {
+                        bgChance = 9; // Редкие фоны - 9%
+                    } else if (bg.rarity === 'legendary') {
+                        bgChance = 6; // Легендарные фоны - 6%
+                    } else if (bg.rarity === 'mythic') {
+                        bgChance = 3; // Мифические фоны - 3%
+                    }
+                    
+                    cumulativeChance += bgChance;
                     if (random <= cumulativeChance && !this.unlockedBackgrounds.includes(key)) {
                         reward = { type: 'background', key: key, background: bg };
                         this.unlockedBackgrounds.push(key);
@@ -3852,10 +4143,11 @@ class LabubuCareGame {
             }
         }
         
-        // Если ничего не выпало, даем монеты
+        // 4. Монеты - основная награда (90% случаев)
         if (!reward) {
-            reward = { type: 'money', amount: 100 };
-            this.money += 100;
+            const bonusAmount = Math.floor(Math.random() * 400) + 100; // От 100 до 500 монет
+            reward = { type: 'money', amount: bonusAmount };
+            this.money += bonusAmount;
         }
         
         this.playHappySound();
@@ -3869,16 +4161,59 @@ class LabubuCareGame {
     showChestResult(reward) {
         let message = '';
         let className = '';
+        let extraContent = '';
         
-        if (reward.type === 'skin') {
+        if (reward.type === 'frame') {
+            message = `🖼️ Новая рамка: ${reward.frame.name}!`;
+            className = 'bg-yellow-100 border-yellow-500 text-yellow-700';
+            extraContent = `
+                <div class="mb-4">
+                    <div class="w-20 h-20 mx-auto rounded-lg ${reward.frame.style} flex items-center justify-center">
+                        <div class="w-12 h-12 bg-gray-200 rounded flex items-center justify-center text-lg">🐰</div>
+                    </div>
+                    <p class="text-sm mt-2 text-yellow-600">
+                        🖼️ ${reward.frame.rarity} рамка
+                    </p>
+                    <p class="text-xs mt-1 text-gray-600">${reward.frame.description}</p>
+                </div>
+            `;
+        // АКСЕССУАРЫ УДАЛЕНЫ ИЗ РЕЗУЛЬТАТОВ СУНДУКОВ
+        } else if (reward.type === 'skin') {
             message = `🎉 Новый скин: ${reward.skin.name}!`;
             className = 'bg-purple-100 border-purple-500 text-purple-700';
+            extraContent = `
+                <div class="mb-4">
+                    <div class="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl" style="background-color: ${reward.skin.color};">
+                        🐰
+                    </div>
+                    <p class="text-sm mt-2" style="color: ${this.rarities[reward.skin.rarity].color};">
+                        ${this.rarities[reward.skin.rarity].emoji} ${this.rarities[reward.skin.rarity].name}
+                    </p>
+                </div>
+            `;
         } else if (reward.type === 'background') {
             message = `🎨 Новый фон: ${reward.background.name}!`;
             className = 'bg-blue-100 border-blue-500 text-blue-700';
+            extraContent = `
+                <div class="mb-4">
+                    <div class="w-16 h-16 mx-auto rounded-lg bg-gradient-to-br ${reward.background.gradient} flex items-center justify-center text-2xl">
+                        ${reward.background.emoji}
+                    </div>
+                    <p class="text-sm mt-2 text-blue-600">
+                        🎨 ${reward.background.rarity} фон
+                    </p>
+                </div>
+            `;
         } else {
             message = `💰 Получено ${reward.amount} монет!`;
             className = 'bg-yellow-100 border-yellow-500 text-yellow-700';
+            extraContent = `
+                <div class="mb-4">
+                    <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-yellow-300 to-orange-400 flex items-center justify-center text-3xl">
+                        💰
+                    </div>
+                </div>
+            `;
         }
         
         // Создать модальное окно результата
@@ -3887,32 +4222,13 @@ class LabubuCareGame {
         modal.innerHTML = `
             <div class="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
                 <div class="text-center">
-                    <div class="text-4xl mb-4">🎁</div>
+                    <div class="text-4xl mb-4 animate-bounce">🎁</div>
                     <h3 class="text-lg font-bold mb-2">Сундук открыт!</h3>
-                    <div class="p-4 rounded-lg mb-4 ${className}">
+                    <div class="p-4 rounded-lg mb-4 border-2 ${className}">
                         ${message}
                     </div>
-                    ${reward.type === 'skin' ? `
-                        <div class="mb-4">
-                            <div class="w-16 h-16 mx-auto rounded-full flex items-center justify-center text-2xl" style="background-color: ${reward.skin.color};">
-                                🐰
-                            </div>
-                            <p class="text-sm mt-2" style="color: ${this.rarities[reward.skin.rarity].color};">
-                                ${this.rarities[reward.skin.rarity].emoji} ${this.rarities[reward.skin.rarity].name}
-                            </p>
-                        </div>
-                    ` : ''}
-                    ${reward.type === 'background' ? `
-                        <div class="mb-4">
-                            <div class="w-16 h-16 mx-auto rounded-lg bg-gradient-to-br ${reward.background.gradient} flex items-center justify-center text-2xl">
-                                ${reward.background.emoji}
-                            </div>
-                            <p class="text-sm mt-2 text-blue-600">
-                                🎨 ${reward.background.rarity}
-                            </p>
-                        </div>
-                    ` : ''}
-                    <button onclick="this.parentElement.parentElement.parentElement.remove()" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-bold">
+                    ${extraContent}
+                    <button onclick="this.parentElement.parentElement.parentElement.remove(); if(typeof game !== 'undefined' && game.switchTab) game.switchTab('chests');" class="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-lg font-bold transition-colors">
                         Отлично!
                     </button>
                 </div>
@@ -3938,6 +4254,24 @@ class LabubuCareGame {
             this.showMessage('❌ Скин не разблокирован!');
         }
     }
+    
+    selectFrame(frameKey) {
+        if (!this.unlockedFrames) this.unlockedFrames = ['default'];
+        
+        if (this.unlockedFrames.includes(frameKey) || frameKey === 'default') {
+            this.currentFrame = frameKey;
+            this.saveValue('current_frame', this.currentFrame);
+            this.updateDisplay();
+            
+            const frameName = (this.frames && this.frames[frameKey]) ? this.frames[frameKey].name : 'Стандартная рамка';
+            this.showMessage(`🖼️ Выбрана рамка: ${frameName}!`);
+            this.switchTab('chests');
+        } else {
+            this.showMessage('❌ Рамка не разблокирована!');
+        }
+    }
+    
+    // АКСЕССУАРЫ УБРАНЫ ИЗ ИГРЫ - ФУНКЦИЯ НЕ НУЖНА
     
     checkNotifications() {
         // Безопасная проверка stats
@@ -4202,6 +4536,7 @@ LabubuCareGame.prototype.getCurrentPlayerStatus = function() {
 };
 
 // Убираем сложные бонусы - оставляем только плюс к наградам
+// Функции getFriendsDecayBonus и getStatusDecayBonus удалены для упрощения
 
 LabubuCareGame.prototype.inviteFriend = function(friendCode) {
     if (!this.friendsSystem) return;
@@ -4396,9 +4731,9 @@ LabubuCareGame.prototype.getFriendsTabContent = function() {
                 <div class="bg-blue-50 p-3 rounded">
                     <div class="text-sm font-bold text-blue-800 mb-2">💪 Бонусы от друзей:</div>
                     <div class="text-xs text-blue-700">
-                        🔹 Замедление падения статистик: -${(this.getFriendsDecayBonus() * 100).toFixed(1)}%<br>
+                        🔹 Совместная забота о питомце<br>
                         🔹 Каждый друг помогает вашему питомцу!<br>
-                        🔹 Чем больше друзей, тем лучше бонусы
+                        🔹 Приглашайте больше друзей для веселья
                     </div>
                 </div>
             </div>
@@ -4505,9 +4840,10 @@ LabubuCareGame.prototype.updateStatusDisplay = function() {
 
 // Система ежедневных заданий
 LabubuCareGame.prototype.initializeDailyTasks = function() {
-    this.lastTaskReset = this.loadData('last_task_reset', Date.now(), 'number'); // ИСПРАВЛЕНО: начинаем с текущего времени
+    this.lastTaskReset = this.loadData('last_task_reset', Date.now(), 'number');
     this.completedTasks = this.loadData('completed_tasks', [], 'array');
     this.taskStreak = this.loadData('task_streak', 0, 'number');
+    this.taskProgress = this.loadData('task_progress', {}, 'object');
     
     // Проверяем, нужно ли сбросить задания каждые 24 часа
     const now = Date.now();
@@ -4518,9 +4854,37 @@ LabubuCareGame.prototype.initializeDailyTasks = function() {
         this.resetDailyTasks();
     }
     
+    // ИСПРАВЛЕНИЕ: принудительно сбрасываем некорректный прогресс
+    if (!this.taskProgress || typeof this.taskProgress !== 'object') {
+        this.taskProgress = {};
+        this.saveValue('task_progress', this.taskProgress);
+    }
+    
+    // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: обнуляем некорректные прогрессы
+    console.log('🔍 Проверка и исправление системы заданий...');
+    const taskIds = ['feed_times', 'play_games', 'wash_pet', 'reach_happiness', 'earn_money', 'reach_all_stats_high'];
+    taskIds.forEach(taskId => {
+        if (this.taskProgress[taskId] && (isNaN(this.taskProgress[taskId]) || this.taskProgress[taskId] === undefined)) {
+            console.log(`🔧 Исправляем некорректный прогресс для ${taskId}: ${this.taskProgress[taskId]} → 0`);
+            this.taskProgress[taskId] = 0;
+        }
+    });
+    this.saveValue('task_progress', this.taskProgress);
+    
     // Сложность заданий зависит от уровня игрока
-    const levelMultiplier = Math.max(1, Math.floor(this.level / 10) + 1); // +1 сложность каждые 10 уровней
+    const levelMultiplier = Math.max(1, Math.floor((this.level || 1) / 10) + 1); // +1 сложность каждые 10 уровней
     const baseReward = 100 * levelMultiplier;
+    
+    // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: безопасная инициализация прогресса
+    const safeProgress = (taskId, defaultValue = 0) => {
+        const progress = this.taskProgress[taskId];
+        if (progress === undefined || progress === null || isNaN(progress)) {
+            console.log(`🔧 Обнуляем некорректный прогресс ${taskId}: ${progress} → ${defaultValue}`);
+            this.taskProgress[taskId] = defaultValue;
+            return defaultValue;
+        }
+        return Math.max(0, Math.floor(progress)); // Округляем и делаем неотрицательным
+    };
     
     return {
         tasks: [
@@ -4528,7 +4892,7 @@ LabubuCareGame.prototype.initializeDailyTasks = function() {
                 id: 'feed_times', 
                 name: `Покормить ${3 + levelMultiplier} раз`, 
                 description: `Покормите питомца ${3 + levelMultiplier} раз за день`,
-                progress: 0, 
+                progress: this.completedTasks.includes('feed_times') ? (3 + levelMultiplier) : safeProgress('feed_times', 0),
                 target: 3 + levelMultiplier, 
                 reward: { money: baseReward * 2, experience: 30 + (levelMultiplier * 10), chests: levelMultiplier },
                 emoji: '🍽️',
@@ -4538,7 +4902,7 @@ LabubuCareGame.prototype.initializeDailyTasks = function() {
                 id: 'play_games', 
                 name: `Сыграть ${2 + levelMultiplier} игр`, 
                 description: `Сыграйте в мини-игры ${2 + levelMultiplier} раз`,
-                progress: 0, 
+                progress: this.completedTasks.includes('play_games') ? (2 + levelMultiplier) : safeProgress('play_games', 0),
                 target: 2 + levelMultiplier, 
                 reward: { money: baseReward * 1.5, experience: 50 + (levelMultiplier * 15), happiness: 15 + (levelMultiplier * 5) },
                 emoji: '🎮',
@@ -4548,7 +4912,7 @@ LabubuCareGame.prototype.initializeDailyTasks = function() {
                 id: 'wash_pet', 
                 name: `Помыть питомца ${Math.max(1, levelMultiplier)} раз`, 
                 description: `Помойте питомца ${Math.max(1, levelMultiplier)} раз`,
-                progress: 0, 
+                progress: this.completedTasks.includes('wash_pet') ? Math.max(1, levelMultiplier) : safeProgress('wash_pet', 0),
                 target: Math.max(1, levelMultiplier), 
                 reward: { money: baseReward, experience: 20 + (levelMultiplier * 5), cleanliness: 30 + (levelMultiplier * 10) },
                 emoji: '🛁',
@@ -4558,7 +4922,7 @@ LabubuCareGame.prototype.initializeDailyTasks = function() {
                 id: 'reach_happiness', 
                 name: `Счастье ${Math.min(100, 80 + levelMultiplier * 5)}%+`, 
                 description: `Достигните ${Math.min(100, 80 + levelMultiplier * 5)}% счастья`,
-                progress: 0, 
+                progress: this.completedTasks.includes('reach_happiness') ? 1 : safeProgress('reach_happiness', 0), 
                 target: 1, 
                 reward: { money: baseReward * 2.5, chests: Math.max(1, levelMultiplier) },
                 emoji: '😊',
@@ -4568,7 +4932,7 @@ LabubuCareGame.prototype.initializeDailyTasks = function() {
                 id: 'earn_money', 
                 name: `Заработать ${300 + (levelMultiplier * 200)} монет`, 
                 description: `Заработайте ${300 + (levelMultiplier * 200)} монет за день`,
-                progress: 0, 
+                progress: this.completedTasks.includes('earn_money') ? (300 + (levelMultiplier * 200)) : safeProgress('earn_money', 0),
                 target: 300 + (levelMultiplier * 200), 
                 reward: { experience: 80 + (levelMultiplier * 20), chests: 2 + levelMultiplier },
                 emoji: '💰',
@@ -4579,7 +4943,7 @@ LabubuCareGame.prototype.initializeDailyTasks = function() {
                 id: 'reach_all_stats_high', 
                 name: `Все статистики ${70 + levelMultiplier * 3}%+`, 
                 description: `Поднимите все статистики выше ${70 + levelMultiplier * 3}%`,
-                progress: 0, 
+                progress: this.completedTasks.includes('reach_all_stats_high') ? 1 : safeProgress('reach_all_stats_high', 0),
                 target: 1, 
                 reward: { money: baseReward * 3, experience: 100 + (levelMultiplier * 25), chests: 2 + levelMultiplier },
                 emoji: '📊',
@@ -4591,8 +4955,10 @@ LabubuCareGame.prototype.initializeDailyTasks = function() {
 
 LabubuCareGame.prototype.resetDailyTasks = function() {
     this.completedTasks = [];
+    this.taskProgress = {}; // Сбрасываем прогресс
     this.lastTaskReset = Date.now();
     this.saveValue('completed_tasks', this.completedTasks);
+    this.saveValue('task_progress', this.taskProgress);
     this.saveValue('last_task_reset', this.lastTaskReset);
     
     // Пересоздаем систему заданий с новой сложностью
@@ -4609,9 +4975,15 @@ LabubuCareGame.prototype.updateTaskProgress = function(taskType, amount = 1) {
     
     this.dailyTasksSystem.tasks.forEach(task => {
         if (task.type === taskType && !this.completedTasks.includes(task.id)) {
+            const oldProgress = task.progress;
             task.progress = Math.min(task.target, task.progress + amount);
             
-            console.log(`📋 Обновлен прогресс задания ${task.id}: ${task.progress}/${task.target}`);
+            // Сохраняем прогресс в отдельном объекте
+            if (!this.taskProgress) this.taskProgress = {};
+            this.taskProgress[task.id] = task.progress;
+            this.saveValue('task_progress', this.taskProgress);
+            
+            console.log(`📋 Обновлен прогресс задания ${task.id}: ${oldProgress} → ${task.progress}/${task.target}`);
             
             // Проверяем завершение задания
             if (task.progress >= task.target) {
@@ -4626,20 +4998,24 @@ LabubuCareGame.prototype.updateTaskProgress = function(taskType, amount = 1) {
             
             if (allStatsHigh && task.progress === 0) {
                 task.progress = 1;
+                if (!this.taskProgress) this.taskProgress = {};
+                this.taskProgress[task.id] = 1;
+                this.saveValue('task_progress', this.taskProgress);
                 this.completeTask(task);
             }
         }
         
         // Специальная проверка для задания "достичь определенного уровня счастья"
-        if (task.type === 'stat' && task.id.includes('happiness') && !this.completedTasks.includes(task.id)) {
-            // Безопасная проверка наличия чисел в названии
-            const matches = task.name.match(/\d+/);
-            if (matches && matches.length > 0) {
-                const minRequired = parseInt(matches[0]); // Извлекаем число из названия
-                if (this.stats.happiness >= minRequired && task.progress === 0) {
-                    task.progress = 1;
-                    this.completeTask(task);
-                }
+        if (task.type === 'stat' && task.id === 'reach_happiness' && !this.completedTasks.includes(task.id)) {
+            const levelMultiplier = Math.max(1, Math.floor(this.level / 10) + 1);
+            const minRequired = Math.min(100, 80 + levelMultiplier * 5);
+            
+            if (this.stats.happiness >= minRequired && task.progress === 0) {
+                task.progress = 1;
+                if (!this.taskProgress) this.taskProgress = {};
+                this.taskProgress[task.id] = 1;
+                this.saveValue('task_progress', this.taskProgress);
+                this.completeTask(task);
             }
         }
     });
@@ -4866,9 +5242,11 @@ LabubuCareGame.prototype.getDailyTasksTabContent = function() {
                         <div>
                             <div class="text-sm font-bold text-blue-800">Серия выполнений: ${this.taskStreak} дней 🔥</div>
                             <div class="text-xs text-blue-700">Обновление через: ${timeUntilReset}</div>
+                            <div class="text-xs text-gray-600 mt-1">Выполнено: ${this.completedTasks.length}/${this.dailyTasksSystem.tasks.length} заданий</div>
                         </div>
                         <div class="text-2xl">📅</div>
                     </div>
+
                 </div>
                 
                 <div class="space-y-2 max-h-64 overflow-y-auto">
@@ -4922,6 +5300,16 @@ LabubuCareGame.prototype.getDailyTasksTabContent = function() {
                         • Выполнено заданий: ${this.completedTasks.length}/${this.dailyTasksSystem.tasks.length}
                     </div>
                 </div>
+                
+                <!-- Экстренная кнопка сброса для отладки -->
+                <div class="mt-3 p-2 bg-red-50 rounded border border-red-200">
+                    <div class="text-center">
+                        <button onclick="game.emergencyTaskReset()" class="text-xs bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                            🚨 Экстренный сброс заданий (если не работают)
+                        </button>
+                        <div class="text-xs text-red-600 mt-1">Используйте только если задания показывают NaN или не работают</div>
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -4943,17 +5331,100 @@ LabubuCareGame.prototype.getTimeUntilTaskReset = function() {
     return `${hours}ч ${minutes}м`;
 };
 
+// Функция для проверки и исправления некорректного прогресса
+LabubuCareGame.prototype.validateTaskProgress = function() {
+    console.log('🔍 Проверка корректности прогресса заданий...');
+    
+    if (!this.dailyTasksSystem || !this.dailyTasksSystem.tasks) {
+        console.log('⚠️ Система заданий не инициализирована, принудительно создаем...');
+        this.dailyTasksSystem = this.initializeDailyTasks();
+        if (!this.dailyTasksSystem || !this.dailyTasksSystem.tasks) {
+            console.error('❌ Критическая ошибка: не удалось создать систему заданий');
+            return;
+        }
+    }
+    
+    let hasInvalidProgress = false;
+    
+    this.dailyTasksSystem.tasks.forEach(task => {
+        // КРИТИЧЕСКОЕ ИСПРАВЛЕНИЕ: проверяем на NaN и undefined
+        if (task.progress === undefined || task.progress === null || isNaN(task.progress) || !isFinite(task.progress)) {
+            console.log(`🔧 КРИТИЧЕСКОЕ: Некорректный прогресс в задании ${task.id}: ${task.progress} → 0`);
+            task.progress = 0;
+            if (this.taskProgress) {
+                this.taskProgress[task.id] = 0;
+            }
+            hasInvalidProgress = true;
+        }
+        
+        // Проверяем на некорректные значения target
+        if (task.target === undefined || task.target === null || isNaN(task.target) || !isFinite(task.target) || task.target <= 0) {
+            console.log(`🔧 КРИТИЧЕСКОЕ: Некорректная цель в задании ${task.id}: ${task.target} → 1`);
+            task.target = 1;
+            hasInvalidProgress = true;
+        }
+        
+        // Если задание не в списке выполненных, но имеет максимальный прогресс
+        if (!this.completedTasks.includes(task.id) && task.progress >= task.target) {
+            console.log(`🐛 Найден некорректный прогресс в задании ${task.id}: ${task.progress}/${task.target}`);
+            
+            // Сбрасываем прогресс к 0
+            task.progress = 0;
+            if (this.taskProgress) {
+                this.taskProgress[task.id] = 0;
+            }
+            hasInvalidProgress = true;
+        }
+    });
+    
+    if (hasInvalidProgress) {
+        this.saveValue('task_progress', this.taskProgress || {});
+        console.log('✅ Некорректный прогресс исправлен');
+        this.showMessage('🔧 Прогресс заданий исправлен!');
+    } else {
+        console.log('✅ Прогресс заданий корректен');
+    }
+};
+
+// Функция экстренной перезагрузки системы заданий
+LabubuCareGame.prototype.emergencyTaskReset = function() {
+    console.log('🚨 ЭКСТРЕННАЯ ПЕРЕЗАГРУЗКА СИСТЕМЫ ЗАДАНИЙ');
+    
+    // Полностью очищаем все данные заданий
+    this.completedTasks = [];
+    this.taskProgress = {};
+    this.taskStreak = 0;
+    this.lastTaskReset = Date.now();
+    
+    // Сохраняем
+    this.saveValue('completed_tasks', []);
+    this.saveValue('task_progress', {});
+    this.saveValue('task_streak', 0);
+    this.saveValue('last_task_reset', Date.now());
+    
+    // Принудительно пересоздаем систему заданий
+    this.dailyTasksSystem = null;
+    this.dailyTasksSystem = this.initializeDailyTasks();
+    
+    console.log('✅ Система заданий полностью перезагружена');
+    this.showMessage('🔄 Система заданий перезагружена!');
+    
+    // Обновляем отображение
+    if (this.activeTab === 'tasks') {
+        this.switchTab('tasks');
+    }
+};
+
 // Модифицируем метод feedPet для учета заданий
 const originalFeedPet = LabubuCareGame.prototype.feedPet;
 LabubuCareGame.prototype.feedPet = function(foodIndex) {
+    const oldMoney = this.money;
     const result = originalFeedPet.call(this, foodIndex);
     
-    // Обновляем прогресс задания только если покормили успешно
-    if (this.money >= this.food[foodIndex].price) {
+    // Обновляем прогресс задания только если покормили успешно (деньги уменьшились)
+    if (this.money < oldMoney) {
         this.updateTaskProgress('feed');
-        
-        // Проверяем задание на заработанные деньги (потрачены деньги = заработок в игровой логике)
-        this.updateTaskProgress('money', this.food[foodIndex].price);
+        console.log(`📋 Задание покормить: +1 прогресс`);
     }
     
     return result;
@@ -4973,15 +5444,19 @@ LabubuCareGame.prototype.washPet = function() {
 // Модифицируем completeMiniGame для учета заданий
 const originalCompleteMiniGame = LabubuCareGame.prototype.completeMiniGame;
 LabubuCareGame.prototype.completeMiniGame = function(success) {
+    const oldMoney = this.money;
     const result = originalCompleteMiniGame.call(this, success);
     
     if (success && this.currentMiniGame) {
         // Обновляем прогресс задания
         this.updateTaskProgress('game');
+        console.log(`📋 Задание игры: +1 прогресс`);
         
-        // Обновляем прогресс заработанных денег
-        if (this.currentMiniGame.reward && this.currentMiniGame.reward.money) {
-            this.updateTaskProgress('money', this.currentMiniGame.reward.money);
+        // Обновляем прогресс заработанных денег (только если деньги увеличились)
+        const moneyGained = this.money - oldMoney;
+        if (moneyGained > 0) {
+            this.updateTaskProgress('money', moneyGained);
+            console.log(`📋 Задание денег: +${moneyGained} прогресс`);
         }
     }
     
@@ -5076,24 +5551,32 @@ LabubuCareGame.prototype.checkAllTasksStatus = function() {
     
     this.dailyTasksSystem.tasks.forEach(task => {
         if (!this.completedTasks.includes(task.id)) {
-            // Проверяем специальные задания
-            if (task.type === 'stat' && task.id.includes('happiness')) {
-                // Безопасная проверка наличия чисел в названии
-                const matches = task.name.match(/\d+/);
-                if (matches && matches.length > 0) {
-                    const minRequired = parseInt(matches[0]);
-                    if (this.stats.happiness >= minRequired) {
-                        task.progress = 1;
-                        this.completeTask(task);
-                    }
+            // Проверяем специальные задания только если у них прогресс 0
+            if (task.type === 'stat' && task.id === 'reach_happiness' && task.progress === 0) {
+                const levelMultiplier = Math.max(1, Math.floor(this.level / 10) + 1);
+                const minRequired = Math.min(100, 80 + levelMultiplier * 5);
+                
+                if (this.stats.happiness >= minRequired) {
+                    console.log(`✅ Задание на счастье выполнено: ${this.stats.happiness} >= ${minRequired}`);
+                    task.progress = 1;
+                    if (!this.taskProgress) this.taskProgress = {};
+                    this.taskProgress[task.id] = 1;
+                    this.saveValue('task_progress', this.taskProgress);
+                    this.completeTask(task);
                 }
             }
             
-            if (task.type === 'all_stats') {
-                const minRequired = 70 + Math.max(1, Math.floor(this.level / 10) + 1) * 3;
+            if (task.type === 'all_stats' && task.progress === 0) {
+                const levelMultiplier = Math.max(1, Math.floor(this.level / 10) + 1);
+                const minRequired = 70 + levelMultiplier * 3;
                 const allStatsHigh = Object.values(this.stats).every(stat => stat >= minRequired);
+                
                 if (allStatsHigh) {
+                    console.log(`✅ Задание на все статистики выполнено: все >= ${minRequired}`);
                     task.progress = 1;
+                    if (!this.taskProgress) this.taskProgress = {};
+                    this.taskProgress[task.id] = 1;
+                    this.saveValue('task_progress', this.taskProgress);
                     this.completeTask(task);
                 }
             }
@@ -5763,10 +6246,35 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('🔥 Система вирусности активирована!');
         console.log('🎯 Система прогрессии запущена!');
         
-        // Принудительная проверка заданий при запуске
+        // Принудительная проверка и исправление заданий при запуске
         setTimeout(() => {
-            if (game.checkAllTasksStatus) {
-                game.checkAllTasksStatus();
+            console.log('🔧 Запуск диагностики системы заданий...');
+            
+            // Проверяем, правильно ли инициализированы задания
+            if (!game.dailyTasksSystem || !game.dailyTasksSystem.tasks || game.dailyTasksSystem.tasks.length === 0) {
+                console.log('🚨 КРИТИЧЕСКАЯ ОШИБКА: Система заданий не инициализирована, запускаем экстренную перезагрузку');
+                game.emergencyTaskReset();
+            } else {
+                // Проверяем каждое задание на корректность
+                let hasNaN = false;
+                game.dailyTasksSystem.tasks.forEach(task => {
+                    if (isNaN(task.progress) || isNaN(task.target) || task.progress === undefined || task.target === undefined) {
+                        hasNaN = true;
+                        console.log(`🐛 Найдено NaN в задании ${task.id}: progress=${task.progress}, target=${task.target}`);
+                    }
+                });
+                
+                if (hasNaN) {
+                    console.log('🚨 Найдены NaN значения, запускаем экстренную перезагрузку');
+                    game.emergencyTaskReset();
+                } else {
+                    if (game.validateTaskProgress) {
+                        game.validateTaskProgress();
+                    }
+                    if (game.checkAllTasksStatus) {
+                        game.checkAllTasksStatus();
+                    }
+                }
             }
         }, 2000);
         
