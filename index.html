@@ -67,10 +67,18 @@
         <div id="collaboratorsInfo" class="text-xs text-purple-600 mt-1 hidden"></div>
     </div>
 
-    <!-- Персонаж Labubu -->
-    <div class="text-center mb-4 bg-white rounded-lg p-6 shadow">
-        <div class="mb-4 relative inline-block">
-            <img id="petImage" src="https://i.pinimg.com/474x/49/b9/bc/49b9bc9d7961d675e91a963b192c16a9.jpg" alt="Labubu" class="w-32 h-32 mx-auto object-contain">
+    <!-- Персонаж Labubu с красивой рамкой статуса -->
+    <div class="text-center mb-4 bg-white rounded-lg p-6 shadow" id="petContainer">
+        <!-- Статус и рамка -->
+        <div class="mb-2" id="statusDisplay">
+            <div class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold" id="statusBadge">
+                <span id="statusEmoji">🌱</span>
+                <span id="statusName" class="ml-1">Новичок</span>
+            </div>
+        </div>
+        
+        <div class="mb-4 relative inline-block" id="petFrame">
+            <img id="petImage" src="https://i.pinimg.com/474x/49/b9/bc/49b9bc9d7961d675e91a963b192c16a9.jpg" alt="Labubu" class="w-32 h-32 mx-auto object-contain rounded-lg">
             
             <!-- Одежда -->
             <div class="absolute inset-0" id="outfitContainer"></div>
@@ -79,6 +87,9 @@
             <div id="sleepIndicator" class="absolute -top-2 -right-2 text-lg animate-pulse hidden">💤</div>
             <div id="moodIndicator" class="absolute -top-1 -left-1 text-sm"></div>
             <div id="criticalIndicator" class="absolute inset-0 bg-red-500 bg-opacity-20 rounded-full animate-pulse hidden"></div>
+            
+            <!-- Эффект активного события -->
+            <div id="eventEffect" class="absolute -inset-2 rounded-lg hidden"></div>
         </div>
         
         <div class="text-2xl mb-2" id="moodEmoji">😊</div>
@@ -86,6 +97,12 @@
         <div class="text-xs text-purple-600 mt-1" id="evolutionStage">Малыш</div>
         <div id="currentOutfit" class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full mt-2 inline-block hidden"></div>
         <div class="text-xs text-gray-500 mt-1">🎂 Возраст: <span id="ageText">0</span> дней</div>
+        
+        <!-- Активное событие -->
+        <div id="activeEventDisplay" class="hidden mt-2 p-2 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg border border-purple-300">
+            <div class="text-xs font-bold text-purple-800">🎪 Активное событие:</div>
+            <div class="text-xs text-purple-700" id="activeEventText"></div>
+        </div>
     </div>
 
     <!-- Сообщения -->
@@ -97,13 +114,15 @@
     </div>
 
     <!-- Вкладки -->
-    <div class="flex mb-3 bg-white rounded-lg p-1 shadow text-xs">
-        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors bg-purple-500 text-white" data-tab="care">🔧 Уход</button>
-        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50" data-tab="games">🎮 Игры</button>
-        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50" data-tab="shop">🛍️ Магазин</button>
-        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50" data-tab="chests">📦 Сундуки</button>
-        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50" data-tab="pets">🐰 Питомцы</button>
-        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50" data-tab="info">ℹ️ Инфо</button>
+    <div class="flex mb-3 bg-white rounded-lg p-1 shadow text-xs overflow-x-auto">
+        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors bg-purple-500 text-white whitespace-nowrap" data-tab="care">🔧 Уход</button>
+        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="games">🎮 Игры</button>
+        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="shop">🛍️ Магазин</button>
+        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="chests">📦 Сундуки</button>
+        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="pets">🐰 Питомцы</button>
+        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="friends">👥 Друзья</button>
+        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="achievements">🏆 Награды</button>
+        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="info">ℹ️ Инфо</button>
     </div>
 
     <!-- Контент вкладок -->
@@ -121,50 +140,7 @@
 
 <script>
 class LabubuCareGame {
-    // ==== НОВОЕ: ЕЖЕДНЕВНЫЕ ЗАДАНИЯ ====
-    dailyMissions = [
-        { id: 'feed', desc: 'Покормите питомца 3 раза', progress: 0, req: 3, done: false, reward: 'х5 монет' },
-        { id: 'clean', desc: 'Помойте питомца 1 раз', progress: 0, req: 1, done: false, reward: '1 энергитик' },
-        { id: 'play', desc: 'Сыграйте 2 мини-игры', progress: 0, req: 2, done: false, reward: '5 опыта' },
-        { id: 'invite', desc: 'Пригласите друга', progress: 0, req: 1, done: false, reward: '1 сундук' }
-    ];
-    dailyResetAt = 0; // timestamp
-    // ---- END ----
     constructor() {
-        // Сброс миссий если сменился день
-        this.loadDailyMissions();
-        // <<<<< ПАДЕНИЕ СТАТОВ >>>>>
-        this.decayStep = {
-            hunger: 2, happiness: 1, cleanliness: 2, health: 1, energy: 1, sleep: 1
-        };
-        this.decayIntervalMs = 60000; // 1 минута
-
-        // Дополнительная еда:
-        this.foodExtended = [
-            { name: 'Пельмени', hunger: 45, price: 60, emoji: '🥟', health: 7 },
-            { name: 'Плов', hunger: 55, price: 85, emoji: '🍛', happiness: 10 },
-            { name: 'Суп', hunger: 30, price: 40, emoji: '🥣', health: 6 },
-            { name: 'Круассан', hunger: 22, price: 25, emoji: '🥐', happiness: 6 },
-            { name: 'Смузи', happiness: 15, health: 10, price: 50, emoji: '🥤' },
-            { name: 'Пицца XXL', hunger: 80, price: 140, emoji: '🍕', happiness: 20 },
-            { name: 'Газировка', happiness: 8, price: 10, emoji: '🥤', energy: 6 }
-        ];
-        // ВАЖНО: Сначала устанавливаем gameUserId
-        this.statusTitles = [
-            {min: 0, title: 'Новичок', frame: '', color: '#bbb'},
-            {min: 5, title: 'Друг', frame: '🟦', color: '#6EE7B7'},
-            {min: 15, title: 'Герой', frame: '🟨', color: '#FACC15'},
-            {min: 25, title: 'Король', frame: '👑', color: '#F59E42'},
-            {min: 40, title: 'Легенда', frame: '🌟', color: '#9152F8'}
-        ];
-        this.friendsCodes = [];
-        this.collaborators = [];
-        this.nextStatusFrame = null;
-        this.lastInviteTime = 0;
-        this.lastDecayTime = Date.now() - 60000; // Время последнего понижения статов
-        this.gameUserId = this.generateUserId();
-        console.log('🆔 Создан gameUserId:', this.gameUserId);
-        
         // Инициализация свойств до загрузки данных
         this.stats = {
             hunger: 100, happiness: 100, cleanliness: 100,
@@ -172,10 +148,10 @@ class LabubuCareGame {
         };
         this.evolutionStages = {
             baby: { name: 'Малыш', minAge: 0 },
-            child: { name: 'Ребенок', minAge: 3 },
-            teen: { name: 'Подросток', minAge: 10 },
-            adult: { name: 'Взрослый', minAge: 20 },
-            elder: { name: 'Мудрец', minAge: 40 }
+            child: { name: 'Ребенок', minAge: 7 },
+            teen: { name: 'Подросток', minAge: 30 },
+            adult: { name: 'Взрослый', minAge: 60 },
+            elder: { name: 'Мудрец', minAge: 100 }
         };
         this.skins = {
             default: { 
@@ -207,11 +183,24 @@ class LabubuCareGame {
             { name: 'Бургер', hunger: 45, price: 50, emoji: '🍔', happiness: 8 },
             { name: 'Рыба', hunger: 35, health: 10, price: 45, emoji: '🐟' },
             { name: 'Салат', health: 15, cleanliness: 10, price: 40, emoji: '🥗' },
-            { name: 'Молоко', hunger: 15, health: 8, price: 25, emoji: '🥛' }
+            { name: 'Молоко', hunger: 15, health: 8, price: 25, emoji: '🥛' },
+            // НОВАЯ ЕДА
+            { name: 'Шоколад', hunger: 20, happiness: 25, price: 60, emoji: '🍫' },
+            { name: 'Донат', hunger: 30, happiness: 18, price: 55, emoji: '🍩' },
+            { name: 'Круассан', hunger: 35, happiness: 12, price: 70, emoji: '🥐' },
+            { name: 'Тако', hunger: 45, happiness: 15, price: 85, emoji: '🌮' },
+            { name: 'Рамен', hunger: 55, health: 8, price: 90, emoji: '🍜' },
+            { name: 'Стейк', hunger: 70, health: 15, price: 150, emoji: '🥩' },
+            { name: 'Лобстер', hunger: 60, happiness: 30, price: 200, emoji: '🦞' },
+            { name: 'Икра', hunger: 30, happiness: 40, price: 300, emoji: '🍣' },
+            { name: 'Трюфель', hunger: 25, happiness: 50, price: 500, emoji: '🍄' },
+            { name: 'Эликсир здоровья', health: 50, energy: 20, price: 250, emoji: '🧪' },
+            { name: 'Энергетическая капсула', energy: 60, price: 180, emoji: '💊' },
+            { name: 'Волшебная ягода', hunger: 40, happiness: 30, health: 20, price: 400, emoji: '🫐' },
+            { name: 'Золотое яблоко', hunger: 50, happiness: 35, health: 25, energy: 15, price: 600, emoji: '🍎' },
+            { name: 'Нектар богов', hunger: 80, happiness: 60, health: 40, energy: 30, price: 1000, emoji: '🍯' }
         ];
         
-        // МНОГО ЕДЫ:
-        this.food = this.food.concat(this.foodExtended);
         this.miniGames = [
             { id: 'memory', name: 'Мемори', emoji: '🧠', description: 'Запомни последовательность', reward: { happiness: 25, experience: 20, money: 15 } },
             { id: 'reaction', name: 'Реакция', emoji: '⚡', description: 'Нажми когда появится сигнал', reward: { happiness: 20, experience: 15, money: 10 } },
@@ -238,6 +227,12 @@ class LabubuCareGame {
         // Инициализация данных
         this.initializeData();
         
+        // НОВЫЕ СИСТЕМЫ
+        this.statusSystem = this.initializeStatusSystem();
+        this.friendsSystem = this.initializeFriendsSystem();
+        this.achievementsSystem = this.initializeAchievements();
+        this.eventsSystem = this.initializeEvents();
+        
         // Звуковая система
         this.audioContext = null;
         this.soundEnabled = this.loadData('sound_enabled', true, 'boolean');
@@ -247,23 +242,15 @@ class LabubuCareGame {
         this.currentMiniGame = null;
         this.notifications = [];
         
-        // Проверяем возраст при инициализации
-        this.checkEvolution();
-        
-        // Обрабатываем время отсутствия при загрузке
-        this.processTimeAway();
-        
         // Принудительно обновляем отображение сразу после инициализации данных
         setTimeout(() => {
             this.updateDisplay();
-            this.debugSaveSystem();
         }, 50);
         
         // Инициализация
         this.init();
         this.startGameLoop();
         this.startNotificationTimer();
-        this.startStatsDecay(); // Падение статов
         
         // Автосохранение каждые 30 секунд
         this.startAutoSave();
@@ -279,15 +266,8 @@ class LabubuCareGame {
         console.log('🔄 Загрузка данных игры...');
         
         try {
-            // Загружаем или создаем gameUserId
-        const existingUserId = localStorage.getItem('game_user_id');
-        if (existingUserId) {
-            this.gameUserId = existingUserId;
-        } else {
-            this.gameUserId = this.generateUserId();
-            localStorage.setItem('game_user_id', this.gameUserId);
-        }
-        console.log('🆔 Используется gameUserId:', this.gameUserId);
+            // Загружаем только системные данные из localStorage
+            this.gameUserId = this.loadData('game_user_id', this.generateUserId(), 'string');
             this.telegramConnected = this.loadData('telegram_connected', false, 'boolean');
             this.telegramChatId = this.loadData('telegram_chat_id', '', 'string');
             
@@ -301,67 +281,44 @@ class LabubuCareGame {
             } else {
                 console.log('📱 БД недоступна, загружаем из localStorage как резерв...');
                 
-                // Если БД недоступна, загружаем из localStorage для ЭТОГО пользователя
-                this.stats = this.loadData('labubu_stats', {
+                // Если БД недоступна, загружаем из localStorage
+                this.stats = this.loadData('shared_labubu_stats', {
                     hunger: 100, happiness: 100, cleanliness: 100,
                     health: 100, energy: 100, sleep: 100
                 });
                 
-                this.money = this.loadData('labubu_money', 100, 'number');
-                this.outfit = this.loadData('labubu_outfit', 'default', 'string');
-                this.ownedOutfits = this.loadData('owned_outfits', ['default']);
-                this.lastStatDecay = this.loadData('last_stat_decay', Date.now(), 'number');
-                this.level = this.loadData('labubu_level', 1, 'number');
-                this.experience = this.loadData('labubu_experience', 0, 'number');
-                this.age = this.loadData('labubu_age', 0, 'number');
-                this.evolutionStage = this.loadData('labubu_evolution', 'baby', 'string');
-                this.lastUpdate = this.loadData('labubu_last_update', Date.now(), 'number');
-                this.lastNotification = this.loadData('labubu_last_notification', Date.now(), 'number');
-                this.petName = this.loadData('pet_name', 'Labubu', 'string');
-                this.isSleeping = this.loadData('labubu_sleeping', false, 'boolean');
-                this.currentSkin = this.loadData('current_skin', 'default', 'string');
-                this.unlockedSkins = this.loadData('unlocked_skins', ['default']);
-                this.chestCount = this.loadData('chest_count', 0, 'number');
-                this.friendsInvited = this.loadData('friends_invited', 0, 'number');
-                this.lastChestLevel = this.loadData('last_chest_level', 0, 'number');
+                this.money = this.loadData('shared_labubu_money', 100, 'number');
+                this.outfit = this.loadData('shared_labubu_outfit', 'default', 'string');
+                this.level = this.loadData('shared_labubu_level', 1, 'number');
+                this.experience = this.loadData('shared_labubu_experience', 0, 'number');
+                this.age = this.loadData('shared_labubu_age', 0, 'number');
+                this.evolutionStage = this.loadData('shared_labubu_evolution', 'baby', 'string');
+                this.lastUpdate = this.loadData('shared_labubu_last_update', Date.now(), 'number');
+                this.lastNotification = this.loadData('shared_labubu_last_notification', Date.now(), 'number');
+                this.petName = this.loadData('shared_pet_name', 'Labubu', 'string');
+                this.isSleeping = this.loadData('shared_labubu_sleeping', false, 'boolean');
+                this.currentSkin = this.loadData('shared_current_skin', 'default', 'string');
+                this.unlockedSkins = this.loadData('shared_unlocked_skins', ['default']);
+                this.chestCount = this.loadData('shared_chest_count', 0, 'number');
+                this.friendsInvited = this.loadData('shared_friends_invited', 0, 'number');
+                this.lastChestLevel = this.loadData('shared_last_chest_level', 0, 'number');
                 
                 console.log('⚠️ Используются локальные данные из-за недоступности БД');
             }
             
-            // Загрузка данных питомцев (система множественных питомцев)
-            this.pets = this.loadData('labubu_pets', []);
-            this.activePetId = this.loadData('active_pet_id', 'main_pet', 'string');
-            
-            // Если питомцев нет, создаем основного
-            if (!this.pets || this.pets.length === 0) {
-                this.pets = [
-                    { 
-                        id: 'main_pet', 
-                        name: this.petName, 
-                        stats: this.stats, 
-                        level: this.level,
-                        experience: this.experience,
-                        money: this.money,
-                        age: this.age, 
-                        outfit: this.outfit, 
-                        currentSkin: this.currentSkin,
-                        evolutionStage: this.evolutionStage,
-                        unlockedSkins: this.unlockedSkins,
-                        ownedOutfits: this.ownedOutfits,
-                        chestCount: this.chestCount,
-                        isSleeping: this.isSleeping,
-                        lastUpdate: this.lastUpdate,
-                        lastStatDecay: this.lastStatDecay
-                    }
-                ];
-                this.activePetId = 'main_pet';
-            } else {
-                // Загружаем данные активного питомца
-                const activePet = this.pets.find(pet => pet.id === this.activePetId);
-                if (activePet) {
-                    this.loadPetData(activePet);
+            // Загрузка данных питомцев (всегда из localStorage как дополнение)
+            this.pets = this.loadData('shared_labubu_pets', [
+                { 
+                    id: 'pet1', 
+                    name: this.petName, 
+                    stats: this.stats, 
+                    outfit: this.outfit, 
+                    age: this.age, 
+                    evolutionStage: this.evolutionStage,
+                    currentSkin: this.currentSkin
                 }
-            }
+            ]);
+            this.activePetId = this.loadData('shared_active_pet_id', 'pet1', 'string');
             
             // Валидация загруженных данных
             this.validateGameData();
@@ -427,6 +384,14 @@ class LabubuCareGame {
             mythic: { name: 'Мифическая', color: '#FFD700', emoji: '🟡' }
         };
 
+        // Эволюционные стадии
+        this.evolutionStages = {
+            baby: { name: 'Малыш', minAge: 0 },
+            child: { name: 'Ребенок', minAge: 7 },
+            teen: { name: 'Подросток', minAge: 30 },
+            adult: { name: 'Взрослый', minAge: 60 },
+            elder: { name: 'Мудрец', minAge: 100 }
+        };
         
         // Одежда с обновленными ценами и изображениями (отсортировано по возрастанию цен)
         this.outfits = {
@@ -459,30 +424,12 @@ class LabubuCareGame {
     
     loadData(key, defaultValue, type = 'auto') {
         try {
-            // Проверяем, есть ли gameUserId
-            if (!this.gameUserId) {
-                console.warn('⚠️ gameUserId не установлен, используем обычный ключ');
-                const saved = localStorage.getItem(key);
-                return saved ? this.parseValue(saved, type, defaultValue) : defaultValue;
-            }
-            
-            // Создаем уникальный ключ для каждого пользователя
-            const userKey = `${this.gameUserId}_${key}`;
-            const saved = localStorage.getItem(userKey);
+            const saved = localStorage.getItem(key);
             
             if (saved === null || saved === undefined) {
                 return defaultValue;
             }
             
-            return this.parseValue(saved, type, defaultValue);
-        } catch (error) {
-            console.error(`Ошибка загрузки данных для ключа ${key}:`, error);
-            return defaultValue;
-        }
-    }
-    
-    parseValue(saved, type, defaultValue) {
-        try {
             // Обработка разных типов данных
             switch (type) {
                 case 'string':
@@ -500,11 +447,12 @@ class LabubuCareGame {
                     try {
                         return JSON.parse(saved);
                     } catch (parseError) {
-                        console.warn(`Ошибка парсинга значения:`, parseError);
+                        console.warn(`Ошибка парсинга для ключа ${key}:`, parseError);
                         return defaultValue;
                     }
             }
         } catch (error) {
+            console.error(`Ошибка загрузки данных для ключа ${key}:`, error);
             return defaultValue;
         }
     }
@@ -512,12 +460,11 @@ class LabubuCareGame {
     saveData() {
         try {
             console.log('💾 Сохранение данных игры...');
-            console.log('🆔 gameUserId для сохранения:', this.gameUserId);
             
             // Обновляем время последнего обновления
             this.lastUpdate = Date.now();
             
-            // Обновляем данные активного питомца
+            // Обновление активного питомца
             this.updateActivePet();
             
             // ПРИОРИТЕТ: Сохранение в базу данных
@@ -531,11 +478,6 @@ class LabubuCareGame {
             
             // Дублирование в localStorage как кэш
             this.saveToLocalStorage();
-        
-        // Инициализируем lastStatDecay если не загружено
-        if (!this.lastStatDecay) {
-            this.lastStatDecay = this.loadData('last_stat_decay', Date.now(), 'number');
-        }
             
             // Создание резервной копии
             this.createBackup();
@@ -550,26 +492,11 @@ class LabubuCareGame {
     
     saveValue(key, value) {
         try {
-            // Проверяем, есть ли gameUserId
-            if (!this.gameUserId) {
-                console.warn('⚠️ gameUserId не установлен, используем обычный ключ');
-                if (typeof value === 'object') {
-                    localStorage.setItem(key, JSON.stringify(value));
-                } else {
-                    localStorage.setItem(key, value.toString());
-                }
-                return;
-            }
-            
-            // Создаем уникальный ключ для каждого пользователя
-            const userKey = `${this.gameUserId}_${key}`;
             if (typeof value === 'object') {
-                localStorage.setItem(userKey, JSON.stringify(value));
+                localStorage.setItem(key, JSON.stringify(value));
             } else {
-                localStorage.setItem(userKey, value.toString());
+                localStorage.setItem(key, value.toString());
             }
-            
-            console.log(`💾 Сохранено: ${userKey} = ${typeof value === 'object' ? JSON.stringify(value) : value}`);
         } catch (error) {
             console.error(`Ошибка сохранения ${key}:`, error);
         }
@@ -612,7 +539,17 @@ class LabubuCareGame {
             this.unlockedSkins = ['default'];
         }
         
-        // У каждого игрока один личный питомец
+        if (!Array.isArray(this.pets)) {
+            this.pets = [{
+                id: 'pet1',
+                name: this.petName,
+                stats: this.stats,
+                outfit: this.outfit,
+                age: this.age,
+                evolutionStage: this.evolutionStage,
+                currentSkin: this.currentSkin
+            }];
+        }
         
         // Валидация временных меток
         if (!this.lastUpdate || this.lastUpdate > Date.now()) {
@@ -634,144 +571,26 @@ class LabubuCareGame {
         });
     }
     
-    // ==== ЕЖЕДНЕВНЫЕ МИССИИ ====
-    getMissionsTabContent() {
-        this.checkDailyMissions();
-        return `
-            <div class="bg-white rounded-lg p-4 shadow">
-                <h3 class="font-bold text-purple-800 text-sm mb-4">🗓️ Ежедневные задания</h3>
-                <div>
-                ${this.dailyMissions.map(m=>`
-                    <div class="flex items-center mb-3">
-                        <span class="inline-block px-2 py-1 mr-2 rounded text-xs ${m.done?'bg-green-200 text-green-700':'bg-gray-100 text-gray-800'}">${m.desc}</span>
-                        <span class="text-xs text-gray-500">${m.progress}/${m.req}</span>
-                        ${m.done?'<span class="ml-2 text-green-600 font-bold">✅</span>':
-                         `<button class="ml-2 bg-blue-200 text-xs px-2 py-1 rounded" onclick="game.claimDailyMission('${m.id}')">Получить</button>`}
-                    </div>
-                `).join('')}
-                </div>
-                <div class="mt-3 text-xs text-gray-600">💡 Задания обновляются раз в сутки.</div>
-            </div>
-        `;
-    }
-
-    checkDailyMissions() {
-        const now = Math.floor(Date.now()/1000);
-        const oneDay = 86400;
-        if (!this.dailyResetAt || now >= this.dailyResetAt) this.resetDailyMissions();
-        // обновить done для текущих
-        this.dailyMissions.forEach(m => m.done = (m.progress >= m.req));
-        // автосейв
-        this.saveData();
-    }
-    // Сохранить/загрузить миссии
-    saveDailyMissions() {
-        localStorage.setItem(`${this.gameUserId}_daily_missions`, JSON.stringify(this.dailyMissions));
-        localStorage.setItem(`${this.gameUserId}_missions_reset_at`, `${this.dailyResetAt}`);
-    }
-    loadDailyMissions() {
-        try {
-            const missionsRaw = localStorage.getItem(`${this.gameUserId}_daily_missions`);
-            if (missionsRaw) this.dailyMissions = JSON.parse(missionsRaw);
-            const resetRaw = localStorage.getItem(`${this.gameUserId}_missions_reset_at`);
-            if (resetRaw) this.dailyResetAt = parseInt(resetRaw);
-        } catch(e) { this.resetDailyMissions(); }
-    }
-    resetDailyMissions() {
-        this.dailyMissions = [
-            { id: 'feed', desc: 'Покормите питомца 3 раза', progress: 0, req: 3, done: false, reward: 'х5 монет' },
-            { id: 'clean', desc: 'Помойте питомца 1 раз', progress: 0, req: 1, done: false, reward: '1 энергетик' },
-            { id: 'play', desc: 'Сыграйте 2 мини-игры', progress: 0, req: 2, done: false, reward: '5 опыта' },
-            { id: 'invite', desc: 'Пригласите друга', progress: 0, req: 1, done: false, reward: '1 сундук' }
-        ];
-        this.dailyResetAt = Math.floor(Date.now()/1000) + 86400;
-        this.saveDailyMissions();
-    }
-    claimDailyMission(missionId) {
-        const m = this.dailyMissions.find(x=>x.id===missionId);
-        if (!m || !m.done) return this.showMessage('Выполните все условия!');
-        // выдать награду
-        switch(missionId) {
-            case 'feed': this.money += 5; break;
-            case 'clean': this.stats.energy = Math.min(100,this.stats.energy+25); break;
-            case 'play': this.experience += 5; break;
-            case 'invite': this.chestCount += 1; break;
+    updateActivePet() {
+        const activePet = this.pets.find(pet => pet.id === this.activePetId);
+        if (activePet) {
+            activePet.name = this.petName;
+            activePet.stats = { ...this.stats };
+            activePet.outfit = this.outfit;
+            activePet.age = this.age;
+            activePet.evolutionStage = this.evolutionStage;
+            activePet.currentSkin = this.currentSkin;
+            activePet.level = this.level;
+            activePet.experience = this.experience;
+            activePet.money = this.money;
         }
-        m.done = false;
-        m.progress = 0;
-        this.saveDailyMissions();
-        this.saveData();
-        this.updateDisplay();
-        this.showMessage('Награда за миссию получена!');
     }
-
-    // ===== КОНЕЦ блока миссий =====
-
-    // ==== Приглашения ==== 
-    inviteFriend(code) {
-        let mission = this.dailyMissions.find(x=>x.id==='invite');
-        if (mission && !mission.done){mission.progress=Math.min(mission.req,mission.progress+1);this.saveDailyMissions();}
-        if (!code || code === this.gameUserId.substring(0,6) || this.collaborators.includes(code)) return this.showMessage('Некорректный код!');
-        this.collaborators.push(code);
-        this.friendsInvited += 1;
-        this.chestCount = (this.chestCount||0) + 1;
-        this.saveData();
-        this.showMessage('Друг добавлен! Получен сундук!');
-        this.updateDisplay();
-    }
-    acceptFriendInvite() {
-        const code = document.getElementById('inviteCodeInput').value.trim();
-        this.inviteFriend(code);
-        document.getElementById('inviteCodeInput').value = '';
-    }
-
-    // ==== Открытие сундука ====
-    openChest() {
-        if (!this.chestCount || this.chestCount === 0) return this.showMessage('Нет сундуков.');
-        const rewards = [
-            {type: 'money', amount: Math.floor(Math.random()*150+50), msg: 'Монеты'},
-            {type: 'food', idx: Math.floor(Math.random()*this.food.length), msg: 'Эксклюзивная еда'},
-            {type: 'skin', skin: 'golden', msg: 'Легендарный скин!'},
-            {type: 'energy', amount: 30, msg: 'Энергия'},
-            {type: 'happiness', amount: 30, msg: 'Счастье'},
-            {type: 'cleanliness', amount: 35, msg: 'Чистота'},
-        ];
-        const choice = rewards[Math.floor(Math.random()*rewards.length)];
-        if (choice.type === 'money') this.money += choice.amount;
-        if (choice.type === 'food') this.stats.hunger = Math.min(100, this.stats.hunger + 35);
-        if (choice.type === 'skin') if(!this.unlockedSkins.includes(choice.skin)) this.unlockedSkins.push(choice.skin);
-        if (choice.type === 'energy') this.stats.energy = Math.min(100, this.stats.energy + choice.amount);
-        if (choice.type === 'happiness') this.stats.happiness = Math.min(100, this.stats.happiness + choice.amount);
-        if (choice.type === 'cleanliness') this.stats.cleanliness = Math.min(100, this.stats.cleanliness + choice.amount);
-        this.chestCount--;
-        this.saveData();
-        document.getElementById('chestRewardMsg').innerHTML = `<b>Награда:</b> ${choice.msg}`;
-        this.updateDisplay();
-    }
-
-    // ==== Падение шкал ====
-    startStatsDecay() {
-        setInterval(()=>{
-            // Кооперация уменьшает падения
-            const isCoop = this.collaborators.length > 0;
-            for (let key of Object.keys(this.decayStep)) {
-                let dec = this.decayStep[key];
-                if(isCoop) dec = Math.floor(dec/2) + 1;
-                this.stats[key] = Math.max(0, this.stats[key] - dec);
-            }
-            this.saveData();
-            this.updateDisplay();
-        }, this.decayIntervalMs);
-    }
-    
-    // Функция удалена - каждый игрок имеет одного питомца
     
     createBackup() {
         try {
             const backupData = {
                 timestamp: Date.now(),
                 version: '4.0',
-                gameUserId: this.gameUserId,
                 data: {
                     stats: this.stats,
                     money: this.money,
@@ -786,26 +605,21 @@ class LabubuCareGame {
                     unlockedSkins: this.unlockedSkins,
                     chestCount: this.chestCount,
                     friendsInvited: this.friendsInvited,
-                    pets: this.pets,
-                    ownedOutfits: this.ownedOutfits
+                    pets: this.pets
                 }
             };
             
-            // Индивидуальный бэкап для каждого пользователя
-            const backupKey = `${this.gameUserId}_labubu_backup`;
-            const historyKey = `${this.gameUserId}_labubu_backup_history`;
-            
-            localStorage.setItem(backupKey, JSON.stringify(backupData));
+            localStorage.setItem('labubu_backup', JSON.stringify(backupData));
             
             // Хранить только последние 3 резервные копии
-            const backupHistory = JSON.parse(localStorage.getItem(historyKey) || '[]');
+            const backupHistory = JSON.parse(localStorage.getItem('labubu_backup_history') || '[]');
             backupHistory.push(backupData);
             
             if (backupHistory.length > 3) {
                 backupHistory.shift();
             }
             
-            localStorage.setItem(historyKey, JSON.stringify(backupHistory));
+            localStorage.setItem('labubu_backup_history', JSON.stringify(backupHistory));
             
         } catch (error) {
             console.error('Ошибка создания резервной копии:', error);
@@ -814,10 +628,9 @@ class LabubuCareGame {
     
     restoreFromBackup() {
         try {
-            const backupKey = `${this.gameUserId}_labubu_backup`;
-            const backup = JSON.parse(localStorage.getItem(backupKey) || '{}');
+            const backup = JSON.parse(localStorage.getItem('labubu_backup') || '{}');
             
-            if (backup.data && backup.timestamp && backup.gameUserId === this.gameUserId) {
+            if (backup.data && backup.timestamp) {
                 const data = backup.data;
                 
                 this.stats = data.stats || this.stats;
@@ -834,7 +647,6 @@ class LabubuCareGame {
                 this.chestCount = data.chestCount || this.chestCount;
                 this.friendsInvited = data.friendsInvited || this.friendsInvited;
                 this.pets = data.pets || this.pets;
-                this.ownedOutfits = data.ownedOutfits || this.ownedOutfits;
                 
                 this.saveData();
                 this.updateDisplay();
@@ -1077,27 +889,6 @@ class LabubuCareGame {
             age: this.age
         });
         
-        // Рамка статуса
-        const petImage = document.getElementById('petImage');
-        const avgStats = Object.values(this.stats).reduce((a, b) => a + b, 0) / 6;
-        let frame = '', frameColor = '', statusTitle = '';
-        for (let i = this.statusTitles.length - 1; i >= 0; i--) {
-            if (this.level >= this.statusTitles[i].min) {
-                frame = this.statusTitles[i].frame;
-                frameColor = this.statusTitles[i].color;
-                statusTitle = this.statusTitles[i].title;
-                break;
-            }
-        }
-        if (petImage) {
-            petImage.style.border = frame ? '4px solid ' + frameColor : 'none';
-            petImage.style.boxShadow = frame ? '0 0 24px ' + frameColor : 'none';
-        }
-        const evolutionStage = document.getElementById('evolutionStage');
-        if(evolutionStage && statusTitle) {
-            evolutionStage.innerHTML += ` <span style="color:${frameColor};font-weight:bold;">${frame} <span>${statusTitle}</span></span>`;
-        }
-        
         // Основная информация
         const petNameDisplay = document.getElementById('petNameDisplay');
         const levelDisplay = document.getElementById('levelDisplay');
@@ -1147,7 +938,8 @@ class LabubuCareGame {
         const mood = this.getMood();
         const moodEmoji = document.getElementById('moodEmoji');
         const moodStatus = document.getElementById('moodStatus');
-        const petImageForMood = document.getElementById('petImage');
+        const evolutionStage = document.getElementById('evolutionStage');
+        const petImage = document.getElementById('petImage');
         
         if (moodEmoji && mood) moodEmoji.textContent = mood.emoji;
         if (moodStatus && mood) moodStatus.textContent = mood.status;
@@ -1429,8 +1221,6 @@ class LabubuCareGame {
     }
     
     switchTab(tab) {
-        // Ежедневное обновление миссий
-        if (tab === 'missions') this.checkDailyMissions();
         this.activeTab = tab;
         
         // Обновить кнопки
@@ -1449,8 +1239,6 @@ class LabubuCareGame {
     
     getTabContent(tab) {
         switch (tab) {
-            case 'missions':
-                return this.getMissionsTabContent();
             case 'care':
                 return this.getCareTabContent();
             case 'games':
@@ -1474,14 +1262,17 @@ class LabubuCareGame {
                 <div class="text-sm">${item.emoji}</div>
                 <div class="font-medium text-xs">${item.name}</div>
                 <div class="text-xs text-gray-600">${item.price}💰</div>
+                ${item.happiness ? `<div class="text-xs text-yellow-600">+${item.happiness}😊</div>` : ''}
+                ${item.health ? `<div class="text-xs text-red-600">+${item.health}❤️</div>` : ''}
+                ${item.energy ? `<div class="text-xs text-green-600">+${item.energy}⚡</div>` : ''}
             </button>
         `).join('');
         
         return `
             <div class="space-y-3">
                 <div class="bg-white rounded-lg p-3 shadow">
-                    <h3 class="font-bold mb-2 text-purple-800 text-sm">🍽️ Кормление</h3>
-                    <div class="grid grid-cols-4 gap-1">${foodGrid}</div>
+                    <h3 class="font-bold mb-2 text-purple-800 text-sm">🍽️ Кормление (${this.food.length} видов еды)</h3>
+                    <div class="grid grid-cols-3 gap-1 max-h-60 overflow-y-auto">${foodGrid}</div>
                 </div>
                 <div class="bg-white rounded-lg p-3 shadow">
                     <h3 class="font-bold mb-2 text-purple-800 text-sm">⚡ Действия</h3>
@@ -1499,6 +1290,21 @@ class LabubuCareGame {
                             <div class="text-sm">${this.isSleeping ? '☀️' : '😴'}</div>
                             <div class="font-medium">${this.isSleeping ? 'Будить' : 'Спать'}</div>
                         </button>
+                    </div>
+                </div>
+                
+                <!-- Совместный уход -->
+                <div class="bg-white rounded-lg p-3 shadow">
+                    <h3 class="font-bold mb-2 text-purple-800 text-sm">👥 Совместный уход</h3>
+                    <div class="bg-blue-50 p-3 rounded">
+                        <div class="text-xs text-blue-800 mb-2">
+                            <strong>Активных помощников:</strong> ${this.friendsList.length}
+                        </div>
+                        <div class="text-xs text-blue-700">
+                            🔹 Бонус от друзей: -${(this.getFriendsDecayBonus() * 100).toFixed(1)}% к снижению статистик<br>
+                            🔹 Бонус от статуса: -${(this.getStatusDecayBonus() * 100).toFixed(1)}% к снижению статистик<br>
+                            🔹 Общий бонус: -${((this.getFriendsDecayBonus() + this.getStatusDecayBonus()) * 100).toFixed(1)}%
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1523,16 +1329,126 @@ class LabubuCareGame {
         `;
     }
     
+    getFriendsTabContent() {
+        return `
+            <div class="space-y-3">
+                <div class="bg-white rounded-lg p-3 shadow">
+                    <h3 class="font-bold mb-2 text-purple-800 text-sm">👥 Друзья и приглашения</h3>
+                    
+                    <!-- Мой код приглашения -->
+                    <div class="bg-green-50 p-3 rounded mb-3">
+                        <div class="text-sm font-bold text-green-800 mb-1">Ваш код приглашения:</div>
+                        <div class="flex items-center justify-between">
+                            <code class="bg-green-200 px-2 py-1 rounded font-mono text-sm">${this.inviteCode}</code>
+                            <button onclick="navigator.clipboard.writeText('${this.inviteCode}'); game.showMessage('Код скопирован!')" 
+                                    class="bg-green-500 text-white px-2 py-1 rounded text-xs">
+                                📋 Копировать
+                            </button>
+                        </div>
+                        <div class="text-xs text-green-700 mt-1">Поделитесь этим кодом с друзьями!</div>
+                    </div>
+                    
+                    <!-- Пригласить друга -->
+                    <div class="bg-blue-50 p-3 rounded mb-3">
+                        <div class="text-sm font-bold text-blue-800 mb-2">Пригласить друга:</div>
+                        <div class="flex space-x-2">
+                            <input type="text" id="friendCode" placeholder="Введите код друга" 
+                                   class="flex-1 px-2 py-1 border rounded text-sm">
+                            <button onclick="game.inviteFriend(document.getElementById('friendCode').value)" 
+                                    class="bg-blue-500 text-white px-3 py-1 rounded text-xs">
+                                Добавить
+                            </button>
+                        </div>
+                        <div class="text-xs text-blue-700 mt-1">За каждого друга: +1 сундук, +100 монет!</div>
+                    </div>
+                    
+                    <!-- Список друзей -->
+                    <div class="bg-purple-50 p-3 rounded mb-3">
+                        <div class="text-sm font-bold text-purple-800 mb-2">Мои друзья (${this.friendsList.length}):</div>
+                        ${this.friendsList.length > 0 ? `
+                            <div class="grid grid-cols-2 gap-2 max-h-24 overflow-y-auto">
+                                ${this.friendsList.map(friend => `
+                                    <div class="bg-purple-100 p-2 rounded text-xs text-center">
+                                        👤 ${friend}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : '<div class="text-xs text-purple-600">Пока нет друзей. Пригласите первого!</div>'}
+                    </div>
+                    
+                    <!-- Награды за друзей -->
+                    <div class="bg-yellow-50 p-3 rounded">
+                        <div class="text-sm font-bold text-yellow-800 mb-2">🎁 Награды за приглашения:</div>
+                        <div class="text-xs text-yellow-700 space-y-1">
+                            ${Object.entries(this.friendsSystem.inviteRewards).map(([count, reward]) => `
+                                <div class="flex justify-between ${this.friendsList.length >= count ? 'line-through text-green-600' : ''}">
+                                    <span>${count} друзей:</span>
+                                    <span>+${reward.chests}📦 +${reward.money}💰</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    getAchievementsTabContent() {
+        return `
+            <div class="space-y-3">
+                <div class="bg-white rounded-lg p-3 shadow">
+                    <h3 class="font-bold mb-2 text-purple-800 text-sm">🏆 Достижения (${this.unlockedAchievements.length}/${Object.keys(this.achievementsSystem).length})</h3>
+                    
+                    <div class="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
+                        ${Object.entries(this.achievementsSystem).map(([achievementId, achievement]) => {
+                            const isUnlocked = this.unlockedAchievements.includes(achievementId);
+                            return `
+                                <div class="p-3 rounded ${isUnlocked ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-lg ${isUnlocked ? '' : 'grayscale'}">${achievement.emoji}</span>
+                                            <div>
+                                                <div class="font-medium text-sm ${isUnlocked ? 'text-green-800' : 'text-gray-600'}">${achievement.name}</div>
+                                                <div class="text-xs ${isUnlocked ? 'text-green-600' : 'text-gray-500'}">
+                                                    ${achievement.reward.money ? `+${achievement.reward.money}💰 ` : ''}
+                                                    ${achievement.reward.chests ? `+${achievement.reward.chests}📦` : ''}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-xl">${isUnlocked ? '✅' : '🔒'}</div>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                
+                <!-- Прогресс к новым достижениям -->
+                <div class="bg-white rounded-lg p-3 shadow">
+                    <h4 class="font-bold mb-2 text-purple-800 text-sm">📈 Прогресс:</h4>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between">
+                            <span>Уровень:</span>
+                            <span>${this.level}/10 для достижения "Уровень 10"</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Деньги:</span>
+                            <span>${this.money}/10,000 для достижения "10,000 монет"</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Друзья:</span>
+                            <span>${this.friendsList.length}/10 для достижения "10 друзей"</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
     getShopTabContent() {
-        const outfitsList = Object.entries(this.outfits).map(([key, item]) => {
-            const isOwned = this.ownedOutfits.includes(key);
-            const isWearing = this.outfit === key;
-            
-            return `
+        const outfitsList = Object.entries(this.outfits).map(([key, item]) => `
             <button onclick="game.buyOutfit('${key}')" class="w-full p-2 rounded-lg text-xs transition-colors flex items-center justify-between ${
-                isWearing ? 'bg-green-100 border-2 border-green-500' : 
-                isOwned ? 'bg-blue-50 border-2 border-blue-300' :
-                'bg-gray-100 hover:bg-gray-200'
+                this.outfit === key ? 'bg-green-100 border-2 border-green-500' : 'bg-gray-100 hover:bg-gray-200'
             }">
                 <div class="flex items-center space-x-2">
                     <span class="text-lg">${item.emoji}</span>
@@ -1540,48 +1456,18 @@ class LabubuCareGame {
                         <div class="font-medium">${item.name}</div>
                         <div class="text-xs text-gray-500">${item.description}</div>
                         <div class="text-xs text-gray-600 font-bold">
-                            ${isOwned ? 'Куплено' : item.price === 0 ? 'Бесплатно' : `${item.price}💰`}
+                            ${item.price === 0 ? 'Бесплатно' : `${item.price}💰`}
                         </div>
                     </div>
                 </div>
-                ${isWearing ? '<span class="text-green-600 font-bold">✓ Надето</span>' : 
-                  isOwned ? '<span class="text-blue-600 font-bold">👍 Надеть</span>' : 
-                  ''}
+                ${this.outfit === key ? '<span class="text-green-600 font-bold">✓</span>' : ''}
             </button>
-        `
-        }).join('');
+        `).join('');
         
         return `
             <div class="bg-white rounded-lg p-3 shadow">
                 <h3 class="font-bold mb-2 text-purple-800 text-sm">👗 Магазин одежды</h3>
-                <div class="grid grid-cols-1 gap-1 max-h-64 overflow-y-auto">
-                    ${Object.entries(this.outfits).map(([key, item]) => {
-                        const isOwned = this.ownedOutfits.includes(key);
-                        const isWearing = this.outfit === key;
-                        
-                        return `
-                        <button onclick="game.buyOutfit('${key}')" class="w-full p-2 rounded-lg text-xs transition-colors flex items-center justify-between ${
-                            isWearing ? 'bg-green-100 border-2 border-green-500' : 
-                            isOwned ? 'bg-blue-50 border-2 border-blue-300' :
-                            'bg-gray-100 hover:bg-gray-200'
-                        }">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-lg">${item.emoji}</span>
-                                <div class="text-left">
-                                    <div class="font-medium">${item.name}</div>
-                                    <div class="text-xs text-gray-500">${item.description}</div>
-                                    <div class="text-xs text-gray-600 font-bold">
-                                        ${isOwned ? 'Куплено' : item.price === 0 ? 'Бесплатно' : `${item.price}💰`}
-                                    </div>
-                                </div>
-                            </div>
-                            ${isWearing ? '<span class="text-green-600 font-bold">✓ Надето</span>' : 
-                              isOwned ? '<span class="text-blue-600 font-bold">👍 Надеть</span>' : 
-                              ''}
-                        </button>
-                        `;
-                    }).join('')}
-                </div>
+                <div class="grid grid-cols-1 gap-1 max-h-64 overflow-y-auto">${outfitsList}</div>
             </div>
         `;
     }
@@ -1589,105 +1475,21 @@ class LabubuCareGame {
     getPetsTabContent() {
         return `
             <div class="bg-white rounded-lg p-3 shadow">
-                <h3 class="font-bold mb-2 text-purple-800 text-sm">🐰 Мои питомцы</h3>
-                <div class="mb-2">
-                    <input type="text" id="inviteCodeInput" class="border rounded px-2 py-1 text-xs" placeholder="Ввести код друга">
-                    <button onclick="game.acceptFriendInvite()" class="ml-1 text-xs px-2 py-1 bg-orange-200 rounded">Принять приглашение</button>
-                </div>
-                <div class="mb-2">
-                    Ваш код приглашения: <b id="myFriendCode">${this.gameUserId.substring(0,6)}</b> <button onclick="navigator.clipboard.writeText('${this.gameUserId.substring(0,6)}')" class="text-xs px-1 py-1 bg-blue-200 rounded">Скопировать</button>
-                </div>
-                <div id="collaboratorsList" class="text-xs text-purple-700 mt-2 mb-2">
-                    Приглашено друзей: <b>${this.friendsInvited}</b><br>
-                    ${this.collaborators.length > 0 ? this.collaborators.map(c=>`👥 Друг: ${c}`).join('<br>') : 'Нет друзей для совместного ухода.'}
-                </div>
-            
-                <div class="text-center mb-4">
-                    <div class="text-4xl mb-2">🐰</div>
-                    <h4 class="font-bold text-lg text-purple-800">${this.petName}</h4>
-                    <p class="text-sm text-gray-600">Ваш активный питомец</p>
-                </div>
-                
-                <div class="bg-blue-50 p-3 rounded-lg mb-4">
-                    <h4 class="font-bold text-sm text-blue-800 mb-2">📊 Статистика питомца</h4>
-                    <div class="text-xs text-blue-700 space-y-1">
-                        <p><strong>Имя:</strong> ${this.petName}</p>
-                        <p><strong>Возраст:</strong> ${this.age} дней</p>
-                        <p><strong>Уровень:</strong> ${this.level}</p>
-                        <p><strong>Эволюция:</strong> ${this.evolutionStages[this.evolutionStage].name}</p>
-                        <p><strong>Скин:</strong> ${this.skins[this.currentSkin].name}</p>
-                    </div>
-                </div>
-                
-                <div class="bg-green-50 p-3 rounded-lg">
-                    <h4 class="font-bold text-sm text-green-800 mb-2">➕ Создать нового питомца</h4>
-                    <p class="text-xs text-green-700 mb-3">Создайте дополнительного питомца для ухода!</p>
-                    
-                    <div class="mb-3">
-                        <input type="text" id="newPetName" placeholder="Имя нового питомца" 
-                               class="w-full px-2 py-1 border rounded text-sm" maxlength="15">
-                    </div>
-                    
-                    <button onclick="game.createNewPet()" 
-                            class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded font-bold transition-colors">
-                        🐰 Создать питомца
-                    </button>
-                    
-                    <p class="text-xs text-gray-600 mt-2 text-center">
-                        💡 У вас может быть несколько питомцев для ухода
-                    </p>
-                </div>
-                
-                ${this.pets && this.pets.length > 1 ? `
-                <div class="bg-purple-50 p-3 rounded-lg mt-3">
-                    <h4 class="font-bold text-sm text-purple-800 mb-2">👥 Все ваши питомцы (${this.pets.length})</h4>
-                    <div class="space-y-2 max-h-32 overflow-y-auto">
-                        ${this.pets.map(pet => `
-                            <div class="flex items-center justify-between p-2 rounded ${pet.id === this.activePetId ? 'bg-purple-200 border-2 border-purple-500' : 'bg-white border border-gray-200'}">
-                                <div class="flex items-center space-x-2">
-                                    <div class="text-lg">🐰</div>
-                                    <div>
-                                        <div class="font-medium text-sm">${pet.name}</div>
-                                        <div class="text-xs text-gray-600">Lv.${pet.level || 1} • ${pet.age || 0}д • ${this.evolutionStages[pet.evolutionStage] ? this.evolutionStages[pet.evolutionStage].name : 'Малыш'}</div>
-                                    </div>
-                                </div>
-                                <div class="flex space-x-1">
-                                    ${pet.id === this.activePetId ? 
-                                        '<span class="text-xs text-purple-600 font-bold">✓ Активен</span>' : 
-                                        `<button onclick="game.switchToPet('${pet.id}')" class="text-xs bg-purple-500 text-white px-2 py-1 rounded hover:bg-purple-600">Выбрать</button>`
-                                    }
-                                </div>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-                ` : ''}
-                
-                <div class="bg-yellow-50 p-3 rounded-lg mt-3">
-                    <h4 class="font-bold text-sm text-yellow-800 mb-2">🔄 Управление питомцами</h4>
-                    <div class="text-xs text-yellow-700 space-y-1">
-                        <p>• Создавайте новых питомцев когда захотите</p>
-                        <p>• Переключайтесь между питомцами</p>
-                        <p>• У каждого свои статистики и прогресс</p>
-                        <p>• Все питомцы развиваются независимо</p>
-                    </div>
+                <h3 class="font-bold mb-2 text-purple-800 text-sm">🐰 Управление питомцами</h3>
+                <button onclick="game.createNewPet()" class="w-full mb-3 p-3 bg-green-100 hover:bg-green-200 rounded-lg text-sm transition-colors">
+                    ➕ Создать нового питомца
+                </button>
+                <div class="bg-blue-50 p-3 rounded-lg">
+                    <h4 class="font-bold text-sm text-blue-800 mb-2">👥 Совместное воспитание</h4>
+                    <p class="text-xs text-blue-700">Все изменения синхронизируются в реальном времени!</p>
                 </div>
             </div>
         `;
     }
     
     getInfoTabContent() {
-        // Новая вкладка — ежедневные миссии
         return `
             <div class="space-y-3">
-                <button class="w-full bg-orange-300 rounded px-2 py-1 font-bold text-white" onclick="game.switchTab('missions')">Ежедневные задания ➡️</button>
-            </div>` +
-        return `
-            <div class="space-y-3">
-                <div class="bg-orange-100 rounded-lg p-2 mb-2 text-xs text-orange-700">
-                    <b>Система приглашения</b>: получите секретный код и пригласите друга (вкладка PET). Когда друг введет ваш код, оба получите сундук!
-                </div>
-            
 
                 
                 <div class="bg-white rounded-lg p-3 shadow">
@@ -1722,10 +1524,9 @@ class LabubuCareGame {
                                 <li>6 редких скинов персонажей</li>
                                 <li>5 стадий эволюции</li>
                                 <li>Реалистичное старение (1 день = 1 день)</li>
-                                <li>🔒 Индивидуальный питомец для каждого игрока</li>
-                                <li>💾 Персональные сохранения и бэкапы</li>
                                 <li>Автоматические уведомления</li>
                                 <li>Звуковые эффекты</li>
+                                <li>Автосохранение и резервные копии</li>
                             </ul>
                         </div>
                         <div class="bg-orange-50 p-2 rounded">
@@ -1739,15 +1540,9 @@ class LabubuCareGame {
                                 <li>При чистоте < 50%: "Я грязный!"</li>
                             </ul>
                         </div>
-
-                        
                         <div class="text-center text-gray-500">
                             <p>🐰 Создано с любовью для ${this.petName}! 💕</p>
-                            <p class="text-xs mt-1">Версия 5.0 - Исправлена система снижения статистик</p>
-                            <div class="bg-green-50 p-2 rounded mt-2">
-                                <p class="text-xs text-green-700">🎯 У каждого игрока свой личный питомец!</p>
-                                <p class="text-xs text-green-600">⏰ Статистики снижаются каждую минуту</p>
-                            </div>
+                            <p class="text-xs mt-1">Версия 4.0 - Enhanced Save System</p>
                         </div>
                     </div>
                 </div>
@@ -1757,9 +1552,6 @@ class LabubuCareGame {
     
     // Игровая логика
     feedPet(foodIndex) {
-        // Прогресс миссии
-        let mission = this.dailyMissions.find(x=>x.id==='feed');
-        if(mission&&!mission.done){mission.progress=Math.min(mission.req,mission.progress+1);this.saveDailyMissions();}
         if (this.isSleeping) {
             this.showMessage(`${this.petName} спит! 😴`);
             return;
@@ -1776,25 +1568,37 @@ class LabubuCareGame {
             
             // Больший бонус энергии от еды
             if (!food.energy) {
-                this.stats.energy = Math.min(100, this.stats.energy + 10); // Увеличен бонус энергии
+                this.stats.energy = Math.min(100, this.stats.energy + 10);
             }
             
-            this.experience += 10;
+            // Бонус опыта от статуса
+            let expGain = 10;
+            const status = this.statusSystem[this.currentStatus];
+            if (status) {
+                expGain += status.bonus.exp;
+            }
+            
+            // Бонус от активного события
+            if (this.activeEvent && this.activeEvent.id === 'double_exp') {
+                expGain *= 2;
+            }
+            
+            this.experience += expGain;
+            this.statusPoints += 5; // Добавляем очки статуса
             
             this.playSound(800, 150);
-            this.showMessage(`${this.petName} съел ${food.name}! ${food.emoji}`);
+            this.showMessage(`${this.petName} съел ${food.name}! ${food.emoji} ${expGain > 10 ? `(+${expGain} опыта!)` : ''}`);
             this.checkLevelUp();
+            this.updateStatus();
             this.saveData();
             this.updateDisplay();
+            this.updateStatusDisplay();
         } else {
             this.showMessage('Недостаточно монет!');
         }
     }
     
     washPet() {
-        // Прогресс миссии
-        let mission = this.dailyMissions.find(x=>x.id==='clean');
-        if(mission&&!mission.done){mission.progress=Math.min(mission.req,mission.progress+1);this.saveDailyMissions();}
         if (this.isSleeping) {
             this.showMessage(`Не буди спящего ${this.petName}! 😴`);
             return;
@@ -1846,25 +1650,18 @@ class LabubuCareGame {
     buyOutfit(outfitKey) {
         const outfit = this.outfits[outfitKey];
         
-        if (this.ownedOutfits.includes(outfitKey)) {
-            // Уже куплен - просто надеваем
-            this.outfit = outfitKey;
-            this.stats.happiness = Math.min(100, this.stats.happiness + 10);
-            this.showMessage(`Надето: ${outfit.name}! ${outfit.emoji}`);
-            this.saveData();
-            this.updateDisplay();
-            this.switchTab('shop');
+        if (this.outfit === outfitKey) {
+            this.showMessage('Эта одежда уже надета!');
             return;
         }
         
         if (this.money >= outfit.price) {
             this.money -= outfit.price;
-            this.ownedOutfits.push(outfitKey);
             this.outfit = outfitKey;
             this.stats.happiness = Math.min(100, this.stats.happiness + 20);
             
             this.playHappySound();
-            this.showMessage(`Куплено и надето: ${outfit.name}! ${outfit.emoji}`);
+            this.showMessage(`Новая одежда: ${outfit.name}! ${outfit.emoji}`);
             this.saveData();
             this.updateDisplay();
             this.switchTab('shop');
@@ -1874,161 +1671,20 @@ class LabubuCareGame {
     }
     
     createNewPet() {
-        const newPetNameInput = document.getElementById('newPetName');
-        const newPetName = newPetNameInput ? newPetNameInput.value.trim() : '';
-        
-        if (!newPetName) {
-            this.showMessage('❌ Введите имя для нового питомца!');
-            return;
-        }
-        
-        if (newPetName.length > 15) {
-            this.showMessage('❌ Имя слишком длинное! Максимум 15 символов.');
-            return;
-        }
-        
-        // Создаем нового питомца
+        const newPetId = `pet${this.pets.length + 1}`;
         const newPet = {
-            id: `pet_${Date.now()}`,
-            name: newPetName,
-            stats: { 
-                hunger: 100, 
-                happiness: 100, 
-                cleanliness: 100, 
-                health: 100, 
-                energy: 100, 
-                sleep: 100 
-            },
-            level: 1,
-            experience: 0,
-            money: 100,
-            age: 0,
+            id: newPetId,
+            name: `${this.petName} ${this.pets.length + 1}`,
+            stats: { hunger: 100, happiness: 100, cleanliness: 100, health: 100, energy: 100, sleep: 100 },
             outfit: 'default',
-            currentSkin: 'default',
-            evolutionStage: 'baby',
-            unlockedSkins: ['default'],
-            ownedOutfits: ['default'],
-            chestCount: 0,
-            isSleeping: false,
-            lastUpdate: Date.now(),
-            lastStatDecay: Date.now()
+            age: 0,
+            evolutionStage: 'baby'
         };
         
-        // Инициализируем систему питомцев если её нет
-        if (!this.pets || !Array.isArray(this.pets)) {
-            this.pets = [
-                {
-                    id: 'main_pet',
-                    name: this.petName,
-                    stats: this.stats,
-                    level: this.level,
-                    experience: this.experience,
-                    money: this.money,
-                    age: this.age,
-                    outfit: this.outfit,
-                    currentSkin: this.currentSkin,
-                    evolutionStage: this.evolutionStage,
-                    unlockedSkins: this.unlockedSkins,
-                    ownedOutfits: this.ownedOutfits,
-                    chestCount: this.chestCount,
-                    isSleeping: this.isSleeping,
-                    lastUpdate: this.lastUpdate,
-                    lastStatDecay: this.lastStatDecay
-                }
-            ];
-            this.activePetId = 'main_pet';
-        }
-        
-        // Добавляем нового питомца
         this.pets.push(newPet);
-        
-        this.playHappySound();
-        this.showMessage(`🎉 Новый питомец "${newPetName}" создан! Добро пожаловать в семью!`);
-        
-        // Очищаем поле ввода
-        if (newPetNameInput) {
-            newPetNameInput.value = '';
-        }
-        
+        this.activePetId = newPetId;
+        this.showMessage(`Новый питомец ${newPet.name} создан! 🎉`);
         this.saveData();
-        this.switchTab('pets');
-        
-        console.log(`🐰 Создан новый питомец: ${newPetName} (ID: ${newPet.id})`);
-        console.log(`👥 Всего питомцев: ${this.pets.length}`);
-    }
-    
-    switchToPet(petId) {
-        if (!this.pets || !Array.isArray(this.pets)) {
-            this.showMessage('❌ Система питомцев не инициализирована!');
-            return;
-        }
-        
-        const targetPet = this.pets.find(pet => pet.id === petId);
-        if (!targetPet) {
-            this.showMessage('❌ Питомец не найден!');
-            return;
-        }
-        
-        // Сохраняем данные текущего питомца
-        if (this.activePetId) {
-            this.updateActivePet();
-        }
-        
-        // Переключаемся на нового питомца
-        this.activePetId = petId;
-        this.loadPetData(targetPet);
-        
-        this.playSound(700, 150);
-        this.showMessage(`🔄 Переключились на питомца "${targetPet.name}"!`);
-        
-        this.saveData();
-        this.updateDisplay();
-        this.switchTab('pets');
-        
-        console.log(`🔄 Переключение на питомца: ${targetPet.name} (ID: ${petId})`);
-    }
-    
-    loadPetData(pet) {
-        // Загружаем данные выбранного питомца
-        this.petName = pet.name;
-        this.stats = pet.stats || { hunger: 100, happiness: 100, cleanliness: 100, health: 100, energy: 100, sleep: 100 };
-        this.level = pet.level || 1;
-        this.experience = pet.experience || 0;
-        this.money = pet.money || 100;
-        this.age = pet.age || 0;
-        this.outfit = pet.outfit || 'default';
-        this.currentSkin = pet.currentSkin || 'default';
-        this.evolutionStage = pet.evolutionStage || 'baby';
-        this.unlockedSkins = pet.unlockedSkins || ['default'];
-        this.ownedOutfits = pet.ownedOutfits || ['default'];
-        this.chestCount = pet.chestCount || 0;
-        this.isSleeping = pet.isSleeping || false;
-        this.lastUpdate = pet.lastUpdate || Date.now();
-        this.lastStatDecay = pet.lastStatDecay || Date.now();
-    }
-    
-    updateActivePet() {
-        if (!this.pets || !Array.isArray(this.pets) || !this.activePetId) return;
-        
-        const activePet = this.pets.find(pet => pet.id === this.activePetId);
-        if (activePet) {
-            // Сохраняем текущие данные в питомца
-            activePet.name = this.petName;
-            activePet.stats = { ...this.stats };
-            activePet.level = this.level;
-            activePet.experience = this.experience;
-            activePet.money = this.money;
-            activePet.age = this.age;
-            activePet.outfit = this.outfit;
-            activePet.currentSkin = this.currentSkin;
-            activePet.evolutionStage = this.evolutionStage;
-            activePet.unlockedSkins = [...this.unlockedSkins];
-            activePet.ownedOutfits = [...this.ownedOutfits];
-            activePet.chestCount = this.chestCount;
-            activePet.isSleeping = this.isSleeping;
-            activePet.lastUpdate = this.lastUpdate;
-            activePet.lastStatDecay = this.lastStatDecay;
-        }
     }
     
     startMiniGame(gameIndex) {
@@ -2444,9 +2100,6 @@ class LabubuCareGame {
     }
     
     completeMiniGame(success = null) {
-        // Прогресс миссии
-        let mission = this.dailyMissions.find(x=>x.id==='play');
-        if(success && mission && !mission.done){mission.progress=Math.min(mission.req,mission.progress+1);this.saveDailyMissions();}
         if (success === null) {
             success = Math.random() > 0.3; // 70% шанс успеха
         }
@@ -2517,105 +2170,6 @@ class LabubuCareGame {
         return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
     }
     
-    processTimeAway() {
-        const now = Date.now();
-        const timeSinceLastDecay = now - this.lastStatDecay;
-        const minutesAway = Math.floor(timeSinceLastDecay / (1000 * 60));
-        
-        console.log(`⏰ Проверка времени отсутствия: ${minutesAway} минут с последнего обновления статистик`);
-        
-        if (minutesAway >= 2) { // Если отсутствовали больше 2 минут
-            const changeIntervals = Math.floor(minutesAway / 2); // Интервалы по 2 минуты
-            
-            console.log(`📊 Обработка ${changeIntervals} интервалов отсутствия`);
-            
-            let newStats = { ...this.stats };
-            let wasAsleep = this.isSleeping;
-            
-            // Предполагаем, что если игрок долго отсутствовал, питомец мог спать
-            // Проверяем время суток для более реалистичного поведения
-            const hour = new Date().getHours();
-            const isNightTime = hour >= 22 || hour <= 6;
-            
-            // Если отсутствовали больше 4 часов и ночное время, предполагаем что спал
-            if (minutesAway > 240 && isNightTime && !this.isSleeping) {
-                console.log('🌙 Длительное отсутствие в ночное время - питомец мог спать');
-                wasAsleep = true;
-            }
-            
-            if (wasAsleep) {
-                console.log(`😴 Обработка отсутствия во время сна (${changeIntervals} интервалов)`);
-                // Во время сна: энергия и сон восстанавливаются быстро, остальное падает медленно
-                newStats.energy = Math.min(100, newStats.energy + (changeIntervals * 15)); // +15 каждые 2 минуты
-                newStats.sleep = Math.min(100, newStats.sleep + (changeIntervals * 20)); // +20 каждые 2 минуты
-                newStats.hunger = Math.max(0, newStats.hunger - (changeIntervals * 1)); // -1 каждые 2 минуты
-                newStats.happiness = Math.max(0, newStats.happiness - (changeIntervals * 0.5)); // -0.5 каждые 2 минуты
-                newStats.cleanliness = Math.max(0, newStats.cleanliness - (changeIntervals * 1)); // -1 каждые 2 минуты
-                newStats.health = Math.max(0, newStats.health - (changeIntervals * 0.5)); // -0.5 каждые 2 минуты
-            } else {
-                console.log(`🏃 Обработка отсутствия в активном состоянии (${changeIntervals} интервалов)`);
-                // В активном состоянии: все снижается, энергия восстанавливается медленно
-                newStats.hunger = Math.max(0, newStats.hunger - (changeIntervals * 3)); // -3 каждые 2 минуты
-                newStats.happiness = Math.max(0, newStats.happiness - (changeIntervals * 2)); // -2 каждые 2 минуты
-                newStats.cleanliness = Math.max(0, newStats.cleanliness - (changeIntervals * 2)); // -2 каждые 2 минуты
-                newStats.health = Math.max(0, newStats.health - (changeIntervals * 1)); // -1 каждые 2 минуты
-                newStats.energy = Math.min(100, newStats.energy + (changeIntervals * 2)); // +2 каждые 2 минуты (медленное восстановление)
-                newStats.sleep = Math.max(0, newStats.sleep - (changeIntervals * 4)); // -4 каждые 2 минуты
-            }
-            
-            // Округляем все значения
-            Object.keys(newStats).forEach(key => {
-                newStats[key] = Math.round(newStats[key]);
-            });
-            
-            // Проверяем, изменились ли статистики
-            const statsChanged = Object.keys(newStats).some(key => 
-                this.stats[key] !== newStats[key]
-            );
-            
-            if (statsChanged) {
-                console.log('📈 Статистики обновлены после отсутствия:', {
-                    minutesAway: minutesAway,
-                    intervals: changeIntervals,
-                    wasAsleep: wasAsleep,
-                    before: this.stats,
-                    after: newStats
-                });
-                
-                this.stats = newStats;
-                this.lastStatDecay = now;
-                
-                // Показываем сообщение игроку
-                let message = `⏰ Вы отсутствовали ${minutesAway} минут. `;
-                if (wasAsleep) {
-                    message += `${this.petName} хорошо отдохнул! ⚡ Энергия восстановлена.`;
-                } else {
-                    message += `${this.petName} скучал! 📉 Некоторые показатели снизились.`;
-                }
-                this.showMessage(message);
-                
-                this.saveData();
-            }
-        }
-    }
-    
-    debugSaveSystem() {
-        console.log('🔍 ОТЛАДКА СИСТЕМЫ СОХРАНЕНИЯ:');
-        console.log('gameUserId:', this.gameUserId);
-        console.log('petName:', this.petName);
-        console.log('money:', this.money);
-        console.log('level:', this.level);
-        console.log('stats:', this.stats);
-        console.log('lastStatDecay:', new Date(this.lastStatDecay));
-        
-        // Проверяем что сохранено в localStorage
-        console.log('💾 В localStorage:');
-        console.log(`${this.gameUserId}_pet_name:`, localStorage.getItem(`${this.gameUserId}_pet_name`));
-        console.log(`${this.gameUserId}_labubu_money:`, localStorage.getItem(`${this.gameUserId}_labubu_money`));
-        console.log(`${this.gameUserId}_labubu_level:`, localStorage.getItem(`${this.gameUserId}_labubu_level`));
-        console.log(`${this.gameUserId}_last_stat_decay:`, localStorage.getItem(`${this.gameUserId}_last_stat_decay`));
-    }
-    
     handleFileImport(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -2645,36 +2199,29 @@ class LabubuCareGame {
     }
     
     resetGamePrompt() {
-        const confirmation = prompt(`🗑️ ВНИМАНИЕ! Это полностью сбросит ВАШУ игру!\n\nВсе ваши данные, включая:\n• Уровень ${this.level} и ${this.experience} опыта\n• ${this.money} монет\n• ${this.unlockedSkins.length} разблокированных скинов\n• ${this.chestCount} сундуков\n• Возраст ${this.age} дней\n\nЭто затронет только ВАШЕГО питомца!\n\nНапишите "СБРОС" чтобы подтвердить:`);
+        const confirmation = prompt(`🗑️ ВНИМАНИЕ! Это полностью сбросит игру!\n\nВсе данные, включая:\n• Уровень ${this.level} и ${this.experience} опыта\n• ${this.money} монет\n• ${this.unlockedSkins.length} разблокированных скинов\n• ${this.chestCount} сундуков\n• Возраст ${this.age} дней\n\nНапишите "СБРОС" чтобы подтвердить:`);
         
         if (confirmation === 'СБРОС') {
-            // Очистить только СВОИ данные из localStorage
+            // Очистить localStorage
             const keysToRemove = [
-                'labubu_stats', 'labubu_money', 'labubu_outfit',
-                'labubu_level', 'labubu_experience', 'labubu_age',
-                'labubu_evolution', 'labubu_last_update', 'pet_name',
-                'labubu_sleeping', 'labubu_pets', 'active_pet_id',
-                'current_skin', 'unlocked_skins', 'chest_count',
-                'friends_invited', 'last_chest_level', 'labubu_last_notification',
-                'owned_outfits', 'last_stat_decay'
+                'shared_labubu_stats', 'shared_labubu_money', 'shared_labubu_outfit',
+                'shared_labubu_level', 'shared_labubu_experience', 'shared_labubu_age',
+                'shared_labubu_evolution', 'shared_labubu_last_update', 'shared_pet_name',
+                'shared_labubu_sleeping', 'shared_labubu_pets', 'shared_active_pet_id',
+                'shared_current_skin', 'shared_unlocked_skins', 'shared_chest_count',
+                'shared_friends_invited', 'shared_last_chest_level', 'shared_labubu_last_notification',
+                'labubu_backup', 'labubu_backup_history'
             ];
             
             keysToRemove.forEach(key => {
-                const userKey = `${this.gameUserId}_${key}`;
-                localStorage.removeItem(userKey);
+                localStorage.removeItem(key);
             });
-            
-            // Удаляем личные бэкапы
-            const backupKey = `${this.gameUserId}_labubu_backup`;
-            const historyKey = `${this.gameUserId}_labubu_backup_history`;
-            localStorage.removeItem(backupKey);
-            localStorage.removeItem(historyKey);
             
             this.resetToDefaults();
             this.updateDisplay();
             this.switchTab('care');
             
-            this.showMessage('🗑️ Ваша игра полностью сброшена! Добро пожаловать, новый владелец Лабубу!');
+            this.showMessage('🗑️ Игра полностью сброшена! Добро пожаловать, новый владелец Лабубу!');
         } else {
             this.showMessage('❌ Сброс отменен.');
         }
@@ -2917,29 +2464,23 @@ class LabubuCareGame {
     }
 
     saveToLocalStorage() {
-        // Сохранение только в localStorage (индивидуально для каждого пользователя)
-        this.saveValue('labubu_stats', this.stats);
-        this.saveValue('labubu_money', this.money);
-        this.saveValue('labubu_outfit', this.outfit);
-        this.saveValue('labubu_level', this.level);
-        this.saveValue('labubu_experience', this.experience);
-        this.saveValue('labubu_age', this.age);
-        this.saveValue('labubu_evolution', this.evolutionStage);
-        this.saveValue('labubu_last_update', Date.now());
-        this.saveValue('pet_name', this.petName);
-        this.saveValue('labubu_sleeping', this.isSleeping);
-        this.saveValue('current_skin', this.currentSkin);
-        this.saveValue('unlocked_skins', this.unlockedSkins);
-        this.saveValue('chest_count', this.chestCount);
-        this.saveValue('friends_invited', this.friendsInvited);
-        this.saveValue('last_chest_level', this.lastChestLevel);
-        this.saveValue('labubu_last_notification', this.lastNotification);
-        this.saveValue('owned_outfits', this.ownedOutfits);
-        this.saveValue('last_stat_decay', this.lastStatDecay);
-        this.saveValue('last_stat_decay', this.lastStatDecay || Date.now());
-        this.saveValue('labubu_pets', this.pets || []);
-        this.saveValue('active_pet_id', this.activePetId || 'main_pet');
-        this.saveValue('last_stat_decay', this.lastStatDecay);
+        // Сохранение только в localStorage (без БД)
+        this.saveValue('shared_labubu_stats', this.stats);
+        this.saveValue('shared_labubu_money', this.money);
+        this.saveValue('shared_labubu_outfit', this.outfit);
+        this.saveValue('shared_labubu_level', this.level);
+        this.saveValue('shared_labubu_experience', this.experience);
+        this.saveValue('shared_labubu_age', this.age);
+        this.saveValue('shared_labubu_evolution', this.evolutionStage);
+        this.saveValue('shared_labubu_last_update', Date.now());
+        this.saveValue('shared_pet_name', this.petName);
+        this.saveValue('shared_labubu_sleeping', this.isSleeping);
+        this.saveValue('shared_current_skin', this.currentSkin);
+        this.saveValue('shared_unlocked_skins', this.unlockedSkins);
+        this.saveValue('shared_chest_count', this.chestCount);
+        this.saveValue('shared_friends_invited', this.friendsInvited);
+        this.saveValue('shared_last_chest_level', this.lastChestLevel);
+        this.saveValue('shared_labubu_last_notification', this.lastNotification);
     }
     
     // Игра "Реакция"
@@ -3869,8 +3410,6 @@ class LabubuCareGame {
         this.completeMiniGame(selectedNumber === this.currentSequence.next);
     }
     
-    // Тестовые функции убраны из финальной версии
-    
     checkLevelUp() {
         const newLevel = Math.floor(this.experience / 100) + 1;
         if (newLevel > this.level) {
@@ -3897,13 +3436,6 @@ class LabubuCareGame {
     }
     
     getChestsTabContent() {
-        return `<div class="bg-white rounded-lg p-4 shadow">
-            <h3 class="font-bold text-purple-800 text-sm mb-2">📦 Сундуки</h3>
-            <div>У вас <b>${this.chestCount || 0}</b> сундуков.</div>
-            <button onclick="game.openChest()" ${(!this.chestCount||this.chestCount===0)?'disabled':''} class="bg-yellow-400 hover:bg-yellow-500 rounded px-3 py-1 mt-2">Открыть сундук</button>
-            <div id="chestRewardMsg"></div>
-        </div>`;
-    }
         const availableChests = this.chestCount;
         const chestsFromFriends = Math.floor(this.friendsInvited / 5);
         const totalChests = availableChests + chestsFromFriends;
@@ -4153,112 +3685,47 @@ class LabubuCareGame {
             .find(([_, stage]) => this.age >= stage.minAge)?.[0] || 'baby';
         
         if (currentStage !== this.evolutionStage) {
-            const oldStage = this.evolutionStages[this.evolutionStage].name;
-            const newStage = this.evolutionStages[currentStage].name;
-            
             this.evolutionStage = currentStage;
             this.playHappySound();
-            this.showMessage(`🎉 Эволюция! ${this.petName} превратился из ${oldStage} в ${newStage}!`);
-            
-            // Бонус за эволюцию
-            this.money += 100;
-            this.stats.happiness = Math.min(100, this.stats.happiness + 20);
-            
-            console.log(`✨ ${this.petName} эволюционировал: ${oldStage} → ${newStage} (возраст: ${this.age} дней)`);
+            this.showMessage(`🎉 Эволюция! Теперь ${this.evolutionStages[currentStage].name}!`);
         }
     }
     
     startGameLoop() {
-        // ОСНОВНОЙ ЦИКЛ - каждые 1 минуту
         setInterval(() => {
-            this.processStatChanges();
-        }, 60000); // Каждую минуту
-        
-        // ДОПОЛНИТЕЛЬНЫЙ ЦИКЛ - каждые 10 минут для проверки старения
-        setInterval(() => {
-            this.processAging();
-        }, 600000); // Каждые 10 минут
-        
-        console.log('🔄 Система автоматического изменения статистик запущена!');
-        console.log('📉 Статистики будут снижаться каждую минуту');
-        console.log('⚡ Энергия будет восстанавливаться постоянно');
-    }
-    
-    processStatChanges() {
-        const now = Date.now();
-        const timeSinceLastDecay = now - this.lastStatDecay;
-        const minutesPassed = Math.floor(timeSinceLastDecay / (1000 * 60));
-        
-        // Снижаем статистики каждую минуту
-        if (minutesPassed >= 1) {
-            console.log(`📊 Обработка изменений статистик для ${this.petName}: ${minutesPassed} минут прошло`);
+            const now = Date.now();
+            const timeDiff = Math.floor((now - this.lastUpdate) / 1000);
             
-            let newStats = { ...this.stats };
-            
-            if (this.isSleeping) {
-                console.log(`😴 ${this.petName} спит - энергия восстанавливается`);
-                // Во время сна: энергия и сон восстанавливаются, остальное падает медленно
-                newStats.energy = Math.min(100, newStats.energy + (minutesPassed * 3)); // +3 в минуту
-                newStats.sleep = Math.min(100, newStats.sleep + (minutesPassed * 5)); // +5 в минуту
-                newStats.hunger = Math.max(0, newStats.hunger - (minutesPassed * 0.5)); // -0.5 в минуту
-                newStats.happiness = Math.max(0, newStats.happiness - (minutesPassed * 0.3)); // -0.3 в минуту
-                newStats.cleanliness = Math.max(0, newStats.cleanliness - (minutesPassed * 0.3)); // -0.3 в минуту
-                newStats.health = Math.max(0, newStats.health - (minutesPassed * 0.2)); // -0.2 в минуту
-            } else {
-                console.log(`🏃 ${this.petName} активен - статистики снижаются`);
-                // В активном состоянии: все снижается, энергия восстанавливается медленно
-                newStats.hunger = Math.max(0, newStats.hunger - (minutesPassed * 2)); // -2 в минуту
-                newStats.happiness = Math.max(0, newStats.happiness - (minutesPassed * 1.5)); // -1.5 в минуту
-                newStats.cleanliness = Math.max(0, newStats.cleanliness - (minutesPassed * 1)); // -1 в минуту
-                newStats.health = Math.max(0, newStats.health - (minutesPassed * 0.8)); // -0.8 в минуту
-                newStats.energy = Math.min(100, newStats.energy + (minutesPassed * 0.5)); // +0.5 в минуту
-                newStats.sleep = Math.max(0, newStats.sleep - (minutesPassed * 2.5)); // -2.5 в минуту
+            // Старение: 1 реальный день = 1 день питомца (86400 секунд = 1 день)
+            if (timeDiff >= 86400) {
+                const daysToAdd = Math.floor(timeDiff / 86400);
+                this.age += daysToAdd;
+                this.checkEvolution();
+                this.lastUpdate = now;
             }
             
-            // Округляем все значения
-            Object.keys(newStats).forEach(key => {
-                newStats[key] = Math.round(newStats[key] * 10) / 10; // Округляем до 1 знака
-            });
-            
-            // Проверяем, изменились ли статистики
-            const statsChanged = Object.keys(newStats).some(key => 
-                Math.abs(this.stats[key] - newStats[key]) >= 0.1
-            );
-            
-            if (statsChanged) {
-                console.log(`📉 Статистики изменены для ${this.petName}:`, {
-                    old: this.stats,
-                    new: newStats,
-                    sleeping: this.isSleeping,
-                    minutes: minutesPassed
-                });
+            // Снижение статистик каждые 5 минут (300 секунд)
+            if (timeDiff >= 300) {
+                if (!this.isSleeping) {
+                    this.stats.hunger = Math.max(0, this.stats.hunger - 3); // ВОЗВРАЩЕНО к исходному
+                    this.stats.happiness = Math.max(0, this.stats.happiness - 2);
+                    this.stats.cleanliness = Math.max(0, this.stats.cleanliness - 2);
+                    this.stats.health = Math.max(0, this.stats.health - (this.stats.hunger < 20 ? 3 : 1));
+                    this.stats.energy = Math.max(0, this.stats.energy - 3); // ВОЗВРАЩЕНО к исходному
+                    this.stats.sleep = Math.max(0, this.stats.sleep - 3);
+                    
+                    this.checkNotifications();
+                } else {
+                    // Восстановление во время сна
+                    this.stats.energy = Math.min(100, this.stats.energy + 8);
+                    this.stats.sleep = Math.min(100, this.stats.sleep + 12);
+                }
                 
-                this.stats = newStats;
-                this.lastStatDecay = now;
-                
-                // Сохраняем данные и обновляем отображение
+                this.lastUpdate = now;
                 this.saveData();
                 this.updateDisplay();
-                
-                // Проверяем уведомления
-                this.checkNotifications();
             }
-        }
-    }
-    
-    processAging() {
-        const now = Date.now();
-        const agingTimeDiff = Math.floor((now - this.lastUpdate) / 1000);
-        
-        // Старение: 1 реальный день = 1 день питомца (86400 секунд = 1 день)
-        if (agingTimeDiff >= 86400) {
-            const daysToAdd = Math.floor(agingTimeDiff / 86400);
-            this.age += daysToAdd;
-            this.lastUpdate = now - (agingTimeDiff % 86400) * 1000; // Сохраняем остаток времени
-            this.checkEvolution();
-            this.saveData();
-            console.log(`🎂 ${this.petName} состарился на ${daysToAdd} дней! Новый возраст: ${this.age}`);
-        }
+        }, 60000); // Проверка каждую минуту
     }
     
     startNotificationTimer() {
@@ -4276,17 +3743,1266 @@ class LabubuCareGame {
     }
 }
 
+// ===== НОВЫЕ ФУНКЦИИ И СИСТЕМЫ =====
+
+// Добавляем новые системы к существующему классу
+LabubuCareGame.prototype.initializeStatusSystem = function() {
+    this.currentStatus = this.loadData('current_status', 'новичок', 'string');
+    this.statusPoints = this.loadData('status_points', 0, 'number');
+    
+    return {
+        'новичок': { 
+            name: 'Новичок', 
+            points: 0, 
+            frame: 'border-2 border-gray-300', 
+            bg: 'bg-gray-50',
+            emoji: '🌱',
+            bonus: { money: 0, exp: 0, decay: 0 }
+        },
+        'опытный': { 
+            name: 'Опытный владелец', 
+            points: 1000, 
+            frame: 'border-2 border-blue-400 shadow-lg shadow-blue-200', 
+            bg: 'bg-blue-50',
+            emoji: '⭐',
+            bonus: { money: 10, exp: 5, decay: 0.2 }
+        },
+        'эксперт': { 
+            name: 'Эксперт по уходу', 
+            points: 5000, 
+            frame: 'border-2 border-purple-400 shadow-lg shadow-purple-200', 
+            bg: 'bg-purple-50',
+            emoji: '💎',
+            bonus: { money: 25, exp: 10, decay: 0.4 }
+        },
+        'мастер': { 
+            name: 'Мастер воспитания', 
+            points: 15000, 
+            frame: 'border-2 border-yellow-400 shadow-lg shadow-yellow-200', 
+            bg: 'bg-yellow-50',
+            emoji: '👑',
+            bonus: { money: 50, exp: 20, decay: 0.6 }
+        },
+        'легенда': { 
+            name: 'Легендарный наставник', 
+            points: 50000, 
+            frame: 'border-4 border-gradient-to-r from-purple-400 via-pink-400 to-red-400 shadow-2xl shadow-purple-300', 
+            bg: 'bg-gradient-to-br from-purple-100 via-pink-100 to-red-100',
+            emoji: '🌟',
+            bonus: { money: 100, exp: 50, decay: 1.0 }
+        },
+        'бог': { 
+            name: 'Божество питомцев', 
+            points: 100000, 
+            frame: 'border-4 border-gradient-to-r from-yellow-400 via-orange-400 to-red-400 shadow-2xl shadow-orange-300 animate-pulse', 
+            bg: 'bg-gradient-to-br from-yellow-100 via-orange-100 to-red-100',
+            emoji: '⚡',
+            bonus: { money: 200, exp: 100, decay: 1.5 }
+        }
+    };
+};
+
+LabubuCareGame.prototype.initializeFriendsSystem = function() {
+    this.inviteCode = this.loadData('invite_code', this.generateInviteCode(), 'string');
+    this.invitedBy = this.loadData('invited_by', '', 'string');
+    this.friendsList = this.loadData('friends_list', [], 'array');
+    this.pendingInvites = this.loadData('pending_invites', [], 'array');
+    this.sharedCarePoints = this.loadData('shared_care_points', 0, 'number');
+    
+    return {
+        inviteRewards: {
+            10: { chests: 1, money: 2000, message: 'Популярный владелец!' }
+        }
+    };
+};
+
+LabubuCareGame.prototype.initializeAchievements = function() {
+    this.unlockedAchievements = this.loadData('unlocked_achievements', [], 'array');
+    
+    return {
+        'first_feed': { name: 'Первое кормление', emoji: '🍼', reward: { money: 100, chests: 1 } },
+        'level_10': { name: 'Уровень 10', emoji: '🔟', reward: { money: 500, chests: 2 } },
+        'level_25': { name: 'Уровень 25', emoji: '🌟', reward: { money: 1500, chests: 5 } },
+        'level_50': { name: 'Уровень 50', emoji: '⭐', reward: { money: 3000, chests: 10 } },
+        'level_100': { name: 'Уровень 100', emoji: '💫', reward: { money: 10000, chests: 25 } },
+        'happy_100': { name: '100% счастья', emoji: '🥰', reward: { money: 200, chests: 1 } },
+        'rich_10k': { name: '10,000 монет', emoji: '💰', reward: { chests: 5 } },
+        'rich_50k': { name: '50,000 монет', emoji: '💎', reward: { chests: 10 } },
+        'rich_100k': { name: '100,000 монет', emoji: '👑', reward: { chests: 20 } },
+        'friend_master': { name: '10 друзей', emoji: '👥', reward: { money: 2000, chests: 1 } },
+        'chest_opener': { name: '50 сундуков', emoji: '📦', reward: { money: 1000 } },
+        'chest_master': { name: '100 сундуков', emoji: '🗂️', reward: { money: 2500, chests: 5 } },
+        'evolution_child': { name: 'Детская эволюция', emoji: '🌱', reward: { chests: 2, money: 500 } },
+        'evolution_teen': { name: 'Подростковая эволюция', emoji: '🌿', reward: { chests: 3, money: 1000 } },
+        'evolution_adult': { name: 'Взрослая эволюция', emoji: '🦋', reward: { chests: 5, money: 2500 } },
+        'evolution_elder': { name: 'Мудрец эволюция', emoji: '🌳', reward: { chests: 10, money: 5000 } },
+        'game_master': { name: '100 игр', emoji: '🎮', reward: { money: 3000, chests: 8 } },
+        'game_legend': { name: '500 игр', emoji: '🏆', reward: { money: 10000, chests: 20 } },
+        'task_streak_7': { name: '7 дней заданий', emoji: '🔥', reward: { money: 1000, chests: 3 } },
+        'task_streak_30': { name: '30 дней заданий', emoji: '💪', reward: { money: 5000, chests: 15 } },
+        'skin_collector': { name: '5 скинов', emoji: '🎨', reward: { money: 2000, chests: 5 } },
+        'outfit_master': { name: '10 нарядов', emoji: '👗', reward: { money: 3000, chests: 8 } }
+    };
+};
+
+LabubuCareGame.prototype.initializeEvents = function() {
+    this.lastEvent = this.loadData('last_event', 0, 'number');
+    this.activeEvent = this.loadData('active_event', null);
+    
+    return {
+        'double_exp': { 
+            name: 'Двойной опыт', 
+            emoji: '⭐', 
+            duration: 3600000, // 1 час
+            effect: 'Опыт увеличен в 2 раза!',
+            chance: 0.1
+        },
+        'money_rain': { 
+            name: 'Денежный дождь', 
+            emoji: '💰', 
+            duration: 1800000, // 30 минут
+            effect: 'Деньги за действия увеличены в 3 раза!',
+            chance: 0.05
+        },
+        'happiness_festival': { 
+            name: 'Фестиваль счастья', 
+            emoji: '🎉', 
+            duration: 7200000, // 2 часа
+            effect: 'Счастье не снижается!',
+            chance: 0.08
+        }
+    };
+};
+
+LabubuCareGame.prototype.generateInviteCode = function() {
+    return 'LAB' + Math.random().toString(36).substr(2, 6).toUpperCase();
+};
+
+LabubuCareGame.prototype.updateStatus = function() {
+    if (!this.statusSystem) return;
+    
+    const totalPoints = this.statusPoints + this.level * 100 + this.experience + this.money / 10;
+    
+    let newStatus = 'новичок';
+    for (const [statusKey, statusData] of Object.entries(this.statusSystem)) {
+        if (totalPoints >= statusData.points) {
+            newStatus = statusKey;
+        }
+    }
+    
+    if (newStatus !== this.currentStatus) {
+        const status = this.statusSystem[newStatus];
+        this.currentStatus = newStatus;
+        this.showMessage(`🎉 Новый статус: ${status.emoji} ${status.name}!`);
+        this.playHappySound();
+    }
+};
+
+LabubuCareGame.prototype.getStatusDecayBonus = function() {
+    if (!this.statusSystem || !this.currentStatus) return 0;
+    const status = this.statusSystem[this.currentStatus];
+    return status ? status.bonus.decay : 0;
+};
+
+LabubuCareGame.prototype.getFriendsDecayBonus = function() {
+    if (!this.friendsList) return 0;
+    return Math.min(0.5, this.friendsList.length * 0.05); // До 0.5 бонуса от друзей
+};
+
+LabubuCareGame.prototype.inviteFriend = function(friendCode) {
+    if (!this.friendsSystem) return;
+    
+    if (friendCode === this.inviteCode) {
+        this.showMessage('❌ Нельзя пригласить самого себя!');
+        return;
+    }
+    
+    if (this.friendsList.includes(friendCode)) {
+        this.showMessage('❌ Этот друг уже в вашем списке!');
+        return;
+    }
+    
+    // В реальной игре здесь была бы проверка на сервере
+    this.friendsList.push(friendCode);
+    this.friendsInvited++;
+    
+    // Проверяем только награду за 10 друзей
+    if (this.friendsList.length === 10) {
+        const reward = this.friendsSystem.inviteRewards[10];
+        this.chestCount += reward.chests;
+        this.money += reward.money;
+        this.showMessage(`🎉 ${reward.message} +${reward.chests} сундук, +${reward.money} монет!`);
+    } else {
+        // Обычная награда за каждого друга
+        this.showMessage('🎉 Друг добавлен! Теперь у вас больше друзей!');
+    }
+    
+    this.checkChestReward();
+    this.saveData();
+    this.updateDisplay();
+};
+
+LabubuCareGame.prototype.checkAchievements = function() {
+    if (!this.achievementsSystem) return;
+    
+    for (const [achievementId, achievement] of Object.entries(this.achievementsSystem)) {
+        if (this.unlockedAchievements.includes(achievementId)) continue;
+        
+        let unlocked = false;
+        
+        switch (achievementId) {
+            case 'first_feed':
+                unlocked = this.level > 1;
+                break;
+            case 'level_10':
+                unlocked = this.level >= 10;
+                break;
+            case 'happy_100':
+                unlocked = this.stats.happiness >= 100;
+                break;
+            case 'rich_10k':
+                unlocked = this.money >= 10000;
+                break;
+            case 'friend_master':
+                unlocked = this.friendsList.length >= 10;
+                break;
+            case 'chest_opener':
+                unlocked = this.chestCount >= 50;
+                break;
+            case 'evolution_adult':
+                unlocked = this.evolutionStage === 'adult';
+                break;
+        }
+        
+        if (unlocked) {
+            this.unlockAchievement(achievementId);
+        }
+    }
+};
+
+LabubuCareGame.prototype.unlockAchievement = function(achievementId) {
+    const achievement = this.achievementsSystem[achievementId];
+    this.unlockedAchievements.push(achievementId);
+    
+    if (achievement.reward.money) {
+        this.money += achievement.reward.money;
+    }
+    if (achievement.reward.chests) {
+        this.chestCount += achievement.reward.chests;
+    }
+    
+    this.showMessage(`🏆 Достижение: ${achievement.emoji} ${achievement.name}!`);
+    this.playHappySound();
+};
+
+LabubuCareGame.prototype.checkRandomEvents = function() {
+    if (!this.eventsSystem) return;
+    
+    const now = Date.now();
+    
+    // Проверяем активное событие
+    if (this.activeEvent) {
+        if (now > this.activeEvent.endTime) {
+            this.showMessage(`📅 Событие "${this.activeEvent.name}" завершено!`);
+            this.activeEvent = null;
+        }
+    }
+    
+    // Шанс нового события каждые 30 минут
+    if (now - this.lastEvent > 1800000) { // 30 минут
+        for (const [eventId, eventData] of Object.entries(this.eventsSystem)) {
+            if (Math.random() < eventData.chance) {
+                this.startEvent(eventId);
+                break;
+            }
+        }
+        this.lastEvent = now;
+    }
+};
+
+LabubuCareGame.prototype.startEvent = function(eventId) {
+    const eventData = this.eventsSystem[eventId];
+    this.activeEvent = {
+        id: eventId,
+        name: eventData.name,
+        emoji: eventData.emoji,
+        effect: eventData.effect,
+        endTime: Date.now() + eventData.duration
+    };
+    
+    this.showMessage(`🎪 Событие: ${eventData.emoji} ${eventData.name}! ${eventData.effect}`);
+    this.playHappySound();
+};
+
+// Добавляем новые вкладки к существующему методу
+LabubuCareGame.prototype.getFriendsTabContent = function() {
+    if (!this.friendsSystem) return '<div>Система друзей не инициализирована</div>';
+    
+    return `
+        <div class="space-y-3">
+            <div class="bg-white rounded-lg p-3 shadow">
+                <h3 class="font-bold mb-2 text-purple-800 text-sm">👥 Друзья и приглашения</h3>
+                
+                <!-- Мой код приглашения -->
+                <div class="bg-green-50 p-3 rounded mb-3">
+                    <div class="text-sm font-bold text-green-800 mb-1">Ваш код приглашения:</div>
+                    <div class="flex items-center justify-between">
+                        <code class="bg-green-200 px-2 py-1 rounded font-mono text-sm">${this.inviteCode}</code>
+                        <button onclick="navigator.clipboard.writeText('${this.inviteCode}'); game.showMessage('Код скопирован!')" 
+                                class="bg-green-500 text-white px-2 py-1 rounded text-xs">
+                            📋 Копировать
+                        </button>
+                    </div>
+                    <div class="text-xs text-green-700 mt-1">Поделитесь этим кодом с друзьями!</div>
+                </div>
+                
+                <!-- Пригласить друга -->
+                <div class="bg-blue-50 p-3 rounded mb-3">
+                    <div class="text-sm font-bold text-blue-800 mb-2">Пригласить друга:</div>
+                    <div class="flex space-x-2">
+                        <input type="text" id="friendCode" placeholder="Введите код друга" 
+                               class="flex-1 px-2 py-1 border rounded text-sm">
+                        <button onclick="game.inviteFriend(document.getElementById('friendCode').value)" 
+                                class="bg-blue-500 text-white px-3 py-1 rounded text-xs">
+                            Добавить
+                        </button>
+                    </div>
+                    <div class="text-xs text-blue-700 mt-1">Друзья помогают вам в игре!</div>
+                </div>
+                
+                <!-- Список друзей -->
+                <div class="bg-purple-50 p-3 rounded mb-3">
+                    <div class="text-sm font-bold text-purple-800 mb-2">Мои друзья (${this.friendsList.length}):</div>
+                    ${this.friendsList.length > 0 ? `
+                        <div class="grid grid-cols-2 gap-2 max-h-24 overflow-y-auto">
+                            ${this.friendsList.map(friend => `
+                                <div class="bg-purple-100 p-2 rounded text-xs text-center">
+                                    👤 ${friend}
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<div class="text-xs text-purple-600">Пока нет друзей. Пригласите первого!</div>'}
+                </div>
+                
+                <!-- Особая награда за 10 друзей -->
+                <div class="bg-yellow-50 p-3 rounded">
+                    <div class="text-sm font-bold text-yellow-800 mb-2">🎁 Особая награда:</div>
+                    <div class="text-xs text-yellow-700">
+                        <div class="flex justify-between ${this.friendsList.length >= 10 ? 'line-through text-green-600' : ''}">
+                            <span>10 друзей:</span>
+                            <span>+1📦 +2000💰</span>
+                        </div>
+                        <div class="text-xs text-gray-600 mt-1">
+                            Прогресс: ${this.friendsList.length}/10 друзей
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Бонусы от друзей -->
+                <div class="bg-blue-50 p-3 rounded">
+                    <div class="text-sm font-bold text-blue-800 mb-2">💪 Бонусы от друзей:</div>
+                    <div class="text-xs text-blue-700">
+                        🔹 Замедление падения статистик: -${(this.getFriendsDecayBonus() * 100).toFixed(1)}%<br>
+                        🔹 Каждый друг помогает вашему питомцу!<br>
+                        🔹 Чем больше друзей, тем лучше бонусы
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+LabubuCareGame.prototype.getAchievementsTabContent = function() {
+    if (!this.achievementsSystem) return '<div>Система достижений не инициализирована</div>';
+    
+    return `
+        <div class="space-y-3">
+            <div class="bg-white rounded-lg p-3 shadow">
+                <h3 class="font-bold mb-2 text-purple-800 text-sm">🏆 Достижения (${this.unlockedAchievements.length}/${Object.keys(this.achievementsSystem).length})</h3>
+                
+                <div class="grid grid-cols-1 gap-2 max-h-64 overflow-y-auto">
+                    ${Object.entries(this.achievementsSystem).map(([achievementId, achievement]) => {
+                        const isUnlocked = this.unlockedAchievements.includes(achievementId);
+                        return `
+                            <div class="p-3 rounded ${isUnlocked ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-lg ${isUnlocked ? '' : 'grayscale'}">${achievement.emoji}</span>
+                                        <div>
+                                            <div class="font-medium text-sm ${isUnlocked ? 'text-green-800' : 'text-gray-600'}">${achievement.name}</div>
+                                            <div class="text-xs ${isUnlocked ? 'text-green-600' : 'text-gray-500'}">
+                                                ${achievement.reward.money ? `+${achievement.reward.money}💰 ` : ''}
+                                                ${achievement.reward.chests ? `+${achievement.reward.chests}📦` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="text-xl">${isUnlocked ? '✅' : '🔒'}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+            
+            <!-- Прогресс к новым достижениям -->
+            <div class="bg-white rounded-lg p-3 shadow">
+                <h4 class="font-bold mb-2 text-purple-800 text-sm">📈 Прогресс:</h4>
+                <div class="space-y-2 text-xs">
+                    <div class="flex justify-between">
+                        <span>Уровень:</span>
+                        <span>${this.level}/10 для достижения "Уровень 10"</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Деньги:</span>
+                        <span>${this.money}/10,000 для достижения "10,000 монет"</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Друзья:</span>
+                        <span>${this.friendsList.length}/10 для достижения "10 друзей"</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+// Обновляем отображение статуса
+LabubuCareGame.prototype.updateStatusDisplay = function() {
+    if (!this.statusSystem || !this.currentStatus) return;
+    
+    const status = this.statusSystem[this.currentStatus];
+    const petContainer = document.getElementById('petContainer');
+    const petFrame = document.getElementById('petFrame');
+    const statusBadge = document.getElementById('statusBadge');
+    const statusEmoji = document.getElementById('statusEmoji');
+    const statusName = document.getElementById('statusName');
+    const activeEventDisplay = document.getElementById('activeEventDisplay');
+    const activeEventText = document.getElementById('activeEventText');
+    const eventEffect = document.getElementById('eventEffect');
+    
+    if (status && petContainer && petFrame && statusBadge) {
+        // Обновляем контейнер и рамку
+        petContainer.className = `text-center mb-4 bg-white rounded-lg p-6 shadow ${status.bg}`;
+        petFrame.className = `mb-4 relative inline-block ${status.frame} rounded-lg p-2`;
+        
+        // Обновляем значок статуса
+        statusBadge.className = `inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${status.bg} ${status.frame}`;
+        if (statusEmoji) statusEmoji.textContent = status.emoji;
+        if (statusName) statusName.textContent = status.name;
+    }
+    
+    // Показываем активное событие
+    if (this.activeEvent && activeEventDisplay && activeEventText) {
+        activeEventDisplay.classList.remove('hidden');
+        activeEventText.textContent = `${this.activeEvent.emoji} ${this.activeEvent.name}: ${this.activeEvent.effect}`;
+        
+        // Добавляем эффект свечения
+        if (eventEffect) {
+            eventEffect.classList.remove('hidden');
+            eventEffect.className = 'absolute -inset-2 rounded-lg bg-gradient-to-r from-purple-300 via-pink-300 to-blue-300 opacity-50 animate-pulse';
+        }
+    } else if (activeEventDisplay) {
+        activeEventDisplay.classList.add('hidden');
+        if (eventEffect) eventEffect.classList.add('hidden');
+    }
+};
+
+// ===== ДОПОЛНИТЕЛЬНЫЕ СИСТЕМЫ =====
+
+// Система ежедневных заданий
+LabubuCareGame.prototype.initializeDailyTasks = function() {
+    this.lastTaskReset = this.loadData('last_task_reset', 0, 'number');
+    this.completedTasks = this.loadData('completed_tasks', [], 'array');
+    this.taskStreak = this.loadData('task_streak', 0, 'number');
+    
+    // Проверяем, нужно ли сбросить задания каждые 24 часа
+    const now = Date.now();
+    const timeSinceReset = now - this.lastTaskReset;
+    const hoursRequired = 24; // Точно 24 часа
+    
+    if (timeSinceReset >= (hoursRequired * 60 * 60 * 1000)) {
+        this.resetDailyTasks();
+    }
+    
+    // Сложность заданий зависит от уровня игрока
+    const levelMultiplier = Math.max(1, Math.floor(this.level / 10) + 1); // +1 сложность каждые 10 уровней
+    const baseReward = 100 * levelMultiplier;
+    
+    return {
+        tasks: [
+            { 
+                id: 'feed_times', 
+                name: `Покормить ${3 + levelMultiplier} раз`, 
+                description: `Покормите питомца ${3 + levelMultiplier} раз за день`,
+                progress: 0, 
+                target: 3 + levelMultiplier, 
+                reward: { money: baseReward * 2, experience: 30 + (levelMultiplier * 10), chests: levelMultiplier },
+                emoji: '🍽️',
+                type: 'feed'
+            },
+            { 
+                id: 'play_games', 
+                name: `Сыграть ${2 + levelMultiplier} игр`, 
+                description: `Сыграйте в мини-игры ${2 + levelMultiplier} раз`,
+                progress: 0, 
+                target: 2 + levelMultiplier, 
+                reward: { money: baseReward * 1.5, experience: 50 + (levelMultiplier * 15), happiness: 15 + (levelMultiplier * 5) },
+                emoji: '🎮',
+                type: 'game'
+            },
+            { 
+                id: 'wash_pet', 
+                name: `Помыть питомца ${Math.max(1, levelMultiplier)} раз`, 
+                description: `Помойте питомца ${Math.max(1, levelMultiplier)} раз`,
+                progress: 0, 
+                target: Math.max(1, levelMultiplier), 
+                reward: { money: baseReward, experience: 20 + (levelMultiplier * 5), cleanliness: 30 + (levelMultiplier * 10) },
+                emoji: '🛁',
+                type: 'wash'
+            },
+            { 
+                id: 'reach_happiness', 
+                name: `Счастье ${Math.min(100, 80 + levelMultiplier * 5)}%+`, 
+                description: `Достигните ${Math.min(100, 80 + levelMultiplier * 5)}% счастья`,
+                progress: 0, 
+                target: 1, 
+                reward: { money: baseReward * 2.5, chests: Math.max(1, levelMultiplier) },
+                emoji: '😊',
+                type: 'stat'
+            },
+            { 
+                id: 'earn_money', 
+                name: `Заработать ${300 + (levelMultiplier * 200)} монет`, 
+                description: `Заработайте ${300 + (levelMultiplier * 200)} монет за день`,
+                progress: 0, 
+                target: 300 + (levelMultiplier * 200), 
+                reward: { experience: 80 + (levelMultiplier * 20), chests: 2 + levelMultiplier },
+                emoji: '💰',
+                type: 'money'
+            },
+            // Новое сложное задание для высоких уровней
+            ...(this.level >= 20 ? [{
+                id: 'reach_all_stats_high', 
+                name: `Все статистики ${70 + levelMultiplier * 3}%+`, 
+                description: `Поднимите все статистики выше ${70 + levelMultiplier * 3}%`,
+                progress: 0, 
+                target: 1, 
+                reward: { money: baseReward * 3, experience: 100 + (levelMultiplier * 25), chests: 2 + levelMultiplier },
+                emoji: '📊',
+                type: 'all_stats'
+            }] : [])
+        ]
+    };
+};
+
+LabubuCareGame.prototype.resetDailyTasks = function() {
+    this.completedTasks = [];
+    this.lastTaskReset = Date.now();
+    this.saveValue('completed_tasks', this.completedTasks);
+    this.saveValue('last_task_reset', this.lastTaskReset);
+    
+    // Пересоздаем систему заданий с новой сложностью
+    this.dailyTasksSystem = this.initializeDailyTasks();
+    
+    console.log('🗓️ Ежедневные задания сброшены через 24 часа');
+};
+
+LabubuCareGame.prototype.updateTaskProgress = function(taskType, amount = 1) {
+    if (!this.dailyTasksSystem) return;
+    
+    this.dailyTasksSystem.tasks.forEach(task => {
+        if (task.type === taskType && !this.completedTasks.includes(task.id)) {
+            task.progress = Math.min(task.target, task.progress + amount);
+            
+            // Проверяем завершение задания
+            if (task.progress >= task.target) {
+                this.completeTask(task);
+            }
+        }
+        
+        // Специальная проверка для задания "все статистики высокие"
+        if (task.type === 'all_stats' && !this.completedTasks.includes(task.id)) {
+            const minRequired = 70 + Math.max(1, Math.floor(this.level / 10) + 1) * 3;
+            const allStatsHigh = Object.values(this.stats).every(stat => stat >= minRequired);
+            
+            if (allStatsHigh && task.progress === 0) {
+                task.progress = 1;
+                this.completeTask(task);
+            }
+        }
+    });
+};
+
+LabubuCareGame.prototype.completeTask = function(task) {
+    if (this.completedTasks.includes(task.id)) return;
+    
+    this.completedTasks.push(task.id);
+    
+    // Выдаем награды
+    if (task.reward.money) {
+        this.money += task.reward.money;
+    }
+    if (task.reward.experience) {
+        this.experience += task.reward.experience;
+    }
+    if (task.reward.chests) {
+        this.chestCount += task.reward.chests;
+    }
+    if (task.reward.happiness) {
+        this.stats.happiness = Math.min(100, this.stats.happiness + task.reward.happiness);
+    }
+    if (task.reward.cleanliness) {
+        this.stats.cleanliness = Math.min(100, this.stats.cleanliness + task.reward.cleanliness);
+    }
+    
+    this.showMessage(`✅ Задание выполнено: ${task.emoji} ${task.name}!`);
+    this.playHappySound();
+    
+    // Проверяем, все ли задания выполнены
+    if (this.completedTasks.length === this.dailyTasksSystem.tasks.length) {
+        this.taskStreak++;
+        const streakBonus = this.taskStreak * 100;
+        this.money += streakBonus;
+        this.chestCount += Math.floor(this.taskStreak / 3);
+        
+        this.showMessage(`🎉 Все задания выполнены! Серия: ${this.taskStreak} дней! +${streakBonus} монет!`);
+        this.saveValue('task_streak', this.taskStreak);
+    }
+    
+    this.saveValue('completed_tasks', this.completedTasks);
+    this.checkLevelUp();
+    this.saveData();
+    this.updateDisplay();
+};
+
+// Система погоды и особых эффектов
+LabubuCareGame.prototype.initializeWeatherSystem = function() {
+    this.currentWeather = this.loadData('current_weather', 'sunny', 'string');
+    this.lastWeatherChange = this.loadData('last_weather_change', 0, 'number');
+    
+    return {
+        weathers: {
+            'sunny': { 
+                name: 'Солнечно', 
+                emoji: '☀️', 
+                effect: 'Счастье +20% быстрее',
+                bonus: { happiness: 1.2 },
+                duration: 2 * 60 * 60 * 1000 // 2 часа
+            },
+            'rainy': { 
+                name: 'Дождь', 
+                emoji: '🌧️', 
+                effect: 'Чистота снижается медленнее',
+                bonus: { cleanliness: 0.5 },
+                duration: 1.5 * 60 * 60 * 1000 // 1.5 часа
+            },
+            'cloudy': { 
+                name: 'Облачно', 
+                emoji: '☁️', 
+                effect: 'Энергия восстанавливается быстрее',
+                bonus: { energy: 1.3 },
+                duration: 3 * 60 * 60 * 1000 // 3 часа
+            },
+            'snowy': { 
+                name: 'Снег', 
+                emoji: '❄️', 
+                effect: 'Сон восстанавливается быстрее',
+                bonus: { sleep: 1.5 },
+                duration: 2.5 * 60 * 60 * 1000 // 2.5 часа
+            },
+            'rainbow': { 
+                name: 'Радуга', 
+                emoji: '🌈', 
+                effect: 'Все статистики +50% быстрее!',
+                bonus: { all: 1.5 },
+                duration: 30 * 60 * 1000, // 30 минут
+                rare: true
+            }
+        }
+    };
+};
+
+LabubuCareGame.prototype.updateWeather = function() {
+    if (!this.weatherSystem) return;
+    
+    const now = Date.now();
+    const currentWeatherData = this.weatherSystem.weathers[this.currentWeather];
+    
+    if (now - this.lastWeatherChange > currentWeatherData.duration) {
+        // Время сменить погоду
+        const weathers = Object.keys(this.weatherSystem.weathers);
+        let newWeather;
+        
+        // 5% шанс на редкую погоду (радуга)
+        if (Math.random() < 0.05) {
+            newWeather = 'rainbow';
+        } else {
+            // Выбираем обычную погоду
+            const normalWeathers = weathers.filter(w => !this.weatherSystem.weathers[w].rare);
+            newWeather = normalWeathers[Math.floor(Math.random() * normalWeathers.length)];
+        }
+        
+        if (newWeather !== this.currentWeather) {
+            this.currentWeather = newWeather;
+            this.lastWeatherChange = now;
+            
+            const weather = this.weatherSystem.weathers[newWeather];
+            this.showMessage(`🌤️ Погода изменилась: ${weather.emoji} ${weather.name}! ${weather.effect}`);
+            
+            this.saveValue('current_weather', this.currentWeather);
+            this.saveValue('last_weather_change', this.lastWeatherChange);
+        }
+    }
+};
+
+// Улучшенные рамки статусов с анимациями
+LabubuCareGame.prototype.getEnhancedStatusFrame = function(statusKey) {
+    const frames = {
+        'новичок': {
+            frame: 'border-2 border-gray-300 shadow-sm',
+            bg: 'bg-gray-50',
+            glow: '',
+            animation: ''
+        },
+        'опытный': {
+            frame: 'border-2 border-blue-400 shadow-lg shadow-blue-200',
+            bg: 'bg-gradient-to-br from-blue-50 to-blue-100',
+            glow: 'drop-shadow-lg',
+            animation: ''
+        },
+        'эксперт': {
+            frame: 'border-2 border-purple-400 shadow-lg shadow-purple-200',
+            bg: 'bg-gradient-to-br from-purple-50 via-purple-100 to-purple-50',
+            glow: 'drop-shadow-xl',
+            animation: 'animate-pulse'
+        },
+        'мастер': {
+            frame: 'border-3 border-yellow-400 shadow-xl shadow-yellow-300',
+            bg: 'bg-gradient-to-br from-yellow-50 via-yellow-100 to-orange-50',
+            glow: 'drop-shadow-2xl filter brightness-110',
+            animation: 'animate-pulse',
+            special: 'ring-2 ring-yellow-300 ring-opacity-50'
+        },
+        'легенда': {
+            frame: 'border-4 border-gradient-to-r from-purple-400 via-pink-400 to-red-400 shadow-2xl shadow-purple-400',
+            bg: 'bg-gradient-to-br from-purple-100 via-pink-100 to-red-100',
+            glow: 'drop-shadow-2xl filter brightness-125 saturate-150',
+            animation: 'animate-pulse',
+            special: 'ring-4 ring-purple-300 ring-opacity-75 ring-offset-2',
+            sparkle: true
+        },
+        'бог': {
+            frame: 'border-4 border-gradient-to-r from-yellow-400 via-orange-400 to-red-400 shadow-2xl shadow-orange-400',
+            bg: 'bg-gradient-to-br from-yellow-100 via-orange-100 to-red-100',
+            glow: 'drop-shadow-2xl filter brightness-150 saturate-200 hue-rotate-15',
+            animation: 'animate-pulse',
+            special: 'ring-4 ring-yellow-400 ring-opacity-100 ring-offset-4 ring-offset-yellow-100',
+            sparkle: true,
+            divine: true
+        }
+    };
+    
+    return frames[statusKey] || frames['новичок'];
+};
+
+// Исправляем getTabContent для обработки всех вкладок
+LabubuCareGame.prototype.getTabContent = function(tab) {
+    switch (tab) {
+        case 'care':
+            return this.getCareTabContent();
+        case 'games':
+            return this.getGamesTabContent();
+        case 'shop':
+            return this.getShopTabContent();
+        case 'chests':
+            return this.getChestsTabContent();
+        case 'pets':
+            return this.getPetsTabContent();
+        case 'friends':
+            return this.getFriendsTabContent();
+        case 'achievements':
+            return this.getAchievementsTabContent();
+        case 'tasks':
+            return this.getDailyTasksTabContent();
+        case 'info':
+            return this.getInfoTabContent();
+        default:
+            return '<div class="bg-white rounded-lg p-4 shadow text-center"><h3 class="font-bold text-purple-800">🔧 Вкладка в разработке</h3><p class="text-gray-600">Эта функция скоро будет доступна!</p></div>';
+    }
+};
+
+// Ежедневные задания
+LabubuCareGame.prototype.getDailyTasksTabContent = function() {
+    if (!this.dailyTasksSystem) return '<div>Система заданий не инициализирована</div>';
+    
+    const timeUntilReset = this.getTimeUntilTaskReset();
+    
+    return `
+        <div class="space-y-3">
+            <div class="bg-white rounded-lg p-3 shadow">
+                <h3 class="font-bold mb-2 text-purple-800 text-sm">📋 Ежедневные задания</h3>
+                
+                <div class="bg-blue-50 p-3 rounded mb-3">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="text-sm font-bold text-blue-800">Серия выполнений: ${this.taskStreak} дней 🔥</div>
+                            <div class="text-xs text-blue-700">Обновление через: ${timeUntilReset}</div>
+                        </div>
+                        <div class="text-2xl">📅</div>
+                    </div>
+                </div>
+                
+                <div class="space-y-2 max-h-64 overflow-y-auto">
+                    ${this.dailyTasksSystem.tasks.map(task => {
+                        const isCompleted = this.completedTasks.includes(task.id);
+                        const progress = Math.min(100, (task.progress / task.target) * 100);
+                        
+                        return `
+                            <div class="p-3 rounded ${isCompleted ? 'bg-green-50 border border-green-200' : 'bg-gray-50 border border-gray-200'}">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-lg">${task.emoji}</span>
+                                        <div>
+                                            <div class="font-medium text-sm ${isCompleted ? 'text-green-800 line-through' : 'text-gray-800'}">${task.name}</div>
+                                            <div class="text-xs ${isCompleted ? 'text-green-600' : 'text-gray-600'}">${task.description}</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-xl">${isCompleted ? '✅' : '⏳'}</div>
+                                </div>
+                                
+                                ${!isCompleted ? `
+                                    <div class="mb-2">
+                                        <div class="flex justify-between text-xs mb-1">
+                                            <span>Прогресс</span>
+                                            <span>${task.progress}/${task.target}</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-blue-500 h-2 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="text-xs ${isCompleted ? 'text-green-600' : 'text-purple-600'}">
+                                    <strong>Награда:</strong>
+                                    ${task.reward.money ? `+${task.reward.money}💰 ` : ''}
+                                    ${task.reward.experience ? `+${task.reward.experience}⭐ ` : ''}
+                                    ${task.reward.chests ? `+${task.reward.chests}📦 ` : ''}
+                                    ${task.reward.happiness ? `+${task.reward.happiness}😊 ` : ''}
+                                    ${task.reward.cleanliness ? `+${task.reward.cleanliness}🛁` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                
+                <div class="mt-3 p-3 bg-yellow-50 rounded">
+                    <div class="text-sm font-bold text-yellow-800 mb-1">🎁 Бонус за серию:</div>
+                    <div class="text-xs text-yellow-700">
+                        • За каждый день: +${this.taskStreak * 100} монет<br>
+                        • Каждые 3 дня: +1 сундук<br>
+                        • Выполнено заданий: ${this.completedTasks.length}/${this.dailyTasksSystem.tasks.length}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+};
+
+LabubuCareGame.prototype.getTimeUntilTaskReset = function() {
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(0, 0, 0, 0);
+    
+    const timeDiff = tomorrow - now;
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return `${hours}ч ${minutes}м`;
+};
+
+// Модифицируем метод feedPet для учета заданий
+const originalFeedPet = LabubuCareGame.prototype.feedPet;
+LabubuCareGame.prototype.feedPet = function(foodIndex) {
+    const result = originalFeedPet.call(this, foodIndex);
+    
+    // Обновляем прогресс задания
+    this.updateTaskProgress('feed');
+    
+    return result;
+};
+
+// Модифицируем washPet для учета заданий
+const originalWashPet = LabubuCareGame.prototype.washPet;
+LabubuCareGame.prototype.washPet = function() {
+    const result = originalWashPet.call(this);
+    
+    // Обновляем прогресс задания
+    this.updateTaskProgress('wash');
+    
+    return result;
+};
+
+// Модифицируем completeMiniGame для учета заданий
+const originalCompleteMiniGame = LabubuCareGame.prototype.completeMiniGame;
+LabubuCareGame.prototype.completeMiniGame = function(success) {
+    const result = originalCompleteMiniGame.call(this, success);
+    
+    if (success) {
+        // Обновляем прогресс задания
+        this.updateTaskProgress('game');
+    }
+    
+    return result;
+};
+
+// Обновляем обновление статуса для более красивых эффектов
+LabubuCareGame.prototype.updateStatusDisplayEnhanced = function() {
+    if (!this.statusSystem || !this.currentStatus) return;
+    
+    const status = this.statusSystem[this.currentStatus];
+    const enhancedFrame = this.getEnhancedStatusFrame(this.currentStatus);
+    
+    const petContainer = document.getElementById('petContainer');
+    const petFrame = document.getElementById('petFrame');
+    const statusBadge = document.getElementById('statusBadge');
+    const statusEmoji = document.getElementById('statusEmoji');
+    const statusName = document.getElementById('statusName');
+    
+    if (status && petContainer && petFrame && statusBadge) {
+        // Обновляем контейнер с улучшенными эффектами
+        petContainer.className = `text-center mb-4 bg-white rounded-lg p-6 shadow ${enhancedFrame.bg} ${enhancedFrame.animation}`;
+        
+        // Обновляем рамку с специальными эффектами
+        let frameClass = `mb-4 relative inline-block ${enhancedFrame.frame} rounded-lg p-2 ${enhancedFrame.glow}`;
+        if (enhancedFrame.special) frameClass += ` ${enhancedFrame.special}`;
+        petFrame.className = frameClass;
+        
+        // Добавляем искры для легендарного и божественного статуса
+        if (enhancedFrame.sparkle) {
+            this.addSparkleEffects(petFrame, enhancedFrame.divine);
+        }
+        
+        // Обновляем значок статуса
+        statusBadge.className = `inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${enhancedFrame.bg} ${enhancedFrame.frame} ${enhancedFrame.animation}`;
+        if (statusEmoji) statusEmoji.textContent = status.emoji;
+        if (statusName) statusName.textContent = status.name;
+    }
+    
+    // Показываем текущую погоду
+    this.updateWeatherDisplay();
+};
+
+LabubuCareGame.prototype.addSparkleEffects = function(element, isDivine = false) {
+    // Удаляем старые искры
+    const oldSparkles = element.querySelectorAll('.sparkle-effect');
+    oldSparkles.forEach(sparkle => sparkle.remove());
+    
+    // Добавляем новые искры
+    const sparkleCount = isDivine ? 8 : 5;
+    const sparkleEmojis = isDivine ? ['⭐', '✨', '💫', '🌟'] : ['✨', '💫'];
+    
+    for (let i = 0; i < sparkleCount; i++) {
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle-effect absolute text-lg animate-pulse';
+        sparkle.textContent = sparkleEmojis[Math.floor(Math.random() * sparkleEmojis.length)];
+        sparkle.style.top = Math.random() * 100 + '%';
+        sparkle.style.left = Math.random() * 100 + '%';
+        sparkle.style.animationDelay = Math.random() * 2 + 's';
+        sparkle.style.zIndex = '20';
+        element.appendChild(sparkle);
+        
+        // Удаляем искру через 3 секунды
+        setTimeout(() => {
+            if (sparkle.parentNode) {
+                sparkle.parentNode.removeChild(sparkle);
+            }
+        }, 3000);
+    }
+};
+
+LabubuCareGame.prototype.updateWeatherDisplay = function() {
+    if (!this.weatherSystem) return;
+    
+    const weather = this.weatherSystem.weathers[this.currentWeather];
+    const weatherElement = document.getElementById('weather');
+    
+    if (weatherElement && weather) {
+        weatherElement.textContent = weather.emoji;
+        weatherElement.title = `${weather.name}: ${weather.effect}`;
+    }
+};
+
+// Добавляем вкладку с заданиями в список вкладок
+document.addEventListener('DOMContentLoaded', () => {
+    // Добавляем кнопку вкладки заданий после загрузки DOM
+    setTimeout(() => {
+        const tabsContainer = document.querySelector('.tab-btn[data-tab="chests"]');
+        if (tabsContainer && tabsContainer.parentNode) {
+            const tasksTab = document.createElement('button');
+            tasksTab.className = 'tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap';
+            tasksTab.setAttribute('data-tab', 'tasks');
+            tasksTab.innerHTML = '📋 Задания';
+            
+            // Вставляем после вкладки сундуков
+            tabsContainer.parentNode.insertBefore(tasksTab, tabsContainer.nextSibling);
+        }
+    }, 500);
+});
+
+// ===== СИСТЕМА ВИРУСНОСТИ И МОТИВАЦИИ =====
+
+// Система уведомлений и мотивации
+LabubuCareGame.prototype.initializeViralSystem = function() {
+    this.streakDays = this.loadData('streak_days', 0, 'number');
+    this.longestStreak = this.loadData('longest_streak', 0, 'number');
+    this.lastLoginDate = this.loadData('last_login_date', '', 'string');
+    this.totalLogins = this.loadData('total_logins', 0, 'number');
+    this.motivationalMessages = this.loadData('motivational_messages', [], 'array');
+    
+    // Проверяем серию дней
+    this.checkDailyStreak();
+    
+    return {
+        dailyBonuses: {
+            1: { money: 100, message: 'Первый день!' },
+            3: { money: 300, chests: 1, message: 'Третий день подряд!' },
+            7: { money: 1000, chests: 3, message: 'Неделя подряд!' },
+            14: { money: 2500, chests: 7, message: 'Две недели!' },
+            30: { money: 10000, chests: 20, message: 'Месяц подряд!' },
+            50: { money: 25000, chests: 50, message: 'Невероятная серия!' },
+            100: { money: 100000, chests: 100, message: 'ЛЕГЕНДАРНАЯ СЕРИЯ!' }
+        },
+        
+        motivationalQuotes: [
+            "Ваш питомец скучает по вам! 🐰💕",
+            "Каждый день с питомцем - это новое приключение! ✨",
+            "Ваш Лабубу становится сильнее благодаря вашей заботе! 💪",
+            "Не забывайте про ежедневные задания - они дают отличные награды! 🎁",
+            "Чем выше ваш уровень, тем интереснее становится игра! 📈",
+            "Приглашайте друзей - вместе играть веселее! 👥",
+            "Каждый сундук может содержать редкий скин! 📦✨",
+            "Мини-игры развивают вашего питомца и дают опыт! 🎮",
+            "Попробуйте достичь всех достижений! 🏆"
+        ]
+    };
+};
+
+LabubuCareGame.prototype.checkDailyStreak = function() {
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString();
+    
+    if (this.lastLoginDate !== today) {
+        this.totalLogins++;
+        
+        if (this.lastLoginDate === yesterday) {
+            // Продолжаем серию
+            this.streakDays++;
+        } else if (this.lastLoginDate !== today) {
+            // Начинаем новую серию
+            this.streakDays = 1;
+        }
+        
+        if (this.streakDays > this.longestStreak) {
+            this.longestStreak = this.streakDays;
+        }
+        
+        this.lastLoginDate = today;
+        this.saveValue('streak_days', this.streakDays);
+        this.saveValue('longest_streak', this.longestStreak);
+        this.saveValue('last_login_date', this.lastLoginDate);
+        this.saveValue('total_logins', this.totalLogins);
+        
+        // Выдаем бонус за серию
+        this.giveDailyStreakBonus();
+    }
+};
+
+LabubuCareGame.prototype.giveDailyStreakBonus = function() {
+    if (!this.viralSystem) return;
+    
+    const bonus = this.viralSystem.dailyBonuses[this.streakDays];
+    if (bonus) {
+        if (bonus.money) {
+            this.money += bonus.money;
+        }
+        if (bonus.chests) {
+            this.chestCount += bonus.chests;
+        }
+        
+        this.showMessage(`🔥 ${bonus.message} Серия: ${this.streakDays} дней! +${bonus.money || 0}💰 ${bonus.chests ? `+${bonus.chests}📦` : ''}`);
+        this.playHappySound();
+    } else if (this.streakDays > 1) {
+        // Ежедневный бонус за серию
+        const dailyBonus = Math.min(1000, this.streakDays * 50);
+        this.money += dailyBonus;
+        this.showMessage(`🔥 Серия ${this.streakDays} дней! +${dailyBonus}💰`);
+    }
+};
+
+// Система случайных событий для мотивации
+LabubuCareGame.prototype.initializeRandomMotivation = function() {
+    this.lastMotivationTime = this.loadData('last_motivation_time', 0, 'number');
+    
+    // Каждые 30 минут показываем мотивационное сообщение
+    setInterval(() => {
+        const now = Date.now();
+        if (now - this.lastMotivationTime > 30 * 60 * 1000) {
+            this.showRandomMotivation();
+            this.lastMotivationTime = now;
+            this.saveValue('last_motivation_time', this.lastMotivationTime);
+        }
+    }, 5 * 60 * 1000); // Проверяем каждые 5 минут
+};
+
+LabubuCareGame.prototype.showRandomMotivation = function() {
+    if (!this.viralSystem) return;
+    
+    const quotes = this.viralSystem.motivationalQuotes;
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    
+    // Иногда даем небольшой бонус с мотивацией
+    if (Math.random() < 0.3) {
+        const bonus = Math.floor(Math.random() * 100) + 50;
+        this.money += bonus;
+        this.showMessage(`💝 ${randomQuote} Бонус: +${bonus}💰`);
+    } else {
+        this.showMessage(`💭 ${randomQuote}`);
+    }
+};
+
+// Система прогрессии и вознаграждений
+LabubuCareGame.prototype.initializeProgressionRewards = function() {
+    this.progressMilestones = {
+        money: [1000, 5000, 10000, 25000, 50000, 100000],
+        level: [5, 10, 15, 20, 25, 30, 50, 75, 100],
+        experience: [500, 1000, 2500, 5000, 10000],
+        chests: [10, 25, 50, 100, 200],
+        age: [10, 30, 60, 100, 200, 365]
+    };
+    
+    this.unlockedMilestones = this.loadData('unlocked_milestones', [], 'array');
+};
+
+LabubuCareGame.prototype.checkProgressMilestones = function() {
+    if (!this.progressMilestones) return;
+    
+    const checks = [
+        { type: 'money', value: this.money },
+        { type: 'level', value: this.level },
+        { type: 'experience', value: this.experience },
+        { type: 'chests', value: this.chestCount },
+        { type: 'age', value: this.age }
+    ];
+    
+    checks.forEach(check => {
+        this.progressMilestones[check.type].forEach(milestone => {
+            const milestoneId = `${check.type}_${milestone}`;
+            
+            if (check.value >= milestone && !this.unlockedMilestones.includes(milestoneId)) {
+                this.unlockedMilestones.push(milestoneId);
+                this.saveValue('unlocked_milestones', this.unlockedMilestones);
+                
+                // Награда за достижение вехи
+                const reward = this.calculateMilestoneReward(check.type, milestone);
+                this.money += reward.money;
+                this.chestCount += reward.chests;
+                
+                this.showMessage(`🎯 Веха достигнута! ${check.type}: ${milestone}! +${reward.money}💰 +${reward.chests}📦`);
+                this.playHappySound();
+            }
+        });
+    });
+};
+
+LabubuCareGame.prototype.calculateMilestoneReward = function(type, milestone) {
+    const baseRewards = {
+        money: { money: Math.floor(milestone * 0.1), chests: Math.floor(milestone / 5000) },
+        level: { money: milestone * 100, chests: Math.floor(milestone / 5) },
+        experience: { money: Math.floor(milestone * 0.2), chests: Math.floor(milestone / 1000) },
+        chests: { money: milestone * 50, chests: Math.floor(milestone / 10) },
+        age: { money: milestone * 25, chests: Math.floor(milestone / 20) }
+    };
+    
+    return baseRewards[type] || { money: 100, chests: 1 };
+};
+
+// Улучшенная система уведомлений
+LabubuCareGame.prototype.enhanceNotificationSystem = function() {
+    // Персонализированные уведомления
+    this.personalizedNotifications = [
+        { condition: () => this.level >= 10, message: `${this.petName} гордится вашими достижениями! Уровень ${this.level}! 🌟` },
+        { condition: () => this.money >= 10000, message: `Вы богаты! ${this.money} монет - отличный результат! 💰` },
+        { condition: () => this.chestCount >= 50, message: `${this.chestCount} сундуков! Вы настоящий коллекционер! 📦` },
+        { condition: () => this.unlockedSkins.length >= 3, message: `${this.unlockedSkins.length} скинов! Ваша коллекция растет! 🎨` },
+        { condition: () => this.age >= 100, message: `${this.petName} мудрец! ${this.age} дней вместе! 🎂` }
+    ];
+    
+    // Показываем персонализированные уведомления случайно
+    if (Math.random() < 0.1) { // 10% шанс
+        const availableNotifications = this.personalizedNotifications.filter(n => n.condition());
+        if (availableNotifications.length > 0) {
+            const notification = availableNotifications[Math.floor(Math.random() * availableNotifications.length)];
+            this.showMessage(notification.message);
+        }
+    }
+};
+
 // Запуск игры
 let game;
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 DOM загружен, инициализация игры...');
     game = new LabubuCareGame();
     
+    // Инициализируем новые системы после создания игры
+    if (game) {
+        game.statusSystem = game.initializeStatusSystem();
+        game.friendsSystem = game.initializeFriendsSystem();
+        game.achievementsSystem = game.initializeAchievements();
+        game.eventsSystem = game.initializeEvents();
+        game.dailyTasksSystem = game.initializeDailyTasks();
+        game.weatherSystem = game.initializeWeatherSystem();
+        game.viralSystem = game.initializeViralSystem();
+        game.initializeProgressionRewards();
+        game.initializeRandomMotivation();
+        
+        console.log('✅ Все системы инициализированы!');
+        console.log('📋 Ежедневные задания активированы с прогрессивной сложностью!');
+        console.log('🌤️ Система погоды запущена!');
+        console.log('🔥 Система вирусности активирована!');
+        console.log('🎯 Система прогрессии запущена!');
+        
+        // Обновляем погоду при старте
+        game.updateWeather();
+        
+        // Запускаем проверку погоды каждые 5 минут
+        setInterval(() => {
+            if (game.updateWeather) {
+                game.updateWeather();
+            }
+        }, 5 * 60 * 1000);
+        
+        // Проверяем прогресс каждые 30 секунд
+        setInterval(() => {
+            if (game.checkProgressMilestones) {
+                game.checkProgressMilestones();
+            }
+            if (game.enhanceNotificationSystem) {
+                game.enhanceNotificationSystem();
+            }
+        }, 30 * 1000);
+    }
+    
     // Дополнительная проверка через 2 секунды
     setTimeout(() => {
         if (game) {
             console.log('🔄 Дополнительное обновление отображения...');
             game.updateDisplay();
+            if (game.updateStatusDisplayEnhanced) {
+                game.updateStatusDisplayEnhanced();
+            } else if (game.updateStatusDisplay) {
+                game.updateStatusDisplay();
+            }
         }
     }, 2000);
 });
