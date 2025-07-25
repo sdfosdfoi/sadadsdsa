@@ -616,8 +616,8 @@ class LabubuCareGame {
         // Одежда с обновленными ценами и изображениями (отсортировано по возрастанию цен)
         this.outfits = {
             default: { name: 'Обычная одежда', price: 0, emoji: '👕', description: 'Классический стиль' },
-            cool: { name: 'Крутые очки', price: 250, emoji: '😎', description: 'Стильные солнцезащитные очки', image: 'https://via.placeholder.com/80x40/000000/ffffff?text=🕶️' },
-            cute: { name: 'Милая шапочка-зайчик', price: 300, emoji: '🐰', description: 'Очаровательная белая шапочка с розовыми ушками', image: 'https://via.placeholder.com/100x80/ffb6c1/ffffff?text=👒' },
+            cool: { name: 'Крутые очки', price: 250, emoji: '😎', description: 'Стильные солнцезащитные очки', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KSpKRVjlm_RkhxVD4pXaJKygJJeOPjjgOlWbpRgLbnB1ZAO5p2dI-3YatEnIOYiZrhL4x169H5PeSeCNLrbN_LiHgjnez_1qMHbXtpbKZonuSv1JEMfsyTE_jWk2Vjwkx9DxVzVrbYcaGEY3CKCNbfm0DqyqQCicS8hmea6djC7V05F=s1024' },
+            cute: { name: 'Милая шапочка-зайчик', price: 300, emoji: '🐰', description: 'Очаровательная белая шапочка с розовыми ушками', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KTBWk5FaVqg5TSheRJrx-E3Ht5wFhgTePYiIpXHsPyJUaC1pywPfkORca_wqkOOCA_8MgfmxeJjKIIgN79qVpZmvjO6DT2U4Djaf9RO5kdXT7Y37WaDe27Snmq8xV9n6kIrvooV0ukvmwKHjU5IwSkuB7v7aZUW-FbO9EHWcvFTIxMY-g=s1024' },
             artist: { name: 'Художник', price: 380, emoji: '🎨', description: 'Берет и палитра художника' },
             summer: { name: 'Летняя панама', price: 500, emoji: '👒', description: 'Защита от солнца в жаркие дни', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KQgNY3oPaKq-vJXjqtKJhwoKBgt5rHdjiTq7FSl987ybzI3bnqyqEZliWC6n1k_YWtItJfQNjLu5ZcOheY9IUSTB5eoHuGKqoBu3HtCCn0pcimU1FsxfZKjdZ6dW-gMU6qVKPPAfeTa9-dgIn97icgGJyx5N3s-FwgRq5B525IWj_oNWw=s1024' },
             pirate: { name: 'Пиратский костюм', price: 500, emoji: '🏴‍☠️', description: 'Флаг и повязка настоящего морского разбойника', image: 'https://lh3.googleusercontent.com/gg-dl/AJfQ9KTqA1YhFzadswfIqFeTFATGNWcVmql50yfSGR14sxF3P_7fA51t61z9O_ElOyuBffWnyEP4uFz70PvgU0UFiXiYv83KqIeQr45k0r4FdFhb0yqWCa2ULVO0DPUanQNk8B4ROzTQGmHwO6-p5dkt8uD0yfrk6P7_DOd7jvVYx27V56CjLg=s1024' },
@@ -5301,15 +5301,7 @@ LabubuCareGame.prototype.getDailyTasksTabContent = function() {
                     </div>
                 </div>
                 
-                <!-- Экстренная кнопка сброса для отладки -->
-                <div class="mt-3 p-2 bg-red-50 rounded border border-red-200">
-                    <div class="text-center">
-                        <button onclick="game.emergencyTaskReset()" class="text-xs bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
-                            🚨 Экстренный сброс заданий (если не работают)
-                        </button>
-                        <div class="text-xs text-red-600 mt-1">Используйте только если задания показывают NaN или не работают</div>
-                    </div>
-                </div>
+
             </div>
         </div>
     `;
