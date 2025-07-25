@@ -119,6 +119,7 @@
         <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="games">🎮 Игры</button>
         <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="shop">🛍️ Магазин</button>
         <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="chests">📦 Сундуки</button>
+        <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="tasks">📋 Задания</button>
         <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="pets">🐰 Питомцы</button>
         <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="friends">👥 Друзья</button>
         <button class="tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap" data-tab="achievements">🏆 Награды</button>
@@ -4308,11 +4309,16 @@ LabubuCareGame.prototype.resetDailyTasks = function() {
 };
 
 LabubuCareGame.prototype.updateTaskProgress = function(taskType, amount = 1) {
-    if (!this.dailyTasksSystem) return;
+    if (!this.dailyTasksSystem || !this.dailyTasksSystem.tasks) {
+        console.log('⚠️ Система заданий не инициализирована');
+        return;
+    }
     
     this.dailyTasksSystem.tasks.forEach(task => {
         if (task.type === taskType && !this.completedTasks.includes(task.id)) {
             task.progress = Math.min(task.target, task.progress + amount);
+            
+            console.log(`📋 Обновлен прогресс задания ${task.id}: ${task.progress}/${task.target}`);
             
             // Проверяем завершение задания
             if (task.progress >= task.target) {
@@ -4330,7 +4336,25 @@ LabubuCareGame.prototype.updateTaskProgress = function(taskType, amount = 1) {
                 this.completeTask(task);
             }
         }
+        
+        // Специальная проверка для задания "достичь определенного уровня счастья"
+        if (task.type === 'stat' && task.id.includes('happiness') && !this.completedTasks.includes(task.id)) {
+            // Безопасная проверка наличия чисел в названии
+            const matches = task.name.match(/\d+/);
+            if (matches && matches.length > 0) {
+                const minRequired = parseInt(matches[0]); // Извлекаем число из названия
+                if (this.stats.happiness >= minRequired && task.progress === 0) {
+                    task.progress = 1;
+                    this.completeTask(task);
+                }
+            }
+        }
     });
+    
+    // Обновляем отображение если находимся на вкладке заданий
+    if (this.activeTab === 'tasks') {
+        this.switchTab('tasks');
+    }
 };
 
 LabubuCareGame.prototype.completeTask = function(task) {
@@ -4524,6 +4548,8 @@ LabubuCareGame.prototype.getTabContent = function(tab) {
             return this.getAchievementsTabContent();
         case 'tasks':
             return this.getDailyTasksTabContent();
+        case 'tasks':
+            return this.getDailyTasksTabContent();
         case 'info':
             return this.getInfoTabContent();
         default:
@@ -4609,14 +4635,17 @@ LabubuCareGame.prototype.getDailyTasksTabContent = function() {
 };
 
 LabubuCareGame.prototype.getTimeUntilTaskReset = function() {
-    const now = new Date();
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
+    const now = Date.now();
+    const timeSinceReset = now - this.lastTaskReset;
+    const hoursRequired = 24; // 24 часа
+    const timeRemaining = (hoursRequired * 60 * 60 * 1000) - timeSinceReset;
     
-    const timeDiff = tomorrow - now;
-    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    if (timeRemaining <= 0) {
+        return '0ч 0м (готово к сбросу)';
+    }
+    
+    const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
     
     return `${hours}ч ${minutes}м`;
 };
@@ -4626,8 +4655,13 @@ const originalFeedPet = LabubuCareGame.prototype.feedPet;
 LabubuCareGame.prototype.feedPet = function(foodIndex) {
     const result = originalFeedPet.call(this, foodIndex);
     
-    // Обновляем прогресс задания
-    this.updateTaskProgress('feed');
+    // Обновляем прогресс задания только если покормили успешно
+    if (this.money >= this.food[foodIndex].price) {
+        this.updateTaskProgress('feed');
+        
+        // Проверяем задание на заработанные деньги (потрачены деньги = заработок в игровой логике)
+        this.updateTaskProgress('money', this.food[foodIndex].price);
+    }
     
     return result;
 };
@@ -4648,9 +4682,14 @@ const originalCompleteMiniGame = LabubuCareGame.prototype.completeMiniGame;
 LabubuCareGame.prototype.completeMiniGame = function(success) {
     const result = originalCompleteMiniGame.call(this, success);
     
-    if (success) {
+    if (success && this.currentMiniGame) {
         // Обновляем прогресс задания
         this.updateTaskProgress('game');
+        
+        // Обновляем прогресс заработанных денег
+        if (this.currentMiniGame.reward && this.currentMiniGame.reward.money) {
+            this.updateTaskProgress('money', this.currentMiniGame.reward.money);
+        }
     }
     
     return result;
@@ -4733,22 +4772,41 @@ LabubuCareGame.prototype.updateWeatherDisplay = function() {
     }
 };
 
-// Добавляем вкладку с заданиями в список вкладок
-document.addEventListener('DOMContentLoaded', () => {
-    // Добавляем кнопку вкладки заданий после загрузки DOM
-    setTimeout(() => {
-        const tabsContainer = document.querySelector('.tab-btn[data-tab="chests"]');
-        if (tabsContainer && tabsContainer.parentNode) {
-            const tasksTab = document.createElement('button');
-            tasksTab.className = 'tab-btn flex-1 py-2 px-1 rounded-md font-medium transition-colors text-purple-500 hover:bg-purple-50 whitespace-nowrap';
-            tasksTab.setAttribute('data-tab', 'tasks');
-            tasksTab.innerHTML = '📋 Задания';
+// Функция для принудительной проверки всех заданий
+LabubuCareGame.prototype.checkAllTasksStatus = function() {
+    if (!this.dailyTasksSystem || !this.dailyTasksSystem.tasks) {
+        console.log('⚠️ Система заданий не инициализирована');
+        return;
+    }
+    
+    console.log('🔍 Проверка статуса всех заданий...');
+    
+    this.dailyTasksSystem.tasks.forEach(task => {
+        if (!this.completedTasks.includes(task.id)) {
+            // Проверяем специальные задания
+            if (task.type === 'stat' && task.id.includes('happiness')) {
+                // Безопасная проверка наличия чисел в названии
+                const matches = task.name.match(/\d+/);
+                if (matches && matches.length > 0) {
+                    const minRequired = parseInt(matches[0]);
+                    if (this.stats.happiness >= minRequired) {
+                        task.progress = 1;
+                        this.completeTask(task);
+                    }
+                }
+            }
             
-            // Вставляем после вкладки сундуков
-            tabsContainer.parentNode.insertBefore(tasksTab, tabsContainer.nextSibling);
+            if (task.type === 'all_stats') {
+                const minRequired = 70 + Math.max(1, Math.floor(this.level / 10) + 1) * 3;
+                const allStatsHigh = Object.values(this.stats).every(stat => stat >= minRequired);
+                if (allStatsHigh) {
+                    task.progress = 1;
+                    this.completeTask(task);
+                }
+            }
         }
-    }, 500);
-});
+    });
+};
 
 // ===== СИСТЕМА ВИРУСНОСТИ И МОТИВАЦИИ =====
 
@@ -4966,11 +5024,24 @@ document.addEventListener('DOMContentLoaded', () => {
         game.initializeProgressionRewards();
         game.initializeRandomMotivation();
         
+        // Инициализируем задания если они не загружены
+        if (!game.dailyTasksSystem || !game.dailyTasksSystem.tasks) {
+            console.log('🔄 Переинициализация системы заданий...');
+            game.dailyTasksSystem = game.initializeDailyTasks();
+        }
+        
         console.log('✅ Все системы инициализированы!');
         console.log('📋 Ежедневные задания активированы с прогрессивной сложностью!');
         console.log('🌤️ Система погоды запущена!');
         console.log('🔥 Система вирусности активирована!');
         console.log('🎯 Система прогрессии запущена!');
+        
+        // Принудительная проверка заданий при запуске
+        setTimeout(() => {
+            if (game.checkAllTasksStatus) {
+                game.checkAllTasksStatus();
+            }
+        }, 2000);
         
         // Обновляем погоду при старте
         game.updateWeather();
